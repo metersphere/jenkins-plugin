@@ -198,9 +198,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             items.add("请选择工作空间", "");
             try {
                 MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
-                // todo userid 通过接口获得
-                String userId = "";
-                List<WorkspaceDTO> list = MeterSphereClient.getWorkspace(userId);
+                List<WorkspaceDTO> list = MeterSphereClient.getWorkspace();
                 if (list != null && list.size() > 0) {
                     for (WorkspaceDTO c : list) {
                         items.add(c.getName(), String.valueOf(c.getId()));

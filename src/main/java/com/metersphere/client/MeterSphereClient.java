@@ -35,6 +35,7 @@ public class MeterSphereClient {
     private String secretKey;
     private String endpoint;
     private HttpClient httpClient;
+    private String userId;
 
     public MeterSphereClient(String accessKey, String secretKey, String endpoint) {
 
@@ -55,9 +56,10 @@ public class MeterSphereClient {
         if (!getUserResult.isSuccess()) {
             throw new MeterSphereException(getUserResult.getMessage());
         }
+        this.userId = getUserResult.getData().toString();
     }
 
-    public List<WorkspaceDTO> getWorkspace(String userId) {
+    public List<WorkspaceDTO> getWorkspace() {
         ResultHolder userPermissinResult = call(ApiUrlConstants.APPLICATION_REPOSITORY_LIST + "/" + userId, RequestMethod.GET);
         String list = JSON.toJSONString(userPermissinResult.getData());
         List<WorkspaceDTO> workspaces = JSON.parseArray(list, WorkspaceDTO.class);
