@@ -212,6 +212,7 @@ public class MeterSphereClient {
     private void auth(HttpRequestBase httpRequestBase) {
         httpRequestBase.addHeader("Accept", ACCEPT);
         httpRequestBase.addHeader("accessKey", accessKey);
+        httpRequestBase.addHeader("Content-type", "application/json");
         String signature;
         try {
             signature = aesEncrypt(accessKey + "|" + UUID.randomUUID().toString() + "|" + System.currentTimeMillis(), secretKey, accessKey);
