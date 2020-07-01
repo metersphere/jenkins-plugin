@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
     <f:entry title="MeterSphere API Endpoint" field="msEndpoint">
         <f:textbox default="http://localhost:8080"/>
     </f:entry>
@@ -9,34 +9,31 @@
     <f:entry title="MeterSphere API SecretKey" field="msSecretKey">
         <f:textbox default="F89JKlpY5PeQqEMB"/>
     </f:entry>
-     <f:entry title="用户ID" field="userId" >
-                    <f:textbox/>
-                </f:entry>
-             <f:validateButton
-        			title="验证账户" progress="验证中..."
-        			method="checkAccount" with="msAccessKey,msSecretKey,msEndpoint,userId" />
+    <f:validateButton
+            title="验证账户" progress="验证中..."
+            method="checkAccount" with="msAccessKey,msSecretKey,msEndpoint"/>
 
 
-        <f:entry title="工作空间名称" field="workspaceId" >
-            <f:select />
-        </f:entry>
-         <f:entry title="项目名称" field="projectId">
-         		<f:select />
-         </f:entry>
-         <f:section title="执行方式">
-     	    <f:radioBlock title="执行测试计划中用例" name="method" value="node" inline="true" checked="${instance.isTestNode}">
-     	        <f:entry title="测试计划" field="testPlanId">
-     	            <f:select />
-     	        </f:entry>
-     	        <f:entry title="模块列表" field="testCaseNodeId">
-                <f:select />
-                </f:entry>
+    <f:entry title="工作空间名称" field="workspaceId">
+        <f:select/>
+    </f:entry>
+    <f:entry title="项目名称" field="projectId">
+        <f:select/>
+    </f:entry>
+    <f:section title="执行方式">
+        <f:radioBlock title="执行测试计划中用例" name="method" value="node" inline="true" checked="${instance.isTestNode}">
+            <f:entry title="测试计划" field="testPlanId">
+                <f:select/>
+            </f:entry>
+            <f:entry title="模块列表" field="testCaseNodeId">
+                <f:select/>
+            </f:entry>
 
-     	    </f:radioBlock>
-     	    <f:radioBlock title="单独选择测试执行" name="method" value="only" inline="true" checked="${instance.isTestOnly}">
-                 <f:entry title="测试用例名称" field="testCaseId">
-                     <f:select />
-                 </f:entry>
-             </f:radioBlock>
-         </f:section>
+        </f:radioBlock>
+        <f:radioBlock title="单独选择测试执行" name="method" value="only" inline="true" checked="${instance.isTestOnly}">
+            <f:entry title="测试用例名称" field="testCaseId">
+                <f:select/>
+            </f:entry>
+        </f:radioBlock>
+    </f:section>
 </j:jelly>
