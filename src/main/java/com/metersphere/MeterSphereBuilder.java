@@ -98,25 +98,31 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     if (list != null && list.size() > 0) {
                         for (TestCaseDTO c : list) {
                             if (c.getType().equals("api")) {
-                                boolean flag = MeterSphereClient.getApiTest(c.getTestId());
-                                log("调用接口测试" + flag);
-                                MeterSphereClient.getApiTestState(c.getTestId());
-                                String status = "";
+                                try {
+                                    MeterSphereClient.getApiTest(c.getTestId());
+                                } catch (Exception e) {
+                                    log(e.getMessage());
+                                }
+
+                                String status = MeterSphereClient.getApiTestState(c.getTestId());
                                 if (status.equalsIgnoreCase("Completed")) {
                                     log("通过");
                                 } else {
-                                    throw new CodeDeployException("测试用例失败，构建失败" + c.getTestId() + "用例");
+                                    throw new CodeDeployException(c.getTestId() + "测试用例失败，构建失败");
                                 }
                             }
                             if (c.getType().equals("performance")) {
-                                boolean flag = MeterSphereClient.getPerformanceTest(c.getTestId());
-                                log("调用性能测试" + flag);
+                                try {
+                                    MeterSphereClient.getPerformanceTest(c.getTestId());
+                                } catch (Exception e) {
+                                    log(e.getMessage());
+                                }
                                 MeterSphereClient.getApiTestState(c.getTestId());
                                 String status = "";
                                 if (status.equalsIgnoreCase("Completed")) {
 
                                 } else {
-                                    throw new CodeDeployException("测试用例失败，构建失败");
+                                    throw new CodeDeployException(c.getTestId() + "测试用例失败，构建失败");
                                 }
                             }
                         }
@@ -133,8 +139,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                     } catch (Exception e) {
                                         log(e.getMessage());
                                     }
-
-
                                     String status = MeterSphereClient.getApiTestState(c.getTestId());
                                     if (status.equalsIgnoreCase("Completed")) {
                                         log("测试用例通过");
@@ -143,7 +147,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                     }
                                 }
                                 if (c.getType().equals("performance")) {
-                                    MeterSphereClient.getPerformanceTest(c.getTestId());
+                                    try {
+                                        MeterSphereClient.getPerformanceTest(c.getTestId());
+                                    } catch (Exception e) {
+                                        log(e.getMessage());
+                                    }
                                     String status = MeterSphereClient.getPerformanceTestState(c.getTestId());
                                     if (status.equalsIgnoreCase("Completed")) {
                                         log("测试用例通过");
@@ -151,12 +159,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                         throw new CodeDeployException(testCaseId + "性能测试用例失败，构建失败");
                                     }
                                 }
-                            } else {
+                            } /*else {
                                 throw new CodeDeployException("传值有误");
-                            }
+                            }*/
                         }
                     } else {
-                        throw new CodeDeployException("测试失败");
+                        throw new CodeDeployException("测试用例不存在");
                     }
                     break;
                 default:

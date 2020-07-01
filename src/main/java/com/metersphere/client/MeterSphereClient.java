@@ -196,11 +196,8 @@ public class MeterSphereClient {
                 }
                 auth(httpPost);
                 HttpResponse response = httpClient.execute(httpPost);
-                System.out.println(response + "ab");
                 HttpEntity httpEntity = response.getEntity();
-                System.out.println(httpEntity);
                 responseJson = EntityUtils.toString(httpEntity);
-                System.out.println(responseJson + "abc");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -244,7 +241,7 @@ class ApiUrlConstants {
     public static final String USER_PERMISSION_LIST = "http://localhost:8081/case/node/list/plan";//模块列表
     public static final String REPOSITORY_LIST = "http://localhost:8081/test/plan/list/all";//测试计划项目下
     public static final String APPLICATION_LIST = "http://localhost:8081/performance/run";//性能测试
-    public static final String CLUSTER_LIST = "https://localhost:8081/api/run";//api测试
+    public static final String CLUSTER_LIST = "http://localhost:8081/api/run";//api测试
     public static final String CLUSTER_ROLE_LIST = "http://localhost:8081/test/plan/case/list";//模块下测试用例
     public static final String API_REPORT = "http://localhost:8081/api/list/all";//API测试报告（特定）
     public static final String PERFORMANCE_REPORT = "http://localhost:8081/performance/list/all";//性能测试测试报告（特定）
