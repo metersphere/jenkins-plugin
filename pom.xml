@@ -7,7 +7,7 @@
         <version>2.19</version>
     </parent>
 
-    <artifactId>MeterSphere-jenkins-plugin</artifactId>
+    <artifactId>metersphere-jenkins-plugin</artifactId>
     <version>2.0</version>
     <packaging>hpi</packaging>
     <groupId>com.metersphere</groupId>
