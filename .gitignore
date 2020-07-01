@@ -1,23 +1,33 @@
-# Compiled class file
-*.class
+# Created by .ignore support plugin (hsz.mobi)
+.DS_Store
+node_modules
+node/
+/dist
 
-# Log file
-*.log
+# local env files
+.env.local
+.env.*.local
 
-# BlueJ files
-*.ctxt
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# Editor directories and files
+.idea
+*.iml
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+src/test/
+target/
+.settings
+.project
+.classpath
+.factorypath
+work/
