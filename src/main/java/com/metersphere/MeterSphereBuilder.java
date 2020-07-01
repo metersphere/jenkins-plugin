@@ -128,18 +128,28 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         for (TestCaseDTO c : list) {
                             if (c.getTestId().equals(testCaseId)) {
                                 if (c.getType().equals("api")) {
-                                    MeterSphereClient.getApiTest(testCaseId);
-                                    MeterSphereClient.getApiTestState(c.getTestId());
-                                    String status = "";
+                                    try {
+                                        MeterSphereClient.getApiTest(testCaseId);
+                                    } catch (Exception e) {
+                                        log(e.getMessage());
+                                    }
+
+
+                                    String status = MeterSphereClient.getApiTestState(c.getTestId());
                                     if (status.equalsIgnoreCase("Completed")) {
                                         log("测试用例通过");
                                     } else {
-                                        throw new CodeDeployException("测试用例失败，构建失败");
+                                        throw new CodeDeployException(testCaseId + "接口测试用例失败，构建失败");
                                     }
                                 }
                                 if (c.getType().equals("performance")) {
                                     MeterSphereClient.getPerformanceTest(c.getTestId());
-                                    MeterSphereClient.getPerformanceTestState(c.getTestId());
+                                    String status = MeterSphereClient.getPerformanceTestState(c.getTestId());
+                                    if (status.equalsIgnoreCase("Completed")) {
+                                        log("测试用例通过");
+                                    } else {
+                                        throw new CodeDeployException(testCaseId + "性能测试用例失败，构建失败");
+                                    }
                                 }
                             } else {
                                 throw new CodeDeployException("传值有误");
@@ -167,6 +177,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     @Extension // This indicates to Jenkins that this is an implementation of an extension point.
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+        String userId = "";
         public FormValidation doCheckAccount(
                 @QueryParameter String msAccessKey,
                 @QueryParameter String msSecretKey,
@@ -197,6 +208,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             ListBoxModel items = new ListBoxModel();
             items.add("请选择工作空间", "");
             try {
+                System.out.println("fsf" + userId);
                 MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
                 List<WorkspaceDTO> list = MeterSphereClient.getWorkspace();
                 if (list != null && list.size() > 0) {

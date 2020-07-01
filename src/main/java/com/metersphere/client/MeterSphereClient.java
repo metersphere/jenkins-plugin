@@ -1,6 +1,7 @@
 package com.metersphere.client;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.metersphere.ResultHolder;
 import com.metersphere.client.model.*;
 import org.apache.commons.codec.binary.Base64;
@@ -36,7 +37,6 @@ public class MeterSphereClient {
     private String endpoint;
     private HttpClient httpClient;
     private String userId;
-
     public MeterSphereClient(String accessKey, String secretKey, String endpoint) {
 
         this.accessKey = accessKey;
@@ -51,17 +51,21 @@ public class MeterSphereClient {
                 .setDefaultRequestConfig(requestConfig).build();
     }
 
-    public void checkUser() {
+    public String checkUser() {
         ResultHolder getUserResult = call(ApiUrlConstants.USER_INFO, RequestMethod.GET);
         if (!getUserResult.isSuccess()) {
             throw new MeterSphereException(getUserResult.getMessage());
         }
         this.userId = getUserResult.getData().toString();
+        System.out.println(this.userId + "oo");
+        return this.userId;
     }
 
     public List<WorkspaceDTO> getWorkspace() {
-        ResultHolder userPermissinResult = call(ApiUrlConstants.APPLICATION_REPOSITORY_LIST + "/" + userId, RequestMethod.GET);
-        String list = JSON.toJSONString(userPermissinResult.getData());
+        String userId = this.checkUser();
+        System.out.println(userId + "kj");
+        ResultHolder result = call(ApiUrlConstants.APPLICATION_REPOSITORY_LIST + "/" + userId, RequestMethod.GET);
+        String list = JSON.toJSONString(result.getData());
         List<WorkspaceDTO> workspaces = JSON.parseArray(list, WorkspaceDTO.class);
         return workspaces;
     }
@@ -144,24 +148,22 @@ public class MeterSphereClient {
 
     public String getApiTestState(String testCaseId) {
         Map<String, String> headers = new HashMap<String, String>();
-        System.out.println("状态");
         headers.put("testCaseId", testCaseId);
         ResultHolder result = call(ApiUrlConstants.API_REPORT + "/" + testCaseId, RequestMethod.GET, new HashMap<String, Object>(), headers);
-/*
         String listJson = JSON.toJSONString(result.getData());
-*/
-     /*   System.out.println("ert");
-        JSONArray jsonArray = JSONArray.parseArray(listJson);
-        System.out.println("ert2");
-        List<ApiTestDTO> apps = JSON.parseArray(listJson, ApiTestDTO.class);*/
-        return "save";
+        JSONObject jsonObject = JSONObject.parseObject(listJson);
+        String state = jsonObject.getString("status");
+        return state;
     }
 
     public String getPerformanceTestState(String testCaseId) {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("testCaseId", testCaseId);
         ResultHolder result = call(ApiUrlConstants.PERFORMANCE_REPORT, RequestMethod.GET, new HashMap<String, Object>(), headers);
-        return "success";
+        String listJson = JSON.toJSONString(result.getData());
+        JSONObject jsonObject = JSONObject.parseObject(listJson);
+        String state = jsonObject.getString("status");
+        return state;
     }
 
     private ResultHolder call(String url, RequestMethod requestMethod) {
@@ -242,7 +244,7 @@ class ApiUrlConstants {
     public static final String USER_PERMISSION_LIST = "http://localhost:8081/case/node/list/plan";//模块列表
     public static final String REPOSITORY_LIST = "http://localhost:8081/test/plan/list/all";//测试计划项目下
     public static final String APPLICATION_LIST = "http://localhost:8081/performance/run";//性能测试
-    public static final String CLUSTER_LIST = "https://127.0.0.1:7890/api/run";//api测试
+    public static final String CLUSTER_LIST = "https://localhost:8081/api/run";//api测试
     public static final String CLUSTER_ROLE_LIST = "http://localhost:8081/test/plan/case/list";//模块下测试用例
     public static final String API_REPORT = "http://localhost:8081/api/list/all";//API测试报告（特定）
     public static final String PERFORMANCE_REPORT = "http://localhost:8081/performance/list/all";//性能测试测试报告（特定）
