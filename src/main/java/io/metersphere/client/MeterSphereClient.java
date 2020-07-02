@@ -68,7 +68,7 @@ public class MeterSphereClient {
     public List<WorkspaceDTO> getWorkspace() {
         String userId = this.checkUser();
         System.out.println(userId + "kj");
-        ResultHolder result = call(ApiUrlConstants.APPLICATION_REPOSITORY_LIST + "/" + userId, RequestMethod.GET);
+        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId, RequestMethod.GET);
         String list = JSON.toJSONString(result.getData());
         List<WorkspaceDTO> workspaces = JSON.parseArray(list, WorkspaceDTO.class);
         return workspaces;
@@ -77,7 +77,7 @@ public class MeterSphereClient {
     public List<ProjectDTO> getProjectIds(String workspaceId) {
         Map<String, String> headers = new HashMap<>();
         headers.put("workspaceId", workspaceId);
-        ResultHolder result = call(ApiUrlConstants.APPLICATION_SETTING_GET + "/" + workspaceId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.PROJECT_LIST_ALL + "/" + workspaceId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         List<ProjectDTO> apps = JSON.parseArray(listJson, ProjectDTO.class);
         return apps;
@@ -87,7 +87,7 @@ public class MeterSphereClient {
     public List<TestCaseDTO> getTestCaseIds(String projectId) {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("projectId", projectId);
-        ResultHolder result = call(ApiUrlConstants.APPLICATION_SETTING_LIST + "/" + projectId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.TEST_CASE_LIST_METHOD + "/" + projectId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
         return apps;
@@ -97,7 +97,7 @@ public class MeterSphereClient {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("testPlanId", testPlanId);
         headers.put("testCaseNodeId", testCaseNodeId);
-        ResultHolder result = call(ApiUrlConstants.CLUSTER_ROLE_LIST + "/" + testPlanId + "/" + testCaseNodeId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + testPlanId + "/" + testCaseNodeId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
         System.out.println("模块下用例" + apps);
@@ -107,7 +107,7 @@ public class MeterSphereClient {
     public List<TestPlanDTO> getTestPlanIds(String projectId, String workspaceId) {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("projectId", projectId);
-        ResultHolder result = call(ApiUrlConstants.REPOSITORY_LIST + "/" + projectId + "/" + workspaceId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.PLAN_LIST_ALL + "/" + projectId + "/" + workspaceId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         List<TestPlanDTO> apps = JSON.parseArray(listJson, TestPlanDTO.class);
         return apps;
@@ -116,7 +116,7 @@ public class MeterSphereClient {
     public List<TestCaseNodeDTO> getTestCaseNodeIds(String testPlanId) {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("testPlanId", testPlanId);
-        ResultHolder result = call(ApiUrlConstants.USER_PERMISSION_LIST + "/" + testPlanId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.CASE_NODE_LIST_PLAN + "/" + testPlanId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseNodeDTO> apps = JSON.parseArray(listJson, TestCaseNodeDTO.class);
         return apps;
@@ -127,7 +127,7 @@ public class MeterSphereClient {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", testCaseId);
         params.put("triggerMode", "MANUAL");
-        ResultHolder result = call(ApiUrlConstants.CLUSTER_LIST, RequestMethod.POST, params, headers);
+        ResultHolder result = call(ApiUrlConstants.API_RUN, RequestMethod.POST, params, headers);
         System.out.println(result + "api测试结果");
         boolean flag = true;
         if (!result.isSuccess()) {
@@ -142,7 +142,7 @@ public class MeterSphereClient {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", "237e9597-45f4-48e3-8ce0-edf5712ee0cc");
         params.put("triggerMode", "MANUAL");
-        ResultHolder result = call(ApiUrlConstants.APPLICATION_LIST, RequestMethod.POST, params, headers);
+        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params, headers);
         boolean flag = true;
         if (!result.isSuccess()) {
             flag = false;
@@ -153,7 +153,7 @@ public class MeterSphereClient {
     public String getApiTestState(String testCaseId) {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("testCaseId", testCaseId);
-        ResultHolder result = call(ApiUrlConstants.API_REPORT + "/" + testCaseId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.API_LIST_ALL + "/" + testCaseId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         String state = jsonObject.getString("status");
@@ -163,7 +163,7 @@ public class MeterSphereClient {
     public String getPerformanceTestState(String testCaseId) {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("testCaseId", testCaseId);
-        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_REPORT, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_LIST_ALL, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         String state = jsonObject.getString("status");
@@ -177,7 +177,7 @@ public class MeterSphereClient {
     }
 
     private ResultHolder call(String url, RequestMethod requestMethod, Object params, Map<String, String> headers) {
-        /*url = this.endpoint + "/" + url;*/
+        url = this.endpoint + "/" + url;
         String responseJson = null;
         try {
             if (requestMethod == RequestMethod.GET) {
