@@ -177,7 +177,7 @@ public class MeterSphereClient {
     }
 
     private ResultHolder call(String url, RequestMethod requestMethod, Object params, Map<String, String> headers) {
-        url = this.endpoint + "/" + url;
+        url = this.endpoint + url;
         String responseJson = null;
         try {
             if (requestMethod == RequestMethod.GET) {
