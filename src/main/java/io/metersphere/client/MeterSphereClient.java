@@ -138,7 +138,7 @@ public class MeterSphereClient {
     }
 
     public String getPerformanceTestState(String testCaseId) {
-        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_LIST_ALL);
+        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_TEST + "/" + testCaseId);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         String state = jsonObject.getString("status");
