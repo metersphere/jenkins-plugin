@@ -1,4 +1,4 @@
-package com.metersphere.client;
+package io.metersphere.commons.exception;
 
 public class MeterSphereException extends RuntimeException {
     private static final long serialVersionUID = -649559784594858788L;

@@ -1,4 +1,4 @@
-package com.metersphere.client.model;
+package io.metersphere.commons.model;
 
 
 

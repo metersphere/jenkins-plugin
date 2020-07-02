@@ -1,7 +1,5 @@
-package com.metersphere;
+package io.metersphere;
 
-import com.metersphere.client.MeterSphereClient;
-import com.metersphere.client.model.*;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -14,6 +12,10 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import io.metersphere.client.MeterSphereClient;
+import io.metersphere.commons.constants.Method;
+import io.metersphere.commons.exception.MeterSphereException;
+import io.metersphere.commons.model.*;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -61,8 +63,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.testId = testId;
         this.testCaseId = testCaseId;
         this.method = StringUtils.isBlank(method) ? Method.node : method;
-        this.isTestNode = method.equals(Method.node) ? true : false;
-        this.isTestOnly = method.equals(Method.only) ? true : false;
+        this.isTestNode = method.equals(Method.node);
+        this.isTestOnly = method.equals(Method.only);
 
     }
 
@@ -83,7 +85,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 findTestCaseId = true;
             }
             if (!findTestCaseId) {
-                throw new CodeDeployException("测试用例不存在！");
+                throw new MeterSphereException("测试用例不存在！");
             }
         } catch (Exception e) {
             log(e.getMessage());
@@ -108,7 +110,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                 if (status.equalsIgnoreCase("Completed")) {
                                     log("通过");
                                 } else {
-                                    throw new CodeDeployException(c.getTestId() + "测试用例失败，构建失败");
+                                    throw new MeterSphereException(c.getTestId() + "测试用例失败，构建失败");
                                 }
                             }
                             if (c.getType().equals("performance")) {
@@ -122,7 +124,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                 if (status.equalsIgnoreCase("Completed")) {
 
                                 } else {
-                                    throw new CodeDeployException(c.getTestId() + "测试用例失败，构建失败");
+                                    throw new MeterSphereException(c.getTestId() + "测试用例失败，构建失败");
                                 }
                             }
                         }
@@ -143,7 +145,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                     if (status.equalsIgnoreCase("Completed")) {
                                         log("测试用例通过");
                                     } else {
-                                        throw new CodeDeployException(testCaseId + "接口测试用例失败，构建失败");
+                                        throw new MeterSphereException(testCaseId + "接口测试用例失败，构建失败");
                                     }
                                 }
                                 if (c.getType().equals("performance")) {
@@ -156,7 +158,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                     if (status.equalsIgnoreCase("Completed")) {
                                         log("测试用例通过");
                                     } else {
-                                        throw new CodeDeployException(testCaseId + "性能测试用例失败，构建失败");
+                                        throw new MeterSphereException(testCaseId + "性能测试用例失败，构建失败");
                                     }
                                 }
                             } /*else {
@@ -164,7 +166,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                             }*/
                         }
                     } else {
-                        throw new CodeDeployException("测试用例不存在");
+                        throw new MeterSphereException("测试用例不存在");
                     }
                     break;
                 default:
@@ -419,7 +421,3 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     }
 }
 
-class Method {
-    public static final String node = "node";
-    public static final String only = "only";
-}

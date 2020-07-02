@@ -1,4 +1,4 @@
-package com.metersphere;
+package io.metersphere;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
