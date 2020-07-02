@@ -20,7 +20,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class MeterSphereClient {
@@ -69,9 +68,7 @@ public class MeterSphereClient {
     }
 
     public List<ProjectDTO> getProjectIds(String workspaceId) {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("workspaceId", workspaceId);
-        ResultHolder result = call(ApiUrlConstants.PROJECT_LIST_ALL + "/" + workspaceId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.PROJECT_LIST_ALL + "/" + workspaceId);
         String listJson = JSON.toJSONString(result.getData());
         List<ProjectDTO> apps = JSON.parseArray(listJson, ProjectDTO.class);
         return apps;
@@ -79,19 +76,14 @@ public class MeterSphereClient {
     }
 
     public List<TestCaseDTO> getTestCaseIds(String projectId) {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("projectId", projectId);
-        ResultHolder result = call(ApiUrlConstants.TEST_CASE_LIST_METHOD + "/" + projectId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.TEST_CASE_LIST_METHOD + "/" + projectId);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
         return apps;
     }
 
     public List<TestCaseDTO> getTestCaseIdsByNodeIds(String testPlanId, String testCaseNodeId) {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("testPlanId", testPlanId);
-        headers.put("testCaseNodeId", testCaseNodeId);
-        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + testPlanId + "/" + testCaseNodeId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + testPlanId + "/" + testCaseNodeId);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
         System.out.println("模块下用例" + apps);
@@ -99,29 +91,24 @@ public class MeterSphereClient {
     }
 
     public List<TestPlanDTO> getTestPlanIds(String projectId, String workspaceId) {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("projectId", projectId);
-        ResultHolder result = call(ApiUrlConstants.PLAN_LIST_ALL + "/" + projectId + "/" + workspaceId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.PLAN_LIST_ALL + "/" + projectId + "/" + workspaceId);
         String listJson = JSON.toJSONString(result.getData());
         List<TestPlanDTO> apps = JSON.parseArray(listJson, TestPlanDTO.class);
         return apps;
     }
 
     public List<TestCaseNodeDTO> getTestCaseNodeIds(String testPlanId) {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("testPlanId", testPlanId);
-        ResultHolder result = call(ApiUrlConstants.CASE_NODE_LIST_PLAN + "/" + testPlanId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.CASE_NODE_LIST_PLAN + "/" + testPlanId);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseNodeDTO> apps = JSON.parseArray(listJson, TestCaseNodeDTO.class);
         return apps;
     }
 
     public boolean getApiTest(String testCaseId) {
-        Map<String, String> headers = new HashMap<String, String>();
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", testCaseId);
         params.put("triggerMode", "MANUAL");
-        ResultHolder result = call(ApiUrlConstants.API_RUN, RequestMethod.POST, params, headers);
+        ResultHolder result = call(ApiUrlConstants.API_RUN, RequestMethod.POST, params);
         System.out.println(result + "api测试结果");
         boolean flag = true;
         if (!result.isSuccess()) {
@@ -131,11 +118,10 @@ public class MeterSphereClient {
     }
 
     public boolean getPerformanceTest(String testCaseId) {
-        Map<String, String> headers = new HashMap<>();
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", testCaseId);
         params.put("triggerMode", "MANUAL");
-        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params, headers);
+        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params);
         boolean flag = true;
         if (!result.isSuccess()) {
             flag = false;
@@ -144,9 +130,7 @@ public class MeterSphereClient {
     }
 
     public String getApiTestState(String testCaseId) {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("testCaseId", testCaseId);
-        ResultHolder result = call(ApiUrlConstants.API_LIST_ALL + "/" + testCaseId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.API_LIST_ALL + "/" + testCaseId);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         String state = jsonObject.getString("status");
@@ -154,9 +138,7 @@ public class MeterSphereClient {
     }
 
     public String getPerformanceTestState(String testCaseId) {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("testCaseId", testCaseId);
-        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_LIST_ALL, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_LIST_ALL);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         String state = jsonObject.getString("status");
@@ -164,10 +146,10 @@ public class MeterSphereClient {
     }
 
     private ResultHolder call(String url) {
-        return call(url, RequestMethod.GET, null, null);
+        return call(url, RequestMethod.GET, null);
     }
 
-    private ResultHolder call(String url, RequestMethod requestMethod, Object params, Map<String, String> headers) {
+    private ResultHolder call(String url, RequestMethod requestMethod, Object params) {
         url = this.endpoint + url;
         String responseJson;
 
