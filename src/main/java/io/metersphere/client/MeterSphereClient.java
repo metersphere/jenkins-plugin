@@ -7,22 +7,16 @@ import io.metersphere.commons.constants.ApiUrlConstants;
 import io.metersphere.commons.constants.RequestMethod;
 import io.metersphere.commons.exception.MeterSphereException;
 import io.metersphere.commons.model.*;
+import io.metersphere.commons.utils.HttpClientConfig;
+import io.metersphere.commons.utils.HttpClientUtil;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +50,7 @@ public class MeterSphereClient {
     }
 
     public String checkUser() {
-        ResultHolder getUserResult = call(ApiUrlConstants.USER_INFO, RequestMethod.GET);
+        ResultHolder getUserResult = call(ApiUrlConstants.USER_INFO);
         if (!getUserResult.isSuccess()) {
             throw new MeterSphereException(getUserResult.getMessage());
         }
@@ -68,7 +62,7 @@ public class MeterSphereClient {
     public List<WorkspaceDTO> getWorkspace() {
         String userId = this.checkUser();
         System.out.println(userId + "kj");
-        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId, RequestMethod.GET);
+        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId);
         String list = JSON.toJSONString(result.getData());
         List<WorkspaceDTO> workspaces = JSON.parseArray(list, WorkspaceDTO.class);
         return workspaces;
@@ -137,10 +131,9 @@ public class MeterSphereClient {
     }
 
     public boolean getPerformanceTest(String testCaseId) {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("testCaseId", testCaseId);
+        Map<String, String> headers = new HashMap<>();
         HashMap<String, Object> params = new HashMap<>();
-        params.put("id", "237e9597-45f4-48e3-8ce0-edf5712ee0cc");
+        params.put("id", testCaseId);
         params.put("triggerMode", "MANUAL");
         ResultHolder result = call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params, headers);
         boolean flag = true;
@@ -170,42 +163,21 @@ public class MeterSphereClient {
         return state;
     }
 
-    private ResultHolder call(String url, RequestMethod requestMethod) {
-        /*Map<String, Object> params = new HashMap<String, Object>();
-        params.put("userId", userId);*/
-        return call(url, requestMethod, null, null);
+    private ResultHolder call(String url) {
+        return call(url, RequestMethod.GET, null, null);
     }
 
     private ResultHolder call(String url, RequestMethod requestMethod, Object params, Map<String, String> headers) {
         url = this.endpoint + url;
-        String responseJson = null;
-        try {
-            if (requestMethod == RequestMethod.GET) {
-                HttpGet httpGet = new HttpGet(url);
-                auth(httpGet);
-                HttpResponse response = httpClient.execute(httpGet);
-                HttpEntity httpEntity = response.getEntity();
-                responseJson = EntityUtils.toString(httpEntity);
-            } else {
-                HttpPost httpPost = new HttpPost(url);
-                if (headers != null && headers.size() > 0) {
-                    for (String key : headers.keySet()) {
-                        httpPost.addHeader(key, headers.get(key));
-                    }
-                }
-                if (params != null) {
-                    StringEntity stringEntity = new StringEntity(JSON.toJSONString(params), "UTF-8");
-                    /*设置请求参数*/
-                    httpPost.setEntity(stringEntity);
-                }
-                auth(httpPost);
-                HttpResponse response = httpClient.execute(httpPost);
-                HttpEntity httpEntity = response.getEntity();
-                responseJson = EntityUtils.toString(httpEntity);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        String responseJson;
+
+        HttpClientConfig config = auth();
+        if (requestMethod == RequestMethod.GET) {
+            responseJson = HttpClientUtil.get(url, config);
+        } else {
+            responseJson = HttpClientUtil.post(url, JSON.toJSONString(params), config);
         }
+
         ResultHolder result = JSON.parseObject(responseJson, ResultHolder.class);
         if (!result.isSuccess()) {
             throw new MeterSphereException(result.getMessage());
@@ -213,17 +185,19 @@ public class MeterSphereClient {
         return JSON.parseObject(responseJson, ResultHolder.class);
     }
 
-    private void auth(HttpRequestBase httpRequestBase) {
-        httpRequestBase.addHeader("Accept", ACCEPT);
-        httpRequestBase.addHeader("accessKey", accessKey);
-        httpRequestBase.addHeader("Content-type", "application/json");
+    private HttpClientConfig auth() {
+        HttpClientConfig httpClientConfig = new HttpClientConfig();
+        httpClientConfig.addHeader("Accept", ACCEPT);
+        httpClientConfig.addHeader("accessKey", accessKey);
+        httpClientConfig.addHeader("Content-type", "application/json");
         String signature;
         try {
             signature = aesEncrypt(accessKey + "|" + UUID.randomUUID().toString() + "|" + System.currentTimeMillis(), secretKey, accessKey);
         } catch (Exception e) {
             throw new MeterSphereException("签名失败: " + e.getMessage());
         }
-        httpRequestBase.addHeader("signature", signature);
+        httpClientConfig.addHeader("signature", signature);
+        return httpClientConfig;
     }
 
     private static String aesEncrypt(String src, String secretKey, String iv) throws Exception {
