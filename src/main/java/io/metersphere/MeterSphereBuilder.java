@@ -50,7 +50,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     private boolean isTestOnly;
 
     @DataBoundConstructor
-    public MeterSphereBuilder(boolean isTestNode, boolean isTestOnly, String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId, String projectId, String nodeId, PrintStream logger, String testPlanId, String testCaseNodeId, String testId, String testCaseId, String method) {
+    public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId, String projectId, String nodeId, PrintStream logger, String testPlanId, String testCaseNodeId, String testId, String testCaseId, String method) {
         this.msEndpoint = msEndpoint;
         this.msAccessKey = msAccessKey;
         this.msSecretKey = msSecretKey;
@@ -63,9 +63,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.testId = testId;
         this.testCaseId = testCaseId;
         this.method = StringUtils.isBlank(method) ? Method.node : method;
-        this.isTestNode = method.equals(Method.node);
-        this.isTestOnly = method.equals(Method.only);
-
+        this.isTestNode = this.method.equals(Method.node);
+        this.isTestOnly = this.method.equals(Method.only);
     }
 
     @Override
@@ -188,6 +187,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     @Extension // This indicates to Jenkins that this is an implementation of an extension point.
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
         String userId = "";
+
         public FormValidation doCheckAccount(
                 @QueryParameter String msAccessKey,
                 @QueryParameter String msSecretKey,
