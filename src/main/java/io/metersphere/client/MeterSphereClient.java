@@ -61,13 +61,11 @@ public class MeterSphereClient {
             throw new MeterSphereException(getUserResult.getMessage());
         }
         this.userId = getUserResult.getData().toString();
-        System.out.println(this.userId + "oo");
         return this.userId;
     }
 
     public List<WorkspaceDTO> getWorkspace() {
         String userId = this.checkUser();
-        System.out.println(userId + "kj");
         ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId, RequestMethod.GET);
         String list = JSON.toJSONString(result.getData());
         List<WorkspaceDTO> workspaces = JSON.parseArray(list, WorkspaceDTO.class);
@@ -93,14 +91,14 @@ public class MeterSphereClient {
         return apps;
     }
 
-    public List<TestCaseDTO> getTestCaseIdsByNodeIds(String testPlanId, String testCaseNodeId) {
+    public List<TestCaseDTO> getTestCaseIdsByNodePaths(String testPlanId, List<String> nodePaths) {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("testPlanId", testPlanId);
-        headers.put("testCaseNodeId", testCaseNodeId);
-        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + testPlanId + "/" + testCaseNodeId, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("testPlanId", testPlanId);
+        params.put("nodePaths", nodePaths);
+        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST, RequestMethod.POST, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
-        System.out.println("模块下用例" + apps);
         return apps;
     }
 
@@ -128,7 +126,6 @@ public class MeterSphereClient {
         params.put("id", testCaseId);
         params.put("triggerMode", "MANUAL");
         ResultHolder result = call(ApiUrlConstants.API_RUN, RequestMethod.POST, params, headers);
-        System.out.println(result + "api测试结果");
         boolean flag = true;
         if (!result.isSuccess()) {
             flag = false;

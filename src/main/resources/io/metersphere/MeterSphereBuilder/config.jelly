@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
     <f:entry title="MeterSphere API Endpoint" field="msEndpoint">
-        <f:textbox default="http://localhost:8080"/>
+        <f:textbox default="http://localhost:8081"/>
     </f:entry>
     <f:entry title="MeterSphere API AccessKey" field="msAccessKey">
         <f:textbox default="5QNzRrPKvX3dcJyb"/>
@@ -25,9 +25,9 @@
             <f:entry title="测试计划" field="testPlanId">
                 <f:select/>
             </f:entry>
-            <f:entry title="模块列表" field="testCaseNodeId">
-                <f:select/>
-            </f:entry>
+        <f:entry title="模块列表" field="nodePaths">
+                   <f:textbox/>
+        </f:entry>
 
         </f:radioBlock>
         <f:radioBlock title="单独选择测试执行" name="method" value="only" inline="true" checked="${instance.isTestOnly}">

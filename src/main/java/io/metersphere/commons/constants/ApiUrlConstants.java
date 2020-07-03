@@ -9,7 +9,7 @@ public class ApiUrlConstants {
     public static final String PLAN_LIST_ALL = "/test/plan/list/all";//测试计划项目下
     public static final String PERFORMANCE_RUN = "/performance/run";//性能测试
     public static final String API_RUN = "/api/run";//api测试
-    public static final String TEST_PLAN_CASE_LIST = "/test/plan/case/list";//模块下测试用例
+    public static final String TEST_PLAN_CASE_LIST = "/test/plan/case/list/all";//模块下测试用例
     public static final String API_LIST_ALL = "/api/list/all";//API测试报告（特定）
     public static final String PERFORMANCE_LIST_ALL = "/performance/list/all";//性能测试测试报告（特定）
 }

@@ -1,7 +1,10 @@
 package io.metersphere.commons.model;
 
 
+import java.util.List;
+
 public class TestCaseDTO {
+    private List<String> nodePaths;
     private String id;
     private String maintainerName;
     private String remark;
@@ -19,6 +22,14 @@ public class TestCaseDTO {
     private Long updateTime;
     private String testId;
     private static final long serialVersionUID = 1L;
+
+    public List<String> getNodePaths() {
+        return nodePaths;
+    }
+
+    public void setNodePaths(List<String> nodePaths) {
+        this.nodePaths = nodePaths;
+    }
 
     public String getId() {
         return id;

@@ -1,3 +1,2 @@
 <div>
-  This plugin provides a "post-build" step for FIT2CLOUD CodeDeploy.
-</div>
+ This plugin integrates <a href="https://rdmetersphere.fit2cloud.com">MeterSphere</a> - the cloud load testing service to Jenkins.</div>
