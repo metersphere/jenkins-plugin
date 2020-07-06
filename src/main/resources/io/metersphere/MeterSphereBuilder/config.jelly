@@ -4,10 +4,10 @@
         <f:textbox default="http://localhost:8081"/>
     </f:entry>
     <f:entry title="MeterSphere API AccessKey" field="msAccessKey">
-        <f:textbox default="5QNzRrPKvX3dcJyb"/>
+        <f:textbox default="4dmlNVv2iI1uxX8d"/>
     </f:entry>
     <f:entry title="MeterSphere API SecretKey" field="msSecretKey">
-        <f:textbox default="F89JKlpY5PeQqEMB"/>
+        <f:textbox default="VJwmXYpOYmf8Isl9"/>
     </f:entry>
     <f:validateButton
             title="验证账户" progress="验证中..."
@@ -31,9 +31,9 @@
 
         </f:radioBlock>
         <f:radioBlock title="单独选择测试执行" name="method" value="only" inline="true" checked="${instance.isTestOnly}">
-            <f:entry title="测试用例名称" field="testCaseId">
-                <f:select/>
-            </f:entry>
+            <f:entry title="测试用例" field="testCaseId">
+                    <f:select/>
+                </f:entry>
         </f:radioBlock>
     </f:section>
 </j:jelly>

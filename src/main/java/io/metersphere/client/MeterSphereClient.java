@@ -23,6 +23,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -81,26 +83,24 @@ public class MeterSphereClient {
         return apps;
 
     }
-
+    /*单独测试用例*/
     public List<TestCaseDTO> getTestCaseIds(String projectId) {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("projectId", projectId);
         ResultHolder result = call(ApiUrlConstants.TEST_CASE_LIST_METHOD + "/" + projectId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
         return apps;
     }
 
-    public List<TestCaseDTO> getTestCaseIdsByNodePaths(String testPlanId, List<String> nodePaths) {
+    public List<TestCaseDTO> getTestCaseIdsByNodePaths(String planId, String  nodePaths) {
         Map<String, String> headers = new HashMap<String, String>();
         HashMap<String, Object> params = new HashMap<>();
-        params.put("testPlanId", testPlanId);
-        params.put("nodePaths", nodePaths);
-        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST, RequestMethod.POST, new HashMap<String, Object>(), headers);
+        ResultHolder result  = call(ApiUrlConstants.TEST_PLAN_CASE_LIST+"/"+planId+"/"+nodePaths, RequestMethod.GET, params, headers);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
         return apps;
     }
+
 
     public List<TestPlanDTO> getTestPlanIds(String projectId, String workspaceId) {
         Map<String, String> headers = new HashMap<String, String>();
@@ -108,15 +108,6 @@ public class MeterSphereClient {
         ResultHolder result = call(ApiUrlConstants.PLAN_LIST_ALL + "/" + projectId + "/" + workspaceId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         List<TestPlanDTO> apps = JSON.parseArray(listJson, TestPlanDTO.class);
-        return apps;
-    }
-
-    public List<TestCaseNodeDTO> getTestCaseNodeIds(String testPlanId) {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("testPlanId", testPlanId);
-        ResultHolder result = call(ApiUrlConstants.CASE_NODE_LIST_PLAN + "/" + testPlanId, RequestMethod.GET, new HashMap<String, Object>(), headers);
-        String listJson = JSON.toJSONString(result.getData());
-        List<TestCaseNodeDTO> apps = JSON.parseArray(listJson, TestCaseNodeDTO.class);
         return apps;
     }
 
@@ -149,7 +140,6 @@ public class MeterSphereClient {
 
     public String getApiTestState(String testCaseId) {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("testCaseId", testCaseId);
         ResultHolder result = call(ApiUrlConstants.API_LIST_ALL + "/" + testCaseId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
