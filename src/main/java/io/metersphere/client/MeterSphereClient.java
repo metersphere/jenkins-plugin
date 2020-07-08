@@ -128,7 +128,7 @@ public class MeterSphereClient {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("testCaseId", testCaseId);
         HashMap<String, Object> params = new HashMap<>();
-        params.put("id", "237e9597-45f4-48e3-8ce0-edf5712ee0cc");
+        params.put("id", testCaseId);
         params.put("triggerMode", "MANUAL");
         ResultHolder result = call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params, headers);
         boolean flag = true;
@@ -149,8 +149,7 @@ public class MeterSphereClient {
 
     public String getPerformanceTestState(String testCaseId) {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("testCaseId", testCaseId);
-        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_LIST_ALL, RequestMethod.GET, new HashMap<String, Object>(), headers);
+        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_LIST_ALL + "/" + testCaseId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         String state = jsonObject.getString("status");
