@@ -83,6 +83,7 @@ public class MeterSphereClient {
         return apps;
 
     }
+
     /*单独测试用例*/
     public List<TestCaseDTO> getTestCaseIds(String projectId) {
         Map<String, String> headers = new HashMap<String, String>();
@@ -92,10 +93,10 @@ public class MeterSphereClient {
         return apps;
     }
 
-    public List<TestCaseDTO> getTestCaseIdsByNodePaths(String planId, String  nodePaths) {
+    public List<TestCaseDTO> getTestCaseIdsByNodePaths(String planId, String nodePaths) {
         Map<String, String> headers = new HashMap<String, String>();
         HashMap<String, Object> params = new HashMap<>();
-        ResultHolder result  = call(ApiUrlConstants.TEST_PLAN_CASE_LIST+"/"+planId+"/"+nodePaths, RequestMethod.GET, params, headers);
+        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + planId + "/" + nodePaths, RequestMethod.GET, params, headers);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
         return apps;
