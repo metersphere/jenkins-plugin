@@ -212,8 +212,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                     try {
                                         int count = 10;
                                         while (count-- > 0) {
+                                            log("开始执行接口测试状态查询:" + c.getName());
                                             apiTestState = meterSphereClient.getApiTestState(c.getId());
-                                            log(apiTestState + "状态");
+                                            log(apiTestState + "接口测试状态");
                                             if (apiTestState.equalsIgnoreCase("Completed")) {
                                                 count = 0;
                                                 log(c.getName() + "api请求通过，登陆MeterSphere网站查看报告结果");
@@ -242,7 +243,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                     try {
                                         int count = 10;
                                         while (count-- > 0) {
+                                            log(c.getName() + "执行性能测试状态查询");
                                             status = meterSphereClient.getPerformanceTestState(c.getId());
+                                            log("性能测试状态：" + status);
                                             if (status.equalsIgnoreCase("Completed")) {
                                                 log(c.getName() + "perform性能测试请求通过");
                                             } else if (status.equalsIgnoreCase("error")) {
