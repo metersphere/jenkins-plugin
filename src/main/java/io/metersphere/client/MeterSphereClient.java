@@ -17,6 +17,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -54,14 +57,12 @@ public class MeterSphereClient {
             throw new MeterSphereException(getUserResult.getMessage());
         }
         this.userId = getUserResult.getData().toString();
-        System.out.println(this.userId + "oo");
         return this.userId;
     }
 
     public List<WorkspaceDTO> getWorkspace() {
         String userId = this.checkUser();
-        System.out.println(userId + "kj");
-        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId);
+        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId, RequestMethod.GET);
         String list = JSON.toJSONString(result.getData());
         List<WorkspaceDTO> workspaces = JSON.parseArray(list, WorkspaceDTO.class);
         return workspaces;
@@ -75,6 +76,7 @@ public class MeterSphereClient {
 
     }
 
+    /*单独测试用例*/
     public List<TestCaseDTO> getTestCaseIds(String projectId) {
         ResultHolder result = call(ApiUrlConstants.TEST_CASE_LIST_METHOD + "/" + projectId);
         String listJson = JSON.toJSONString(result.getData());
@@ -86,9 +88,9 @@ public class MeterSphereClient {
         ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + testPlanId + "/" + testCaseNodeId);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
-        System.out.println("模块下用例" + apps);
         return apps;
     }
+
 
     public List<TestPlanDTO> getTestPlanIds(String projectId, String workspaceId) {
         ResultHolder result = call(ApiUrlConstants.PLAN_LIST_ALL + "/" + projectId + "/" + workspaceId);
@@ -109,7 +111,6 @@ public class MeterSphereClient {
         params.put("id", testCaseId);
         params.put("triggerMode", "MANUAL");
         ResultHolder result = call(ApiUrlConstants.API_RUN, RequestMethod.POST, params);
-        System.out.println(result + "api测试结果");
         boolean flag = true;
         if (!result.isSuccess()) {
             flag = false;

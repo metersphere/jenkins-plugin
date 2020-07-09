@@ -1,41 +1,13 @@
-FIT2CLOUD2.0 CodeDeploy Jenkins Plugin
+MeterSphere Jenkins Plugin
 =============================
 
-安装包
-----------
 
-请登录 FIT2CLOUD 客户支持门户，从【常用下载】栏目下载最新的Jenkins 插件安装包。
+## License & Copyright
 
+Copyright (c) 2014-2020 飞致云 FIT2CLOUD, All rights reserved.
 
-Development
-----------
+Licensed under The GNU General Public License version 2 (GPLv2)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
-- Typical maven project, if you find it too slow to resolve the dependencies, try add Aliyun Nexus mirror to you ~/.m2/settings.xml
+https://www.gnu.org/licenses/gpl-2.0.html
 
-```
- <mirror>
-   <id>nexus-aliyun</id>
-   <mirrorOf>*</mirrorOf>
-   <name>Nexus aliyun</name>
-   <url>http://maven.aliyun.com/nexus/content/groups/public</url>
- </mirror> 
-```
-
-- Release .hpi
-
-```
-mvn clean package
-```
-
-- Online Debug
-
-**Note**: comment Aliyun mirror since Aliyun Nexus doesn't have all the central repos synced.
-
-```
-mvn clean hpi:run -Djava.net.preferIPv4Stack=true
-```
-
-License
--------
-
-This plugin is licensed under Apache 2.0. See the LICENSE file for more information.
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
