@@ -13,9 +13,6 @@ import io.metersphere.commons.model.WorkspaceDTO;
 import io.metersphere.commons.utils.HttpClientConfig;
 import io.metersphere.commons.utils.HttpClientUtil;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -29,26 +26,16 @@ public class MeterSphereClient {
 
 
     private static final String ACCEPT = "application/json;charset=UTF-8";
-    private static final Integer CONNECT_TIME_OUT = 10000;
-    private static final Integer CONNECT_REQUEST_TIME_OUT = 10000;
-    private String accessKey;
-    private String secretKey;
-    private String endpoint;
-    private HttpClient httpClient;
-    private String userId;
+
+    private final String accessKey;
+    private final String secretKey;
+    private final String endpoint;
 
     public MeterSphereClient(String accessKey, String secretKey, String endpoint) {
 
         this.accessKey = accessKey;
         this.secretKey = secretKey;
         this.endpoint = endpoint;
-        /*设置http默认超时时间*/
-        RequestConfig requestConfig = RequestConfig
-                .custom()
-                .setConnectTimeout(CONNECT_TIME_OUT)
-                .setConnectionRequestTimeout(CONNECT_REQUEST_TIME_OUT).build();
-        httpClient = HttpClientBuilder.create()
-                .setDefaultRequestConfig(requestConfig).build();
     }
 
     public String checkUser() {
@@ -56,23 +43,20 @@ public class MeterSphereClient {
         if (!getUserResult.isSuccess()) {
             throw new MeterSphereException(getUserResult.getMessage());
         }
-        this.userId = getUserResult.getData().toString();
-        return this.userId;
+        return getUserResult.getData().toString();
     }
 
     public List<WorkspaceDTO> getWorkspace() {
         String userId = this.checkUser();
         ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId);
         String list = JSON.toJSONString(result.getData());
-        List<WorkspaceDTO> workspaces = JSON.parseArray(list, WorkspaceDTO.class);
-        return workspaces;
+        return JSON.parseArray(list, WorkspaceDTO.class);
     }
 
     public List<ProjectDTO> getProjectIds(String workspaceId) {
         ResultHolder result = call(ApiUrlConstants.PROJECT_LIST_ALL + "/" + workspaceId);
         String listJson = JSON.toJSONString(result.getData());
-        List<ProjectDTO> apps = JSON.parseArray(listJson, ProjectDTO.class);
-        return apps;
+        return JSON.parseArray(listJson, ProjectDTO.class);
 
     }
 
@@ -80,22 +64,19 @@ public class MeterSphereClient {
     public List<TestCaseDTO> getTestCaseIds(String projectId) {
         ResultHolder result = call(ApiUrlConstants.TEST_CASE_LIST_METHOD + "/" + projectId);
         String listJson = JSON.toJSONString(result.getData());
-        List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
-        return apps;
+        return JSON.parseArray(listJson, TestCaseDTO.class);
     }
 
     public List<TestCaseDTO> getTestCaseIdsByNodePaths(String planId, String nodePaths) {
         ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + planId + "/" + nodePaths);
         String listJson = JSON.toJSONString(result.getData());
-        List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
-        return apps;
+        return JSON.parseArray(listJson, TestCaseDTO.class);
     }
 
     public List<TestPlanDTO> getTestPlanIds(String projectId, String workspaceId) {
         ResultHolder result = call(ApiUrlConstants.PLAN_LIST_ALL + "/" + projectId + "/" + workspaceId);
         String listJson = JSON.toJSONString(result.getData());
-        List<TestPlanDTO> apps = JSON.parseArray(listJson, TestPlanDTO.class);
-        return apps;
+        return JSON.parseArray(listJson, TestPlanDTO.class);
     }
 
     public void runApiTest(String testCaseId) {
@@ -116,16 +97,14 @@ public class MeterSphereClient {
         ResultHolder result = call(ApiUrlConstants.API_GET + "/" + testCaseId);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
-        String state = jsonObject.getString("status");
-        return state;
+        return jsonObject.getString("status");
     }
 
     public String getPerformanceTestState(String testCaseId) {
         ResultHolder result = call(ApiUrlConstants.PERFORMANCE_GET + "/" + testCaseId);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
-        String state = jsonObject.getString("status");
-        return state;
+        return jsonObject.getString("status");
     }
 
     private ResultHolder call(String url) {
