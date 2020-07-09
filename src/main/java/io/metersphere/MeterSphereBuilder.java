@@ -1,10 +1,12 @@
 package io.metersphere;
 
-import com.alibaba.fastjson.JSON;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.*;
+import hudson.model.AbstractProject;
+import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
@@ -13,9 +15,13 @@ import hudson.util.ListBoxModel;
 import io.metersphere.client.MeterSphereClient;
 import io.metersphere.commons.constants.Method;
 import io.metersphere.commons.exception.MeterSphereException;
-import io.metersphere.commons.model.*;
+import io.metersphere.commons.model.ProjectDTO;
+import io.metersphere.commons.model.TestCaseDTO;
+import io.metersphere.commons.model.TestPlanDTO;
+import io.metersphere.commons.model.WorkspaceDTO;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -26,9 +32,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Serializable {
@@ -84,7 +91,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     final ExecutorService testThreadPool = Executors.newFixedThreadPool(modelList.size());
                     final CountDownLatch countDownLatch = new CountDownLatch(modelList.size());
                     final AtomicBoolean success = new AtomicBoolean(false);
-                    if (modelList != null && modelList.size() > 0) {
+                    if (modelList.size() > 0) {
                         for (final TestCaseDTO c : modelList) {
                             if (c.getType().equals("api")) {
                                 testThreadPool.execute(new Runnable() {
@@ -92,7 +99,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                     public void run() {
                                         try {
                                             log("开始执行接口测试:" + c.getName());
-                                            meterSphereClient.getApiTest(c.getTestId());
+                                            meterSphereClient.runApiTest(c.getTestId());
                                         } catch (Exception e) {
                                             success.set(false);
                                             countDownLatch.countDown();
@@ -139,7 +146,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                     public void run() {
                                         try {
                                             log("开始执行性能测试:" + c.getName());
-                                            meterSphereClient.getPerformanceTest(c.getTestId());
+                                            meterSphereClient.runPerformanceTest(c.getTestId());
                                         } catch (Exception e) {
                                             success.set(false);
                                             countDownLatch.countDown();
@@ -197,14 +204,14 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     }
                     break;
                 case Method.single:
-                    List<TestCaseDTO> projectList = meterSphereClient.getTestCaseIds(projectId);//项目下
-                    if (projectList != null && projectList.size() > 0) {
-                        for (TestCaseDTO c : projectList) {
-                            if (c.getId().equalsIgnoreCase(testCaseId)) {
-                                if (c.getType().equals("api")) {
+                    List<TestCaseDTO> testCaseIds = meterSphereClient.getTestCaseIds(projectId);//项目下
+                    if (CollectionUtils.isNotEmpty(testCaseIds)) {
+                        for (TestCaseDTO c : testCaseIds) {
+                            if (StringUtils.equals(testCaseId, c.getId())) {
+                                if (StringUtils.equals("api", c.getType())) {
                                     try {
                                         log("开始执行接口测试:" + c.getName());
-                                        meterSphereClient.getApiTest(testCaseId);
+                                        meterSphereClient.runApiTest(testCaseId);
                                     } catch (Exception e) {
                                         throw new MeterSphereException(e.getMessage() + "api请求失败");
                                     }
@@ -232,10 +239,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                         throw new MeterSphereException(e.getMessage() + "api请求失败");
                                     }
                                 }
-                                if (c.getType().equals("perform")) {
+                                if (StringUtils.equals("perform", c.getType())) {
                                     try {
                                         log("开始执行性能测试:" + c.getName());
-                                        meterSphereClient.getPerformanceTest(c.getId());
+                                        meterSphereClient.runPerformanceTest(c.getId());
                                     } catch (Exception e) {
                                         throw new MeterSphereException(e.getMessage() + "perform请求失败");
                                     }
