@@ -6,7 +6,10 @@ import io.metersphere.ResultHolder;
 import io.metersphere.commons.constants.ApiUrlConstants;
 import io.metersphere.commons.constants.RequestMethod;
 import io.metersphere.commons.exception.MeterSphereException;
-import io.metersphere.commons.model.*;
+import io.metersphere.commons.model.ProjectDTO;
+import io.metersphere.commons.model.TestCaseDTO;
+import io.metersphere.commons.model.TestPlanDTO;
+import io.metersphere.commons.model.WorkspaceDTO;
 import io.metersphere.commons.utils.HttpClientConfig;
 import io.metersphere.commons.utils.HttpClientUtil;
 import org.apache.commons.codec.binary.Base64;
@@ -17,9 +20,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +62,7 @@ public class MeterSphereClient {
 
     public List<WorkspaceDTO> getWorkspace() {
         String userId = this.checkUser();
-        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId, RequestMethod.GET);
+        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId);
         String list = JSON.toJSONString(result.getData());
         List<WorkspaceDTO> workspaces = JSON.parseArray(list, WorkspaceDTO.class);
         return workspaces;
@@ -84,25 +84,17 @@ public class MeterSphereClient {
         return apps;
     }
 
-    public List<TestCaseDTO> getTestCaseIdsByNodeIds(String testPlanId, String testCaseNodeId) {
-        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + testPlanId + "/" + testCaseNodeId);
+    public List<TestCaseDTO> getTestCaseIdsByNodePaths(String planId, String nodePaths) {
+        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + planId + "/" + nodePaths);
         String listJson = JSON.toJSONString(result.getData());
         List<TestCaseDTO> apps = JSON.parseArray(listJson, TestCaseDTO.class);
         return apps;
     }
 
-
     public List<TestPlanDTO> getTestPlanIds(String projectId, String workspaceId) {
         ResultHolder result = call(ApiUrlConstants.PLAN_LIST_ALL + "/" + projectId + "/" + workspaceId);
         String listJson = JSON.toJSONString(result.getData());
         List<TestPlanDTO> apps = JSON.parseArray(listJson, TestPlanDTO.class);
-        return apps;
-    }
-
-    public List<TestCaseNodeDTO> getTestCaseNodeIds(String testPlanId) {
-        ResultHolder result = call(ApiUrlConstants.CASE_NODE_LIST_PLAN + "/" + testPlanId);
-        String listJson = JSON.toJSONString(result.getData());
-        List<TestCaseNodeDTO> apps = JSON.parseArray(listJson, TestCaseNodeDTO.class);
         return apps;
     }
 
