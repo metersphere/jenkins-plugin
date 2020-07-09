@@ -23,6 +23,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class MeterSphereClient {
@@ -123,9 +124,8 @@ public class MeterSphereClient {
     }
 
     public String getApiTestState(String testCaseId) {
-        ResultHolder result = call(ApiUrlConstants.API_LIST_ALL + "/" + testCaseId);
+        ResultHolder result = call(ApiUrlConstants.API_GET + "/" + testCaseId);
         Map<String, String> headers = new HashMap<String, String>();
-        ResultHolder result = call(ApiUrlConstants.API_GET + "/" + testCaseId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         String state = jsonObject.getString("status");
@@ -133,9 +133,8 @@ public class MeterSphereClient {
     }
 
     public String getPerformanceTestState(String testCaseId) {
-        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_TEST + "/" + testCaseId);
+        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_GET + "/" + testCaseId);
         Map<String, String> headers = new HashMap<String, String>();
-        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_GET + "/" + testCaseId, RequestMethod.GET, new HashMap<String, Object>(), headers);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         String state = jsonObject.getString("status");
