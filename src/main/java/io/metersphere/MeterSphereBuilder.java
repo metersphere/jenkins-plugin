@@ -90,7 +90,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     final List<TestCaseDTO> modelList = meterSphereClient.getTestCaseIdsByNodePaths(testPlanId, nodepath);//模块下
                     final ExecutorService testThreadPool = Executors.newFixedThreadPool(modelList.size());
                     final CountDownLatch countDownLatch = new CountDownLatch(modelList.size());
-                    final AtomicBoolean success = new AtomicBoolean(false);
+                    final AtomicBoolean success = new AtomicBoolean(true);
                     if (modelList.size() > 0) {
                         for (final TestCaseDTO c : modelList) {
                             if (c.getType().equals("api")) {
@@ -123,7 +123,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                                 }
                                                 Thread.sleep(1000 * 2L);
                                             }
-                                            if (count <= 0) {
+                                            if (count <= -1) {
                                                 if (!apiTestState.equalsIgnoreCase("Completed")) {
                                                     log(c.getName() + "：api请求状态" + apiTestState);
                                                     success.set(false);
@@ -154,7 +154,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             throw new MeterSphereException(e.getMessage() + "perform测试请求失败，登陆MeterSphere网站查看该报告结果");
                                         }
                                         try {
-                                            int count = 10;
+                                            int count = 30;
                                             String pfmTestState = "";
                                             while (count-- > 0) {
                                                 log(c.getName() + "执行性能测试状态查询");
@@ -169,9 +169,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                                     success.set(false);
 
                                                 }
-                                                Thread.sleep(1000 * 2L);
+                                                Thread.sleep(1000 * 4L);
                                             }
-                                            if (count <= 0) {
+                                            if (count <= -1) {
                                                 if (!pfmTestState.equalsIgnoreCase("Completed")) {
                                                     log(c.getName() + "：perform请求状态：" + pfmTestState);
                                                     success.set(false);
@@ -230,7 +230,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             }
                                             Thread.sleep(1000 * 2L);
                                         }
-                                        if (count == 0) {
+                                        if (count < -1) {
                                             if (!apiTestState.equalsIgnoreCase("Completed")) {
                                                 log(c.getName() + "：api请求失败");
                                             }
@@ -258,7 +258,14 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             } else if (status.equalsIgnoreCase("error")) {
                                                 throw new MeterSphereException(c.getName() + "状态为：" + status + "perform性能测试请求失败，构建失败");
                                             }
+                                            Thread.sleep(1000 * 4L);
                                         }
+                                        if (count < -1) {
+                                            if (!status.equalsIgnoreCase("Completed")) {
+                                                log(c.getName() + "：perform请求失败");
+                                            }
+                                        }
+
                                     } catch (Exception e) {
                                         throw new MeterSphereException(e.getMessage() + "perform性能测试失败，构建失败");
                                     }
