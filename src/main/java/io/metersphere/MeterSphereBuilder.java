@@ -147,7 +147,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             throw new MeterSphereException(e.getMessage() + "perform测试请求失败，登陆MeterSphere网站查看该报告结果");
                                         }
                                         try {
-                                            int count = 30;
+                                            int count = 10;
                                             String pfmTestState = "";
                                             while (count-- > 0) {
                                                 log(c.getName() + "执行性能测试状态查询");
