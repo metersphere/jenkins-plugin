@@ -8,6 +8,7 @@ public class ApiUrlConstants {
     public static final String CASE_NODE_LIST_PLAN = "/case/node/list/plan";//模块列表
     public static final String PLAN_LIST_ALL = "/test/plan/list/all";//测试计划项目下
     public static final String PERFORMANCE_RUN = "/performance/run";//性能测试
+    public static final String PERFORMANCE_TEST = "/performance/get";//性能测试
     public static final String API_RUN = "/api/run";//api测试
     public static final String TEST_PLAN_CASE_LIST = "/test/plan/case/list/node";//模块下测试用例
     public static final String API_GET = "/api/get";//API测试报告（特定）

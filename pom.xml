@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>metersphere-jenkins-plugin</artifactId>
-    <version>2.0</version>
+    <version>1.0</version>
     <packaging>hpi</packaging>
     <groupId>io.metersphere</groupId>
 
@@ -34,12 +34,11 @@
 
     <properties>
         <jackson.version>2.1.1</jackson.version>
-        <spring.version>3.0.7.RELEASE</spring.version>
         <jenkins.version>1.625.3</jenkins.version>
-        <java.level>7</java.level>
+        <java.level>8</java.level>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <aetherVersion>1.13.1</aetherVersion>
-        <mavenVersion>3.0.3</mavenVersion>
+        <mavenVersion>3.3.9</mavenVersion>
     </properties>
 
     <dependencies>
@@ -88,7 +87,6 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
@@ -117,7 +115,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
