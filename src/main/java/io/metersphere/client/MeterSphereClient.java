@@ -23,7 +23,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class MeterSphereClient {
@@ -99,33 +98,22 @@ public class MeterSphereClient {
         return apps;
     }
 
-    public boolean getApiTest(String testCaseId) {
+    public void runApiTest(String testCaseId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", testCaseId);
         params.put("triggerMode", "MANUAL");
-        ResultHolder result = call(ApiUrlConstants.API_RUN, RequestMethod.POST, params);
-        boolean flag = true;
-        if (!result.isSuccess()) {
-            flag = false;
-        }
-        return flag;
+        call(ApiUrlConstants.API_RUN, RequestMethod.POST, params);
     }
 
-    public boolean getPerformanceTest(String testCaseId) {
+    public void runPerformanceTest(String testCaseId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", testCaseId);
         params.put("triggerMode", "MANUAL");
-        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params);
-        boolean flag = true;
-        if (!result.isSuccess()) {
-            flag = false;
-        }
-        return flag;
+        call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params);
     }
 
     public String getApiTestState(String testCaseId) {
         ResultHolder result = call(ApiUrlConstants.API_GET + "/" + testCaseId);
-        Map<String, String> headers = new HashMap<String, String>();
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         String state = jsonObject.getString("status");
@@ -134,7 +122,6 @@ public class MeterSphereClient {
 
     public String getPerformanceTestState(String testCaseId) {
         ResultHolder result = call(ApiUrlConstants.PERFORMANCE_GET + "/" + testCaseId);
-        Map<String, String> headers = new HashMap<String, String>();
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         String state = jsonObject.getString("status");
@@ -150,7 +137,7 @@ public class MeterSphereClient {
         String responseJson;
 
         HttpClientConfig config = auth();
-        if (requestMethod == RequestMethod.GET) {
+        if (requestMethod.equals(RequestMethod.GET)) {
             responseJson = HttpClientUtil.get(url, config);
         } else {
             responseJson = HttpClientUtil.post(url, JSON.toJSONString(params), config);
