@@ -10,6 +10,6 @@ public class ApiUrlConstants {
     public static final String PERFORMANCE_RUN = "/performance/run";//性能测试
     public static final String API_RUN = "/api/run";//api测试
     public static final String TEST_PLAN_CASE_LIST = "/test/plan/case/list/node";//模块下测试用例
-    public static final String API_LIST_ALL = "/api/list/all";//API测试报告（特定）
-    public static final String PERFORMANCE_LIST_ALL = "/performance/list/all";//性能测试测试报告（特定）
+    public static final String API_GET = "/api/get";//API测试报告（特定）
+    public static final String PERFORMANCE_GET = "/performance/get";//性能测试测试报告（特定）
 }
