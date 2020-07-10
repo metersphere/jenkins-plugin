@@ -82,14 +82,14 @@ public class MeterSphereClient {
     public void runApiTest(String testCaseId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", testCaseId);
-        params.put("triggerMode", "MANUAL");
+        params.put("triggerMode", "API");
         call(ApiUrlConstants.API_RUN, RequestMethod.POST, params);
     }
 
     public void runPerformanceTest(String testCaseId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", testCaseId);
-        params.put("triggerMode", "MANUAL");
+        params.put("triggerMode", "API");
         call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params);
     }
 
