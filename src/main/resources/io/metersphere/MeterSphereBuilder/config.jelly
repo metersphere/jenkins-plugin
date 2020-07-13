@@ -32,8 +32,14 @@
         </f:radioBlock>
         <f:radioBlock title="单独选择测试执行" name="method" value="single" inline="true" checked="${instance.isTestSingle}">
             <f:entry title="测试用例" field="testCaseId">
-                    <f:select/>
-                </f:entry>
+                    <f:select  value="fsdf"/>
+            </f:entry>
         </f:radioBlock>
+    </f:section>
+    <f:section title="开放配置">
+            <f:radioBlock title="jenkins运行结果" name="result" value="jenkins" inline="true" checked="${instance.isTestJenkins}">
+            </f:radioBlock>
+            <f:radioBlock title="测试用例运行结果" name="result" value="metersphere" inline="true" checked="${instance.isTestMeterSphere}">
+            </f:radioBlock>
     </f:section>
 </j:jelly>

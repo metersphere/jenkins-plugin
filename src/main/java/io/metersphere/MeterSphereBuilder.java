@@ -14,6 +14,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.metersphere.client.MeterSphereClient;
 import io.metersphere.commons.constants.Method;
+import io.metersphere.commons.constants.Results;
 import io.metersphere.commons.exception.MeterSphereException;
 import io.metersphere.commons.model.ProjectDTO;
 import io.metersphere.commons.model.TestCaseDTO;
@@ -56,9 +57,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     private final String method;
     private boolean isTestModular;
     private boolean isTestSingle;
+    private final String result;
+    private boolean isTestJenkins;
+    private boolean isTestMeterSphere;
 
     @DataBoundConstructor
-    public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId, String projectId, String nodePaths, PrintStream logger, String testPlanId, String testCaseNodeId, String testId, String testCaseId, String method) {
+    public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId, String projectId, String nodePaths, PrintStream logger, String testPlanId, String testCaseNodeId, String testId, String testCaseId, String method, String result, String isTestJenkins, String isTestMeterSphere) {
         this.msEndpoint = msEndpoint;
         this.msAccessKey = msAccessKey;
         this.msSecretKey = msSecretKey;
@@ -71,6 +75,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.testId = testId;
         this.testCaseId = testCaseId;
         this.method = StringUtils.isBlank(method) ? Method.modular : method;
+        this.result = result;
+        this.isTestJenkins = this.result.equals(Results.jenkins);
+        this.isTestMeterSphere = this.result.equals(Results.metersphere);
         this.isTestModular = this.method.equals(Method.modular);
         this.isTestSingle = this.method.equals(Method.single);
     }
@@ -160,7 +167,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                                 log(c.getName() + "执行性能测试状态查询");
                                                 pfmTestState = meterSphereClient.getPerformanceTestState(c.getTestId());
                                                 log(c.getName() + "性能执行状态" + pfmTestState);
-                                                if (pfmTestState.equalsIgnoreCase("Completed")) {
+                                                if (pfmTestState.equalsIgnoreCase("Running")) {
                                                     count = 0;
                                                     log(c.getName() + "：perform请求状态：" + pfmTestState);
 
@@ -172,7 +179,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                                 Thread.sleep(1000 * 4L);
                                             }
                                             if (count <= -1) {
-                                                if (!pfmTestState.equalsIgnoreCase("Completed")) {
+                                                if (!pfmTestState.equalsIgnoreCase("Running")) {
                                                     log(c.getName() + "：perform请求状态：" + pfmTestState);
                                                     success.set(false);
                                                 }
@@ -191,7 +198,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                             countDownLatch.await();
                             if (success.compareAndSet(true, false)) {
                                 log("请求全部通过");
-                                run.setResult(Result.SUCCESS);
+                                /*     run.setResult(Result.SUCCESS);*/
                             } else {
                                 throw new MeterSphereException("测试用例未能全部完成，构建失败");
 
@@ -255,7 +262,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             log(c.getName() + "执行性能测试状态查询");
                                             status = meterSphereClient.getPerformanceTestState(c.getId());
                                             log("性能测试状态：" + status);
-                                            if (status.equalsIgnoreCase("Completed")) {
+                                            if (status.equalsIgnoreCase("Running")) {
                                                 count = 0;
                                                 log(c.getName() + "perform性能测试请求通过");
 
@@ -265,7 +272,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             Thread.sleep(1000 * 4L);
                                         }
                                         if (count == 0) {
-                                            if (!status.equalsIgnoreCase("Completed")) {
+                                            if (!status.equalsIgnoreCase("Running")) {
                                                 log(c.getName() + "：perform请求失败");
                                                 throw new MeterSphereException(c.getName() + "状态为：" + status + "perform性能测试请求失败，构建失败");
 
@@ -287,7 +294,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
         } catch (Exception e) {
             log(e.getMessage());
-            run.setResult(Result.FAILURE);
+            if (result.equals("jenkins")) {
+                run.setResult(Result.FAILURE);
+            }
+
         }
 
     }
@@ -507,5 +517,17 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     public String getTestCaseId() {
         return testCaseId;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public boolean isTestJenkins() {
+        return isTestJenkins;
+    }
+
+    public boolean isTestMeterSphere() {
+        return isTestMeterSphere;
     }
 }
