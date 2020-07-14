@@ -21,25 +21,25 @@
         <f:select/>
     </f:entry>
     <f:section title="执行方式">
-        <f:radioBlock title="执行测试计划中用例" name="method" value="modular" inline="true" checked="${instance.isTestModular}">
+        <f:radioBlock title="执行测试计划中用例" name="method" value="modular" inline="true" checked="${instance.method == 'modular'}">
             <f:entry title="测试计划" field="testPlanId">
                 <f:select/>
             </f:entry>
-        <f:entry title="模块列表" field="nodePaths">
-                   <f:textbox default="/一级模块1/二级模块1，/一级模块2/二级模块2"/>
-        </f:entry>
+            <f:entry title="模块列表" field="nodePaths">
+                <f:textbox default="/一级模块1/二级模块1，/一级模块2/二级模块2"/>
+            </f:entry>
 
         </f:radioBlock>
-        <f:radioBlock title="单独选择测试执行" name="method" value="single" inline="true" checked="${instance.isTestSingle}">
+        <f:radioBlock title="单独选择测试执行" name="method" value="single" inline="true" checked="${instance.method == 'single'}">
             <f:entry title="测试用例" field="testCaseId">
-                    <f:select />
+                <f:select/>
             </f:entry>
         </f:radioBlock>
     </f:section>
     <f:section title="开放配置">
-            <f:radioBlock title="jenkins运行结果" name="result" value="jenkins" inline="true" checked="${instance.isTestJenkins}">
-            </f:radioBlock>
-            <f:radioBlock title="测试用例运行结果" name="result" value="metersphere" inline="true" checked="${instance.isTestMeterSphere}">
-            </f:radioBlock>
+        <f:radioBlock title="jenkins运行结果" name="result" value="jenkins" inline="true" checked="${instance.result == 'jenkins'}">
+        </f:radioBlock>
+        <f:radioBlock title="测试用例运行结果" name="result" value="metersphere" inline="true" checked="${instance.result == 'metersphere'}">
+        </f:radioBlock>
     </f:section>
 </j:jelly>

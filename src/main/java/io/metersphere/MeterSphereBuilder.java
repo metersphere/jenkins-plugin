@@ -14,7 +14,6 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.metersphere.client.MeterSphereClient;
 import io.metersphere.commons.constants.Method;
-import io.metersphere.commons.constants.Results;
 import io.metersphere.commons.exception.MeterSphereException;
 import io.metersphere.commons.model.ProjectDTO;
 import io.metersphere.commons.model.TestCaseDTO;
@@ -55,14 +54,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     private final String testId;
     private final String testCaseId;
     private final String method;
-    private boolean isTestModular;
-    private boolean isTestSingle;
     private final String result;
-    private boolean isTestJenkins;
-    private boolean isTestMeterSphere;
 
     @DataBoundConstructor
-    public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId, String projectId, String nodePaths, PrintStream logger, String testPlanId, String testCaseNodeId, String testId, String testCaseId, String method, String result, String isTestJenkins, String isTestMeterSphere) {
+    public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId, String projectId, String nodePaths, PrintStream logger, String testPlanId, String testCaseNodeId, String testId, String testCaseId, String method, String result) {
         this.msEndpoint = msEndpoint;
         this.msAccessKey = msAccessKey;
         this.msSecretKey = msSecretKey;
@@ -76,10 +71,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.testCaseId = testCaseId;
         this.method = StringUtils.isBlank(method) ? Method.modular : method;
         this.result = result;
-        this.isTestJenkins = this.result.equals(Results.jenkins);
-        this.isTestMeterSphere = this.result.equals(Results.metersphere);
-        this.isTestModular = this.method.equals(Method.modular);
-        this.isTestSingle = this.method.equals(Method.single);
     }
 
     @Override
@@ -503,14 +494,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         return testCaseNodeId;
     }
 
-    public boolean isTestModular() {
-        return isTestModular;
-    }
-
-    public boolean isTestSingle() {
-        return isTestSingle;
-    }
-
     public String getNodePaths() {
         return nodePaths;
     }
@@ -521,13 +504,5 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     public String getResult() {
         return result;
-    }
-
-    public boolean isTestJenkins() {
-        return isTestJenkins;
-    }
-
-    public boolean isTestMeterSphere() {
-        return isTestMeterSphere;
     }
 }
