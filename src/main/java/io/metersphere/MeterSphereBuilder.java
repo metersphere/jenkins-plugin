@@ -284,7 +284,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
                                 }
                             }
-                            return;
                         }
                         if (flag) {
                             log("该测试用例请求通过，登陆MeterSphere网站查看该报告结果");
