@@ -68,7 +68,20 @@ public class MeterSphereClient {
     }
 
     public List<TestCaseDTO> getTestCaseIdsByNodePaths(String planId, String nodePaths) {
-        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + planId + "/" + nodePaths);
+        ResultHolder result;
+        if (nodePaths.equals("")) {
+            result = call(ApiUrlConstants._TEST_PLAN_CASE_LIST + "/" + planId);
+        } else {
+            result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + planId + "/" + nodePaths);
+
+        }
+        String listJson = JSON.toJSONString(result.getData());
+        return JSON.parseArray(listJson, TestCaseDTO.class);
+    }
+
+    public List<TestCaseDTO> getTestCaseIdsByNodePath(String planId, String nodePaths) {
+        ResultHolder result;
+        result = call(ApiUrlConstants._TEST_PLAN_CASE_LIST_ + "/" + planId + "/" + nodePaths);
         String listJson = JSON.toJSONString(result.getData());
         return JSON.parseArray(listJson, TestCaseDTO.class);
     }
