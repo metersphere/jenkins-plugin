@@ -332,7 +332,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
                 MeterSphereClient.checkUser();
             } catch (Exception e) {
-                return FormValidation.error("\"验证MeterSphere帐号失败！");
+                return FormValidation.error("验证MeterSphere帐号失败！");
             }
             return FormValidation.ok("验证MeterSphere帐号成功！");
         }
