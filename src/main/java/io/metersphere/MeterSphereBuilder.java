@@ -419,14 +419,14 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             ListBoxModel items = new ListBoxModel();
             try {
                 MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
-                items.add("请选择测试用例", "");
+                items.add("请选择测试名称", "");
                 List<TestCaseDTO> list = new ArrayList<>();
                 if (projectId != null && !projectId.equals("")) {
                     list = MeterSphereClient.getTestCaseIds(projectId);
                 }
                 if (list != null && list.size() > 0) {
                     for (TestCaseDTO c : list) {
-                        items.add(c.getName(), String.valueOf(c.getId()));
+                        items.add(c.getName() + "（" + c.getType() + "）", String.valueOf(c.getId()));
                     }
                 }
 

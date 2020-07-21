@@ -1,13 +1,13 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
     <f:entry title="MeterSphere API Endpoint" field="msEndpoint">
-        <f:textbox default="http://localhost:8081"/>
+        <f:textbox/>
     </f:entry>
     <f:entry title="MeterSphere API AccessKey" field="msAccessKey">
-        <f:textbox default="4dmlNVv2iI1uxX8d"/>
+        <f:textbox/>
     </f:entry>
     <f:entry title="MeterSphere API SecretKey" field="msSecretKey">
-        <f:textbox default="VJwmXYpOYmf8Isl9"/>
+        <f:textbox/>
     </f:entry>
     <f:validateButton
             title="验证账户" progress="验证中..."
@@ -31,7 +31,7 @@
 
         </f:radioBlock>
         <f:radioBlock title="单独选择测试执行" name="method" value="single" inline="true" checked="${instance.method == 'single'}">
-            <f:entry title="测试用例" field="testCaseId">
+            <f:entry title="测试名称" field="testCaseId">
                 <f:select/>
             </f:entry>
         </f:radioBlock>
@@ -39,7 +39,8 @@
     <f:section title="开放配置">
         <f:radioBlock title="jenkins运行结果" name="result" value="jenkins" inline="true" checked="${instance.result == 'jenkins'}">
         </f:radioBlock>
-        <f:radioBlock title="测试用例运行结果" name="result" value="metersphere" inline="true" checked="${instance.result == 'metersphere'}">
+        <f:radioBlock title="插件运行结果" name="result" value="metersphere" inline="true"
+                      checked="${instance.result == 'metersphere'}">
         </f:radioBlock>
     </f:section>
 </j:jelly>
