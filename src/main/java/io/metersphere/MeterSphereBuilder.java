@@ -426,7 +426,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 }
                 if (list != null && list.size() > 0) {
                     for (TestCaseDTO c : list) {
-                        items.add(c.getName(), String.valueOf(c.getId()));
+                        items.add(c.getName() + "（" + c.getType() + "）", String.valueOf(c.getId()));
                     }
                 }
 
