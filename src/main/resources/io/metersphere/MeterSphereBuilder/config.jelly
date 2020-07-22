@@ -26,7 +26,7 @@
                 <f:select style="height:40px;"/>
             </f:entry>
             <f:entry title="模块列表" field="nodePaths">
-                <f:textbox style="height:40px;" default="/一级模块1/二级模块1，/一级模块2/二级模块2"/ >
+                <f:textbox style="height:40px;" default="/一级模块1/二级模块1，/一级模块2/二级模块2"/>
             </f:entry>
 
 
