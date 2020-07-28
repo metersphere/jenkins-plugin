@@ -1,5 +1,33 @@
-MeterSphere Jenkins Plugin
+MeterSphere Jenkins 插件
 =============================
+[MeterSphere](https://github.com/metersphere/metersphere) 是一站式的开源企业级持续测试平台，涵盖测试跟踪、接口测试、性能测试、团队协作等功能，兼容JMeter 等开源标准，有效助力开发和测试团队充分利用云弹性进行高度可扩展的自动化测试，加速高质量软件的交付。
+该项目为 MeterSphere 配套的 Jenkins 插件，在 Jenkins 中安装该插件后可将 Jenkins 任务中添加 MeterSphere 构建环节，用户在该构建环节中配置 MeterSphere 平台的认证信息后，可选择指定项目下的接口/性能测试进行触发执行。
+
+## 安装使用
+
+### 下载插件
+  1. 在该项目的 [release](https://github.com/metersphere/jenkins-plugin/releases) 页面下载最新版本的 hpi 包
+  2. 在 Jenkins 的插件管理页面，上传并安装下载好的 hpi 插件包
+
+### 使用指导
+
+插件安装后，在指定的 Jenkins 构建任务中，添加「MeterSphere」类型的构建步骤
+
+![](https://metersphere.io/docs/img/system_management/jenkins-plugin.png)
+
+根据图示配置，填写认证信息并选择需要触发执行的用例
+
+![](https://metersphere.io/docs/img/system_management/Jenkins-config.png)
+
+## 了解更多
+
+- [MeterSphere 官网](https://metersphere.io)
+- [MeterSphere 文档](https://metersphere.io/docs)
+- [演示视频](https://metersphere.oss-cn-hangzhou.aliyuncs.com/metersphere_demo.mp4)
+  
+## 微信群
+
+![wechat-group](https://metersphere.io/docs/img/wechat-group.png)
 
 
 ## License & Copyright
