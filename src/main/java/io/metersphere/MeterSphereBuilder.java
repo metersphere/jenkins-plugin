@@ -241,7 +241,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             Thread.sleep(1000 * 2L);
                                         }
                                         if (count == 0) {
-                                            if (!apiTestState.equalsIgnoreCase("Completed")) {
+                                            if (!apiTestState.equalsIgnoreCase("Success")) {
                                                 flag = false;
                                             }
                                         }
