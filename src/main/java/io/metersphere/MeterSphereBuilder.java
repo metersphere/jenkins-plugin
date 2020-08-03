@@ -131,7 +131,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                                 Thread.sleep(1000 * 2L);
                                             }
                                             if (count == 0) {
-                                                if (!apiTestState.equalsIgnoreCase("Completed")) {
+                                                if (!apiTestState.equalsIgnoreCase("Success")) {
                                                     log(c.getName() + "：api请求状态" + apiTestState);
                                                     success.set(true);
                                                 }
@@ -230,7 +230,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             log("开始请求api状态：" + c.getName());
                                             apiTestState = meterSphereClient.getApiTestState(reportId);
                                             log(c.getName() + "api执行状态：" + apiTestState);
-                                            if (apiTestState.equalsIgnoreCase("Completed")) {
+                                            if (apiTestState.equalsIgnoreCase("Success")) {
                                                 count = 1;
                                             } else if (apiTestState.equalsIgnoreCase("error")) {
                                                 count = 1;
