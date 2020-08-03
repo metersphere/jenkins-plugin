@@ -92,11 +92,13 @@ public class MeterSphereClient {
         return JSON.parseArray(listJson, TestPlanDTO.class);
     }
 
-    public void runApiTest(String testCaseId) {
+    public String runApiTest(String testCaseId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", testCaseId);
         params.put("triggerMode", "API");
-        call(ApiUrlConstants.API_RUN, RequestMethod.POST, params);
+        ResultHolder result = call(ApiUrlConstants.API_RUN, RequestMethod.POST, params);
+        return JSON.toJSONString(result.getData());
+
     }
 
     public void runPerformanceTest(String testCaseId) {
@@ -106,8 +108,9 @@ public class MeterSphereClient {
         call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params);
     }
 
-    public String getApiTestState(String testCaseId) {
-        ResultHolder result = call(ApiUrlConstants.API_GET + "/" + testCaseId);
+    public String getApiTestState(String reportId) {
+        String newReportId = reportId.replace("\"", "");
+        ResultHolder result = call(ApiUrlConstants.API_GET + "/" + newReportId);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         return jsonObject.getString("status");

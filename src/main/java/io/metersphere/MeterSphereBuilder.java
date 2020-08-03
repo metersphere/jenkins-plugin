@@ -72,6 +72,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.method = StringUtils.isBlank(method) ? Method.modular : method;
         this.result = result;
     }
+
     @Override
     public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
         this.logger = listener.getLogger();
@@ -103,9 +104,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                 testThreadPool.execute(new Runnable() {
                                     @Override
                                     public void run() {
+                                        String reportId = "";
                                         try {
                                             log("开始执行接口测试:  " + c.getName());
-                                            meterSphereClient.runApiTest(c.getTestId());
+
+                                            reportId = meterSphereClient.runApiTest(c.getTestId());
                                         } catch (Exception e) {
                                             success.set(true);
                                             log(c.getName() + "发生异常：" + e.getMessage());
@@ -115,9 +118,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             String apiTestState = "";
                                             while (count > 0) {
                                                 log("开始请求api状态：" + c.getName());
-                                                apiTestState = meterSphereClient.getApiTestState(c.getTestId());
+                                                apiTestState = meterSphereClient.getApiTestState(reportId);
                                                 log(c.getName() + "api执行状态：" + apiTestState);
-                                                if (apiTestState.equalsIgnoreCase("Completed")) {
+                                                if (apiTestState.equalsIgnoreCase("Success")) {
                                                     count = 1;
                                                 } else if (apiTestState.equalsIgnoreCase("error")) {
                                                     count = 1;
@@ -212,9 +215,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         for (TestCaseDTO c : testCaseIds) {
                             if (StringUtils.equals(testCaseId, c.getId())) {
                                 if (StringUtils.equals("api", c.getType())) {
+                                    String reportId = "";
                                     try {
                                         log("开始执行接口测试:" + c.getName());
-                                        meterSphereClient.runApiTest(testCaseId);
+                                        reportId = meterSphereClient.runApiTest(testCaseId);
                                     } catch (Exception e) {
                                         flag = false;
                                         log(c.getName() + "发生异常：" + e.getMessage());
@@ -224,7 +228,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                         int count = 10;
                                         while (count > 0) {
                                             log("开始请求api状态：" + c.getName());
-                                            apiTestState = meterSphereClient.getApiTestState(testCaseId);
+                                            apiTestState = meterSphereClient.getApiTestState(reportId);
                                             log(c.getName() + "api执行状态：" + apiTestState);
                                             if (apiTestState.equalsIgnoreCase("Completed")) {
                                                 count = 1;
