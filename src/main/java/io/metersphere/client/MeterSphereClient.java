@@ -123,6 +123,13 @@ public class MeterSphereClient {
         return jsonObject.getString("status");
     }
 
+    public void changeState(String id, String status) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        params.put("status", status);
+        call(ApiUrlConstants.CHANGE_STATE, RequestMethod.POST, params);
+    }
+
     private ResultHolder call(String url) {
         return call(url, RequestMethod.GET, null);
     }
