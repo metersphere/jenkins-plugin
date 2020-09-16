@@ -89,10 +89,16 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     if (StringUtils.contains(nodePaths, "/*")) {
                         nodePath = nodePaths.replace("*", "").replace("/", "f");
                         modelList = meterSphereClient.getTestCaseIdsByNodePath(testPlanId, nodePath);//模块下全部
+                        if (modelList.size() <= 0) {
+                            log("您所选模块下没有相应的接口和性能测试，请检查所填模块是否正确");
+                        }
 
                     } else {
                         nodePath = nodePaths.replace("/", "f");
                         modelList = meterSphereClient.getTestCaseIdsByNodePaths(testPlanId, nodePath);//模块下
+                        if (modelList.size() <= 0) {
+                            log("您所选模块下没有相应的接口和性能测试，请检查所填模块是否正确");
+                        }
 
                     }
                     final ExecutorService testThreadPool = Executors.newFixedThreadPool(modelList.size());
@@ -323,8 +329,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             }
 
         } catch (Exception e) {
-            log(e.getMessage());
-            run.setResult(Result.FAILURE);
+            if (result.equals("metersphere")) {
+                run.setResult(Result.FAILURE);
+            } else {
+                log("该测试用例请求未能通过，登陆MeterSphere网站查看该报告结果");
+            }
 
         }
 
