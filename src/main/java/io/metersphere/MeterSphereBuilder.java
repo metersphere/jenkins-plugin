@@ -136,7 +136,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                                     success.set(true);
                                                     log("更新测试用例结果：" + c.getName());
                                                     meterSphereClient.changeState(c.getId(), "Failure");
-                                                    return;
                                                 } else {
                                                     log("更新测试用例结果：" + c.getName());
                                                     meterSphereClient.changeState(c.getId(), "Failure");
@@ -192,7 +191,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                                     success.set(true);
                                                     log("更新测试用例结果：" + c.getName());
                                                     meterSphereClient.changeState(c.getId(), "Failure");
-                                                    return;
+
                                                 }
                                                 count--;
                                                 Thread.sleep(1000 * 4L);
@@ -212,6 +211,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                         }
                                     }
                                 });
+                            }
+
+                            if (c.getType().equals("functional")) {
+                                countDownLatch.countDown();
                             }
                         }
                         try {
@@ -259,7 +262,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             } else if (apiTestState.equalsIgnoreCase("error")) {
                                                 count = 1;
                                                 flag = false;
-                                                return;
+
                                             }
                                             count--;
                                             Thread.sleep(1000 * 2L);
@@ -294,7 +297,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             } else if (pfmTestState.equalsIgnoreCase("error")) {
                                                 count = 1;
                                                 flag = false;
-                                                return;
+
                                             }
                                             count--;
                                             Thread.sleep(1000 * 4L);
