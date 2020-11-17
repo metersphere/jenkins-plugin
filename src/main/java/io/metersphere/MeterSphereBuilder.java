@@ -14,6 +14,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.metersphere.client.MeterSphereClient;
 import io.metersphere.commons.constants.Method;
+import io.metersphere.commons.constants.Results;
 import io.metersphere.commons.exception.MeterSphereException;
 import io.metersphere.commons.model.ProjectDTO;
 import io.metersphere.commons.model.TestCaseDTO;
@@ -81,6 +82,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         listener.getLogger().println("url=" + run.getUrl());
         final MeterSphereClient meterSphereClient = new MeterSphereClient(this.msAccessKey, this.msSecretKey, this.msEndpoint);
         log("执行方式" + method);
+        final AtomicBoolean success = new AtomicBoolean(false);
         try {
             switch (method) {
                 case Method.modular:
@@ -91,6 +93,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         modelList = meterSphereClient.getTestCaseIdsByNodePath(testPlanId, nodePath);//模块下全部
                         if (modelList.size() <= 0) {
                             log("您所选模块下没有相应的接口和性能测试，请检查所填模块是否正确");
+                            success.set(true);
                         }
 
                     } else {
@@ -98,12 +101,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         modelList = meterSphereClient.getTestCaseIdsByNodePaths(testPlanId, nodePath);//模块下
                         if (modelList.size() <= 0) {
                             log("您所选模块下没有相应的接口和性能测试，请检查所填模块是否正确");
+                            success.set(true);
                         }
 
                     }
                     final ExecutorService testThreadPool = Executors.newFixedThreadPool(modelList.size());
                     final CountDownLatch countDownLatch = new CountDownLatch(modelList.size());
-                    final AtomicBoolean success = new AtomicBoolean(false);
                     if (modelList.size() > 0) {
                         for (final TestCaseDTO c : modelList) {
                             if (c.getType().equals("api")) {
@@ -114,8 +117,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                         try {
                                             log("开始执行接口测试:  " + c.getName());
                                             reportId = meterSphereClient.runApiTest(c.getTestId());
-                                            log("更新测试用例结果：" + c.getName());
-                                            meterSphereClient.changeState(c.getId(), "Failure");
                                         } catch (Exception e) {
                                             success.set(true);
                                             log(c.getName() + "发生异常：" + e.getMessage());
@@ -127,28 +128,23 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                                 log("开始请求api状态：" + c.getName());
                                                 apiTestState = meterSphereClient.getApiTestState(reportId);
                                                 log(c.getName() + "api执行状态：" + apiTestState);
-                                                if (apiTestState.equalsIgnoreCase("Success")) {
+                                                if (apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
                                                     count = 1;
                                                     log("更新测试用例结果：" + c.getName());
-                                                    meterSphereClient.changeState(c.getId(), "Pass");
-                                                } else if (apiTestState.equalsIgnoreCase("error")) {
+                                                    meterSphereClient.changeState(c.getId(), Results.PASS);
+                                                } else if (apiTestState.equalsIgnoreCase(Results.ERROR)) {
                                                     count = 1;
                                                     success.set(true);
                                                     log("更新测试用例结果：" + c.getName());
-                                                    meterSphereClient.changeState(c.getId(), "Failure");
-                                                } else {
-                                                    log("更新测试用例结果：" + c.getName());
-                                                    meterSphereClient.changeState(c.getId(), "Failure");
+                                                    meterSphereClient.changeState(c.getId(), Results.FAILURE);
                                                 }
                                                 count--;
-                                                Thread.sleep(1000 * 2L);
+                                                Thread.sleep(1000 * 10L);
                                             }
                                             if (count == 0) {
-                                                if (!apiTestState.equalsIgnoreCase("Success")) {
+                                                if (!apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
                                                     log(c.getName() + "：api请求状态" + apiTestState);
                                                     success.set(true);
-
-
                                                 }
                                             }
                                         } catch (InterruptedException e) {
@@ -172,8 +168,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                         } catch (Exception e) {
                                             success.set(true);
                                             log(c.getName() + "发生异常：" + e.getMessage());
-                                            log("更新测试用例结果：" + c.getName());
-                                            meterSphereClient.changeState(c.getId(), "Failure");
                                         }
                                         try {
                                             int count = 10;
@@ -182,25 +176,25 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                                 log("开始请求性能测试状态：" + c.getName());
                                                 pfmTestState = meterSphereClient.getPerformanceTestState(c.getTestId());
                                                 log(c.getName() + "性能执行状态" + pfmTestState);
-                                                if (pfmTestState.equalsIgnoreCase("Running")) {
+                                                if (pfmTestState.equalsIgnoreCase(Results.COMPLETED)) {
                                                     count = 1;
                                                     log("更新测试用例结果：" + c.getName());
-                                                    meterSphereClient.changeState(c.getId(), "Pass");
-                                                } else if (pfmTestState.equalsIgnoreCase("error")) {
+                                                    meterSphereClient.changeState(c.getId(), Results.PASS);
+                                                } else if (pfmTestState.equalsIgnoreCase(Results.ERROR)) {
                                                     count = 1;
                                                     success.set(true);
                                                     log("更新测试用例结果：" + c.getName());
-                                                    meterSphereClient.changeState(c.getId(), "Failure");
+                                                    meterSphereClient.changeState(c.getId(), Results.FAILURE);
 
                                                 }
                                                 count--;
-                                                Thread.sleep(1000 * 4L);
+                                                Thread.sleep(1000 * 10L);
                                             }
                                             if (count == 0) {
-                                                if (!pfmTestState.equalsIgnoreCase("Running")) {
+                                                if (!pfmTestState.equalsIgnoreCase(Results.COMPLETED)) {
                                                     success.set(true);
                                                     log("更新测试用例结果：" + c.getName());
-                                                    meterSphereClient.changeState(c.getId(), "Failure");
+                                                    meterSphereClient.changeState(c.getId(), Results.FAILURE);
                                                 }
                                             }
                                         } catch (InterruptedException e) {
@@ -213,7 +207,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                 });
                             }
 
-                            if (c.getType().equals("functional")) {
+                            if (c.getType().equals(Results.FUNCTIONAL)) {
                                 countDownLatch.countDown();
                             }
                         }
@@ -222,7 +216,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                             if (success.compareAndSet(false, true)) {
                                 log("测试用例请求全部通过，登陆MeterSphere网站查看该报告结果");
                             } else {
-                                if (result.equals("metersphere")) {
+                                if (result.equals(Results.METERSPHERE)) {
                                     throw new MeterSphereException("测试用例未能全部完成");
                                 } else {
                                     log("测试用例请求未能全部通过，登陆MeterSphere网站查看该报告结果");
@@ -241,7 +235,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     if (CollectionUtils.isNotEmpty(testCaseIds)) {
                         for (TestCaseDTO c : testCaseIds) {
                             if (StringUtils.equals(testCaseId, c.getId())) {
-                                if (StringUtils.equals("api", c.getType())) {
+                                if (StringUtils.equals(Results.API, c.getType())) {
                                     String reportId = "";
                                     try {
                                         log("开始执行接口测试:" + c.getName());
@@ -257,18 +251,18 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             log("开始请求api状态：" + c.getName());
                                             apiTestState = meterSphereClient.getApiTestState(reportId);
                                             log(c.getName() + "api执行状态：" + apiTestState);
-                                            if (apiTestState.equalsIgnoreCase("Success")) {
+                                            if (apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
                                                 count = 1;
-                                            } else if (apiTestState.equalsIgnoreCase("error")) {
+                                            } else if (apiTestState.equalsIgnoreCase(Results.ERROR)) {
                                                 count = 1;
                                                 flag = false;
 
                                             }
                                             count--;
-                                            Thread.sleep(1000 * 2L);
+                                            Thread.sleep(1000 * 8L);
                                         }
                                         if (count == 0) {
-                                            if (!apiTestState.equalsIgnoreCase("Success")) {
+                                            if (!apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
                                                 flag = false;
                                             }
                                         }
@@ -277,7 +271,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                         log(c.getName() + "发生异常：" + e.getMessage());
                                     }
                                 }
-                                if (StringUtils.equals("perform", c.getType())) {
+                                if (StringUtils.equals(Results.PERFORMANCE, c.getType())) {
                                     try {
                                         log("开始执行性能测试:" + c.getName());
                                         meterSphereClient.runPerformanceTest(testCaseId);
@@ -288,26 +282,25 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                     String pfmTestState = "";
                                     try {
                                         int count = 20;
-                                        while (count-- > 0) {
+                                        while (count > 0) {
                                             log("开始请求性能测试状态：" + c.getName());
                                             pfmTestState = meterSphereClient.getPerformanceTestState(testCaseId);
                                             log(c.getName() + "性能执行状态" + pfmTestState);
-                                            if (pfmTestState.equalsIgnoreCase("Running")) {
+                                            if (pfmTestState.equalsIgnoreCase(Results.COMPLETED)) {
                                                 count = 1;
-                                            } else if (pfmTestState.equalsIgnoreCase("error")) {
+                                            } else if (pfmTestState.equalsIgnoreCase(Results.ERROR)) {
                                                 count = 1;
                                                 flag = false;
 
                                             }
                                             count--;
-                                            Thread.sleep(1000 * 4L);
+                                            Thread.sleep(1000 * 8L);
                                         }
                                         if (count == 0) {
-                                            if (!pfmTestState.equalsIgnoreCase("Running")) {
+                                            if (!pfmTestState.equalsIgnoreCase(Results.COMPLETED)) {
                                                 flag = false;
                                             }
                                         }
-
                                     } catch (Exception e) {
                                         flag = false;
                                         log(c.getName() + "发生异常：" + e.getMessage());
@@ -319,7 +312,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         if (flag) {
                             log("该测试用例请求通过，登陆MeterSphere网站查看该报告结果");
                         } else {
-                            if (result.equals("metersphere")) {
+                            if (result.equals(Results.METERSPHERE)) {
                                 throw new MeterSphereException("该测试用例未能完成");
                             } else {
                                 log("该测试用例请求未能通过，登陆MeterSphere网站查看该报告结果");
@@ -332,7 +325,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             }
 
         } catch (Exception e) {
-            if (result.equals("metersphere")) {
+            if (result.equals(Results.METERSPHERE)) {
                 run.setResult(Result.FAILURE);
             } else {
                 log("该测试用例请求未能通过，登陆MeterSphere网站查看该报告结果");
