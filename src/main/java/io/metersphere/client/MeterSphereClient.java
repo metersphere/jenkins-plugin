@@ -12,6 +12,7 @@ import io.metersphere.commons.model.TestPlanDTO;
 import io.metersphere.commons.model.WorkspaceDTO;
 import io.metersphere.commons.utils.HttpClientConfig;
 import io.metersphere.commons.utils.HttpClientUtil;
+import io.metersphere.commons.utils.LogUtil;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
@@ -50,12 +51,14 @@ public class MeterSphereClient {
         String userId = this.checkUser();
         ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId);
         String list = JSON.toJSONString(result.getData());
+        LogUtil.info("用户所属工作空间" + list);
         return JSON.parseArray(list, WorkspaceDTO.class);
     }
 
     public List<ProjectDTO> getProjectIds(String workspaceId) {
         ResultHolder result = call(ApiUrlConstants.PROJECT_LIST_ALL + "/" + workspaceId);
         String listJson = JSON.toJSONString(result.getData());
+        LogUtil.info("用户所属项目" + listJson);
         return JSON.parseArray(listJson, ProjectDTO.class);
 
     }
@@ -64,6 +67,7 @@ public class MeterSphereClient {
     public List<TestCaseDTO> getTestCaseIds(String projectId) {
         ResultHolder result = call(ApiUrlConstants.TEST_CASE_LIST_METHOD + "/" + projectId);
         String listJson = JSON.toJSONString(result.getData());
+        LogUtil.info("该项目下所有的接口和性能测试" + listJson);
         return JSON.parseArray(listJson, TestCaseDTO.class);
     }
 
@@ -89,6 +93,7 @@ public class MeterSphereClient {
     public List<TestPlanDTO> getTestPlanIds(String projectId, String workspaceId) {
         ResultHolder result = call(ApiUrlConstants.PLAN_LIST_ALL + "/" + projectId + "/" + workspaceId);
         String listJson = JSON.toJSONString(result.getData());
+        LogUtil.info("该项目下的所有的测试计划" + listJson);
         return JSON.parseArray(listJson, TestPlanDTO.class);
     }
 
@@ -161,6 +166,7 @@ public class MeterSphereClient {
         try {
             signature = aesEncrypt(accessKey + "|" + UUID.randomUUID().toString() + "|" + System.currentTimeMillis(), secretKey, accessKey);
         } catch (Exception e) {
+            LogUtil.error(e.getMessage(), e);
             throw new MeterSphereException("签名失败: " + e.getMessage());
         }
         httpClientConfig.addHeader("signature", signature);
