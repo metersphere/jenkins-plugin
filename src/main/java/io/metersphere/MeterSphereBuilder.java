@@ -20,10 +20,12 @@ import io.metersphere.commons.model.ProjectDTO;
 import io.metersphere.commons.model.TestCaseDTO;
 import io.metersphere.commons.model.TestPlanDTO;
 import io.metersphere.commons.model.WorkspaceDTO;
+import jdk.nashorn.internal.objects.Global;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -339,9 +341,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         return BuildStepMonitor.STEP;
     }
 
-
+    @Symbol("meterSphere")
     @Extension // This indicates to Jenkins that this is an implementation of an extension point.
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+
         public FormValidation doCheckAccount(
                 @QueryParameter String msAccessKey,
                 @QueryParameter String msSecretKey,
@@ -359,7 +362,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
                 MeterSphereClient.checkUser();
             } catch (Exception e) {
-                return FormValidation.error("验证MeterSphere帐号失败！");
+
+                return FormValidation.error("验证MeterSphere帐号失败！" + e);
             }
             return FormValidation.ok("验证MeterSphere帐号成功！");
         }
