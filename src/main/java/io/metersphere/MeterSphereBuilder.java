@@ -20,6 +20,7 @@ import io.metersphere.commons.model.ProjectDTO;
 import io.metersphere.commons.model.TestCaseDTO;
 import io.metersphere.commons.model.TestPlanDTO;
 import io.metersphere.commons.model.WorkspaceDTO;
+import io.metersphere.commons.utils.LogUtil;
 import jdk.nashorn.internal.objects.Global;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
@@ -40,6 +41,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Serializable {
 
@@ -344,7 +346,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     @Symbol("meterSphere")
     @Extension // This indicates to Jenkins that this is an implementation of an extension point.
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
-
         public FormValidation doCheckAccount(
                 @QueryParameter String msAccessKey,
                 @QueryParameter String msSecretKey,
@@ -362,8 +363,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
                 MeterSphereClient.checkUser();
             } catch (Exception e) {
-
-                return FormValidation.error("验证MeterSphere帐号失败！" + e);
+                LogUtil.error(e.getMessage(), e);
+                return FormValidation.error("验证MeterSphere帐号失败！" + e.getMessage());
             }
             return FormValidation.ok("验证MeterSphere帐号成功！");
         }
@@ -384,7 +385,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     }
                 }
             } catch (Exception e) {
-
+                LogUtil.error(e.getMessage(), e);
             }
             return items;
 
@@ -402,6 +403,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
                 if (workspaceId != null && !workspaceId.equals("")) {
                     list = MeterSphereClient.getProjectIds(workspaceId);
+
                 }
                 if (list != null && list.size() > 0) {
                     for (ProjectDTO c : list) {
@@ -409,8 +411,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     }
                 }
             } catch (Exception e) {
-//            		e.printStackTrace();
-//                return FormValidation.error(e.getMessage());
+                LogUtil.error(e.getMessage(), e);
             }
             return items;
         }
@@ -436,6 +437,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 }
 
             } catch (Exception e) {
+                LogUtil.error(e.getMessage(), e);
             }
             return items;
         }
@@ -462,7 +464,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 }
 
             } catch (Exception e) {
-
+                LogUtil.error(e.getMessage(), e);
             }
             return items;
         }
