@@ -126,7 +126,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             log(c.getName() + "发生异常：" + e.getMessage());
                                         }
                                         try {
-                                            int count = 10;
+                                            int count = 20;
                                             String apiTestState = "";
                                             while (count > 0) {
                                                 log("开始请求api状态：" + c.getName());
@@ -143,7 +143,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                                     meterSphereClient.changeState(c.getId(), Results.FAILURE);
                                                 }
                                                 count--;
-                                                Thread.sleep(1000 * 10L);
+                                                Thread.sleep(1000 * 60);
                                             }
                                             if (count == 0) {
                                                 if (!apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
@@ -174,7 +174,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                             log(c.getName() + "发生异常：" + e.getMessage());
                                         }
                                         try {
-                                            int count = 10;
+                                            int count = 20;
                                             String pfmTestState = "";
                                             while (count > 0) {
                                                 log("开始请求性能测试状态：" + c.getName());
@@ -192,7 +192,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
                                                 }
                                                 count--;
-                                                Thread.sleep(1000 * 10L);
+                                                Thread.sleep(1000 * 60);
                                             }
                                             if (count == 0) {
                                                 if (!pfmTestState.equalsIgnoreCase(Results.COMPLETED)) {
@@ -250,7 +250,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                     }
                                     String apiTestState = "";
                                     try {
-                                        int count = 10;
+                                        int count = 20;
                                         while (count > 0) {
                                             log("开始请求api状态：" + c.getName());
                                             apiTestState = meterSphereClient.getApiTestState(reportId);
@@ -263,7 +263,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
                                             }
                                             count--;
-                                            Thread.sleep(1000 * 8L);
+                                            Thread.sleep(1000 * 60);
                                         }
                                         if (count == 0) {
                                             if (!apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
@@ -298,7 +298,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
                                             }
                                             count--;
-                                            Thread.sleep(1000 * 8L);
+                                            Thread.sleep(1000 * 60);
                                         }
                                         if (count == 0) {
                                             if (!pfmTestState.equalsIgnoreCase(Results.COMPLETED)) {
