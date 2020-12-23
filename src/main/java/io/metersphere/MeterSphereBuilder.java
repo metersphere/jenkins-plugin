@@ -153,16 +153,17 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                 if (num == 0) {
                                     success.set(true);
                                 }
+                                countDownLatch.countDown();
                             } catch (Exception e) {
                                 log(e.getMessage());
                             } finally {
-                                countDownLatch.countDown();
+
                             }
                         }
                     });
                 }
 
-                if (StringUtils.equals(Results.PERFORMANCE, c.getType())) {
+                if (StringUtils.equals("performance", c.getType())) {
                     log("性能测试[" + c.getName() + "]开始执行");
                     testThreadPool.execute(new Runnable() {
                         @Override
@@ -173,9 +174,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                 if (num == 0) {
                                     success.set(true);
                                 }
-                                log("num:" + num);
-                            } catch (Exception e) {
                                 countDownLatch.countDown();
+                            } catch (Exception e) {
+                                log(e.getMessage());
                             }
                         }
                     });
@@ -301,9 +302,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     num = 0;
                     log("更新测试用例结果：" + c.getName() + "执行结果");
                     meterSphereClient.changeState(id, Results.FAILURE);
-
                 }
-                Thread.sleep(1000 * 60 * 3);
+                Thread.sleep(1000 * 60);
             }
         } catch (InterruptedException e) {
             log(c.getName() + "发生异常：" + e.getMessage());
