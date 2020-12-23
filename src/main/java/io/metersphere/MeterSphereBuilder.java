@@ -153,7 +153,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                 if (num == 0) {
                                     success.set(true);
                                 }
-                                log("num:" + num);
                             } catch (Exception e) {
                                 log(e.getMessage());
                             } finally {
@@ -218,7 +217,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         if (num == 0) {
                             flag = false;
                         }
-                        log("num:" + num);
+
                         if (num == 0) {
                             flag = false;
                         }
