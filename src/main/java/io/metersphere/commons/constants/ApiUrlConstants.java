@@ -14,4 +14,5 @@ public class ApiUrlConstants {
     public static final String API_GET = "/api/report/get";//API测试报告（特定）
     public static final String PERFORMANCE_GET = "/performance/state/get";//性能测试测试报告（特定）
     public static final String CHANGE_STATE = "/test/plan/case/edit";//更新测试计划用例的结果
+    public static final String BASE_INFO = "/system/base/info";//查询站点
 }

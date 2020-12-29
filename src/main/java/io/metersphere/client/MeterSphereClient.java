@@ -6,10 +6,7 @@ import io.metersphere.ResultHolder;
 import io.metersphere.commons.constants.ApiUrlConstants;
 import io.metersphere.commons.constants.RequestMethod;
 import io.metersphere.commons.exception.MeterSphereException;
-import io.metersphere.commons.model.ProjectDTO;
-import io.metersphere.commons.model.TestCaseDTO;
-import io.metersphere.commons.model.TestPlanDTO;
-import io.metersphere.commons.model.WorkspaceDTO;
+import io.metersphere.commons.model.*;
 import io.metersphere.commons.utils.HttpClientConfig;
 import io.metersphere.commons.utils.HttpClientUtil;
 import io.metersphere.commons.utils.LogUtil;
@@ -133,6 +130,15 @@ public class MeterSphereClient {
         params.put("id", id);
         params.put("status", status);
         call(ApiUrlConstants.CHANGE_STATE, RequestMethod.POST, params);
+    }
+
+    /*查询站点*/
+    public String getBaseInfo() {
+        BaseSystemConfigDTO baseSystemConfigDTO = new BaseSystemConfigDTO();
+        ResultHolder result = call(ApiUrlConstants.BASE_INFO);
+        String listJson = JSON.toJSONString(result.getData());
+        JSONObject jsonObject = JSONObject.parseObject(listJson);
+        return jsonObject.getString("url");
     }
 
     private ResultHolder call(String url) {

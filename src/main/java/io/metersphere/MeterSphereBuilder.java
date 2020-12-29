@@ -189,12 +189,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             try {
                 countDownLatch.await();
                 if (success.compareAndSet(false, true)) {
-                    log("测试用例请求全部通过，登陆MeterSphere网站查看该报告结果");
+                    log("测试用例请求全部通过，可以登陆MeterSphere网站查看全部报告结果");
                 } else {
                     if (result.equals(Results.METERSPHERE)) {
                         throw new MeterSphereException("测试用例未能全部完成");
                     } else {
-                        log("测试用例请求未能全部通过，登陆MeterSphere网站查看该报告结果");
+                        log("测试用例请求未能全部通过，可以登陆MeterSphere网站查看全部报告结果");
                     }
                 }
             } catch (InterruptedException e) {
@@ -214,11 +214,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 if (StringUtils.equals(testCaseId, c.getId())) {
                     if (StringUtils.equals(Results.API, c.getType())) {
                         int num = 1;
-                        num = num * runApiTest(meterSphereClient, c, c.getTestId());
+                        num = num * runApiTest(meterSphereClient, c, testCaseId);
                         if (num == 0) {
                             flag = false;
                         }
-
                         if (num == 0) {
                             flag = false;
                         }
@@ -245,6 +244,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
 
     public int runApiTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String id) {
+        String url = meterSphereClient.getBaseInfo();
         int num = 1;
         String reportId = "";
         try {
@@ -261,12 +261,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 log("接口测试【" + c.getName() + "】执行状态：" + apiTestState);
                 if (apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
                     state = false;
-                    log("更新MeterSphere：" + c.getName() + "执行结果");
+                    log("点击链接进入" + c.getName() + "测试报告页面:" + url + "/#/api/report/view/" + reportId.replace("\"", ""));
                     meterSphereClient.changeState(id, Results.PASS);
                 } else if (apiTestState.equalsIgnoreCase(Results.ERROR)) {
                     state = false;
                     num = 0;
-                    log("更新MeterSphere：" + c.getName() + "执行结果");
+                    log("点击链接进入" + c.getName() + "测试报告页面:" + url + "/#/api/report/view/" + reportId.replace("\"", ""));
                     meterSphereClient.changeState(id, Results.FAILURE);
                 }
                 Thread.sleep(1000 * 60);
@@ -280,6 +280,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     }
 
     public int runPerformTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String id) {
+        String url = meterSphereClient.getBaseInfo();
+
         int num = 1;
         try {
             meterSphereClient.runPerformanceTest(id);
@@ -295,12 +297,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 log("性能测试【" + c.getName() + "】执行状态：" + pfmTestState);
                 if (pfmTestState.equalsIgnoreCase(Results.COMPLETED)) {
                     state = false;
-                    log("更新测试用例结果：" + c.getName() + "执行结果");
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/performance/report/view/" + id);
                     meterSphereClient.changeState(id, Results.PASS);
                 } else if (pfmTestState.equalsIgnoreCase(Results.ERROR)) {
                     state = false;
                     num = 0;
-                    log("更新测试用例结果：" + c.getName() + "执行结果");
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/performance/report/view/" + id);
                     meterSphereClient.changeState(id, Results.FAILURE);
                 }
                 Thread.sleep(1000 * 60);
