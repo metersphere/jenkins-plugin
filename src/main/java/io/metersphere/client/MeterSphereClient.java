@@ -16,6 +16,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -68,14 +69,9 @@ public class MeterSphereClient {
         return JSON.parseArray(listJson, TestCaseDTO.class);
     }
 
-    public List<TestCaseDTO> getTestCaseIdsByNodePaths(String planId, String nodePaths) {
+    public List<TestCaseDTO> getTestCaseIdsByPlanId(String testPlanId) {
         ResultHolder result;
-        if (nodePaths.equals("")) {
-            result = call(ApiUrlConstants._TEST_PLAN_CASE_LIST + "/" + planId);
-        } else {
-            result = call(ApiUrlConstants.TEST_PLAN_CASE_LIST + "/" + planId + "/" + nodePaths);
-
-        }
+        result = call(ApiUrlConstants._TEST_PLAN_CASE_LIST + "/" + testPlanId);
         String listJson = JSON.toJSONString(result.getData());
         return JSON.parseArray(listJson, TestCaseDTO.class);
     }
@@ -100,7 +96,55 @@ public class MeterSphereClient {
         params.put("triggerMode", "API");
         ResultHolder result = call(ApiUrlConstants.API_RUN, RequestMethod.POST, params);
         return JSON.toJSONString(result.getData());
+    }
 
+    public String runScenario(TestCaseDTO testCaseDTO) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("id", UUID.randomUUID().toString());
+        params.put("projectId", testCaseDTO.getProjectId());
+        params.put("scenarioIds", Arrays.asList(testCaseDTO.getId()));
+        params.put("executeType", "Saved");
+        params.put("triggerMode", "API");
+        ResultHolder result = call(ApiUrlConstants.API_AUTOMATION_RUN, RequestMethod.POST, params);
+        return JSON.toJSONString(result.getData());
+    }
+
+    public String getApiScenario(String id) {
+        if (id.equals("") || id == null) {
+            id = UUID.randomUUID().toString();
+        }
+        ResultHolder result = call(ApiUrlConstants.API_AUTOMATION_GETAPISCENARIO + "/" + id.replace('"', ' ').trim());
+        String listJson = JSON.toJSONString(result.getData());
+        JSONObject jsonObject = JSONObject.parseObject(listJson);
+        return jsonObject.getString("status");
+    }
+
+    public void runDefinition(TestCaseDTO testCaseDTO) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("caseId", testCaseDTO.getId());
+        params.put("reportId", UUID.randomUUID().toString());
+        call(ApiUrlConstants.API_DEFINITION_RUN, RequestMethod.POST, params);
+
+    }
+
+    public String getDefinition(String id) {
+        if (id.equals("") || id == null) {
+            id = UUID.randomUUID().toString();
+        }
+        ResultHolder result = call(ApiUrlConstants.API_DEFINITION + "/" + id.replace('"', ' ').trim());
+        String listJson = JSON.toJSONString(result.getData());
+        JSONObject jsonObject = JSONObject.parseObject(listJson);
+        return jsonObject.getString("status");
+    }
+
+    public String getApiTestCase(String id) {
+        if (id.equals("") || id == null) {
+            id = UUID.randomUUID().toString();
+        }
+        ResultHolder result = call(ApiUrlConstants.API_test_case + "/" + id.replace('"', ' ').trim());
+        String listJson = JSON.toJSONString(result.getData());
+        JSONObject jsonObject = JSONObject.parseObject(listJson);
+        return jsonObject.getString("api_definition_id");
     }
 
     public void runPerformanceTest(String testCaseId) {

@@ -11,4 +11,6 @@ public class Results {
     public static final String API = "api";
     public static final String PERFORMANCE = "perform";
     public static final String FUNCTIONAL = "functional";
+    public static final String SCENARIO = "scenario";
+    public static final String FAIL = "Fail";
 }

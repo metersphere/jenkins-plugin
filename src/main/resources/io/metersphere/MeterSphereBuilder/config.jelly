@@ -21,15 +21,11 @@
         <f:select style="height:40px;"/>
     </f:entry>
     <f:section title="执行方式">
-        <f:radioBlock title="执行测试计划中用例" name="method" value="modular" inline="true" checked="${instance.method == 'modular'}">
+        <f:radioBlock title="执行测试计划中用例" name="method" value="testPlan" inline="true"
+                      checked="${instance.method == 'modular'}">
             <f:entry title="测试计划" field="testPlanId">
                 <f:select style="height:40px;"/>
             </f:entry>
-            <f:entry title="所属模块" field="nodePaths">
-                <f:textbox style="height:40px;" default="/一级模块1/二级模块1，/一级模块2/二级模块2"/>
-            </f:entry>
-
-
         </f:radioBlock>
         <f:radioBlock title="单独选择测试执行" name="method" value="single" inline="true" checked="${instance.method == 'single'}">
             <f:entry title="测试名称" field="testCaseId">
