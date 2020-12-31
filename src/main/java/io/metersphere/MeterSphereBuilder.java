@@ -387,7 +387,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             String apiTestState = "";
 
             while (state) {
-                apiDefinition = meterSphereClient.getApiTestCase("e96d7c5c-be2c-4c57-8e8e-f783863f1cc4");
+                apiDefinition = meterSphereClient.getApiTestCase(c.getId());
                 apiTestState = meterSphereClient.getDefinition(apiDefinition);
                 log("测试用例【" + c.getName() + "】执行状态：" + apiTestState);
                 if (apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
