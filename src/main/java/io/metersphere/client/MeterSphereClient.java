@@ -137,14 +137,14 @@ public class MeterSphereClient {
         return jsonObject.getString("status");
     }
 
-    public String getApiTestCase(String id) {
+    public String getApiTestCaseReport(String id) {
         if (id.equals("") || id == null) {
             id = UUID.randomUUID().toString();
         }
-        ResultHolder result = call(ApiUrlConstants.API_test_case + "/" + id.replace('"', ' ').trim());
+        ResultHolder result = call(ApiUrlConstants.API_TES_REPORT + "/" + id.replace('"', ' ').trim());
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
-        return jsonObject.getString("api_definition_id");
+        return jsonObject.getString("status");
     }
 
     public void runPerformanceTest(String testCaseId) {

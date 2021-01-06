@@ -88,7 +88,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 case Method.testPlan:
                     final List<TestCaseDTO> modelList;
                     modelList = meterSphereClient.getTestCaseIdsByPlanId(testPlanId);//测试计划下全部
-                    getTestStepsByModular(meterSphereClient, modelList);
+                    getTestStepsByModular(meterSphereClient, modelList, testPlanId);
                     break;
                 case Method.single:
                     List<TestCaseDTO> testCaseIds = meterSphereClient.getTestCaseIds(projectId);//项目下
@@ -109,7 +109,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     }
 
-    public void getTestStepsByModular(MeterSphereClient meterSphereClient, List<TestCaseDTO> modelList) {
+    public void getTestStepsByModular(MeterSphereClient meterSphereClient, List<TestCaseDTO> modelList, String id) {
         final AtomicBoolean success = new AtomicBoolean(false);
         JSON.toJSONString(modelList);
         log("testList=" + "[" + JSON.toJSONString(modelList) + "]");
@@ -159,20 +159,21 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 }
 
                 if (StringUtils.equals("definition", c.getType())) {
-                    log("接口测试用例[" + c.getName() + "]开始执行");
+                    log("测试用例[" + c.getName() + "]开始执行");
                     countDownLatch.countDown();
                     testThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 int num = 1;
-                                num = num * runDefinition(meterSphereClient, c, c.getTestId());
+                                num = num * runDefinition(meterSphereClient, c, c.getTestId(), id);
                                 if (num == 0) {
                                     success.set(true);
                                 }
                                 countDownLatch.countDown();
                             } catch (Exception e) {
                                 log(e.getMessage());
+
                             } finally {
                                 countDownLatch.countDown();
                             }
@@ -373,7 +374,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         return num;
     }
 
-    public int runDefinition(MeterSphereClient meterSphereClient, TestCaseDTO c, String id) {
+    public int runDefinition(MeterSphereClient meterSphereClient, TestCaseDTO c, String id, String testPlanId) {
+        String url = meterSphereClient.getBaseInfo();
         int num = 1;
         try {
             meterSphereClient.runDefinition(c);
@@ -383,18 +385,17 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         }
         try {
             boolean state = true;
-            String apiDefinition = "";
-            String apiTestState = "";
-
+            String status = "";
             while (state) {
-                apiDefinition = meterSphereClient.getApiTestCase(c.getId());
-                apiTestState = meterSphereClient.getDefinition(apiDefinition);
-                log("测试用例【" + c.getName() + "】执行状态：" + apiTestState);
-                if (apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
+                status = meterSphereClient.getApiTestCaseReport(c.getId());
+                log("测试用例【" + c.getName() + "】执行状态：" + status);
+                if (status.equalsIgnoreCase("success")) {
                     state = false;
-                } else if (apiTestState.equalsIgnoreCase(Results.ERROR)) {
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/track/plan/view/" + testPlanId);
+                } else if (status.equalsIgnoreCase("error")) {
                     state = false;
                     num = 0;
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/track/plan/view/" + testPlanId);
                 }
                 Thread.sleep(1000 * 60);
             }

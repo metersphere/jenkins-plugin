@@ -22,7 +22,7 @@
     </f:entry>
     <f:section title="执行方式">
         <f:radioBlock title="执行测试计划中用例" name="method" value="testPlan" inline="true"
-                      checked="${instance.method == 'modular'}">
+                      checked="${instance.method == 'testPlan'}">
             <f:entry title="测试计划" field="testPlanId">
                 <f:select style="height:40px;"/>
             </f:entry>

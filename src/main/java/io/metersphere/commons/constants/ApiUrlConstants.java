@@ -19,6 +19,6 @@ public class ApiUrlConstants {
     public static final String API_AUTOMATION_GETAPISCENARIO = "/api/scenario/report/get";//报告详情
     public static final String API_DEFINITION_RUN = "/api/testcase/jenkins/run";//接口测试用例运行
     public static final String API_DEFINITION = "/api/definition/get";//接口测详情
-    public static final String API_test_case = "/api/testcase/get";//接口yongli测详情/api/testcase
+    public static final String API_TES_REPORT = "/api/definition/report/getReport";//接口用例测详情
 
 }
