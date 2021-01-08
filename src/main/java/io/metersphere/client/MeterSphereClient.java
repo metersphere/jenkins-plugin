@@ -141,10 +141,9 @@ public class MeterSphereClient {
         if (id.equals("") || id == null) {
             id = UUID.randomUUID().toString();
         }
-        ResultHolder result = call(ApiUrlConstants.API_TES_REPORT + "/" + id.replace('"', ' ').trim());
+        ResultHolder result = call(ApiUrlConstants.API_TES_RESULT + "/" + id.replace('"', ' ').trim());
         String listJson = JSON.toJSONString(result.getData());
-        JSONObject jsonObject = JSONObject.parseObject(listJson);
-        return jsonObject.getString("status");
+        return listJson.replace('"', ' ').trim();
     }
 
     public void runPerformanceTest(String testCaseId) {

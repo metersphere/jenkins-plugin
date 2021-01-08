@@ -138,7 +138,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     });
                 }
 
-                if (StringUtils.equals("performance", c.getType())) {
+                if (StringUtils.equals(Results.PERFORMANCE, c.getType())) {
                     log("性能测试[" + c.getName() + "]开始执行");
                     testThreadPool.execute(new Runnable() {
                         @Override
@@ -158,9 +158,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     });
                 }
 
-                if (StringUtils.equals("definition", c.getType())) {
+                if (StringUtils.equals(Results.DEFINITION, c.getType())) {
                     log("测试用例[" + c.getName() + "]开始执行");
-                    countDownLatch.countDown();
                     testThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
@@ -170,7 +169,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                 if (num == 0) {
                                     success.set(true);
                                 }
-                                countDownLatch.countDown();
                             } catch (Exception e) {
                                 log(e.getMessage());
 
@@ -181,7 +179,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     });
                 }
 
-                if (StringUtils.equals("scenario", c.getType())) {
+                if (StringUtils.equals(Results.SCENARIO, c.getType())) {
                     log("接口场景测试[" + c.getName() + "]开始执行");
                     testThreadPool.execute(new Runnable() {
                         @Override
@@ -192,7 +190,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                 if (num == 0) {
                                     success.set(true);
                                 }
-                                countDownLatch.countDown();
+
                             } catch (Exception e) {
                                 log(e.getMessage());
                             } finally {
@@ -250,6 +248,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     }
                     if (StringUtils.equals(Results.SCENARIO, c.getType())) {
                         int num = runScenario(meterSphereClient, c, testCaseId);
+                        if (num == 0) {
+                            flag = false;
+                        }
+                    }
+                    if (StringUtils.equals(Results.DEFINITION, c.getType())) {
+                        int num = runDefinition(meterSphereClient, c, testCaseId, c.getId());
                         if (num == 0) {
                             flag = false;
                         }
@@ -391,11 +395,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 log("测试用例【" + c.getName() + "】执行状态：" + status);
                 if (status.equalsIgnoreCase("success")) {
                     state = false;
-                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/track/plan/view/" + testPlanId);
+                    log("点击链接进入" + c.getName() + "测试用例列表: " + url + "/#/track/plan/view/" + testPlanId);
                 } else if (status.equalsIgnoreCase("error")) {
                     state = false;
                     num = 0;
-                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/track/plan/view/" + testPlanId);
+                    log("点击链接进入" + c.getName() + "测试用例列表: " + url + "/#/track/plan/view/" + testPlanId);
                 }
                 Thread.sleep(1000 * 60);
             }
