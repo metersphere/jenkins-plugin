@@ -27,8 +27,12 @@
                 <f:select style="height:40px;"/>
             </f:entry>
         </f:radioBlock>
-        <f:radioBlock title="单独选择测试执行" name="method" value="single" inline="true" checked="${instance.method == 'single'}">
+        <f:radioBlock title="单独选择测试执行" name="method" value="single" inline="true"
+                      checked="${instance.method == 'single'}">
             <f:entry title="测试名称" field="testCaseId">
+                <f:select style="height:40px;"/>
+            </f:entry>
+            <f:entry title="运行环境" field="environmentId">
                 <f:select style="height:40px;"/>
             </f:entry>
         </f:radioBlock>

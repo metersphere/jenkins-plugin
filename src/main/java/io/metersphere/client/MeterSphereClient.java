@@ -69,6 +69,14 @@ public class MeterSphereClient {
         return JSON.parseArray(listJson, TestCaseDTO.class);
     }
 
+    /*环境测试列表*/
+    public List<ApiTestEnvironmentDTO> getEnvironmentIds(String projectId) {
+        ResultHolder result = call(ApiUrlConstants.ENVIRONMEN_LIST + "/" + projectId);
+        String listJson = JSON.toJSONString(result.getData());
+        LogUtil.info("该项目下的环境列表" + listJson);
+        return JSON.parseArray(listJson, ApiTestEnvironmentDTO.class);
+    }
+
     public List<TestCaseDTO> getTestCaseIdsByPlanId(String testPlanId) {
         ResultHolder result;
         result = call(ApiUrlConstants._TEST_PLAN_CASE_LIST + "/" + testPlanId);
@@ -98,13 +106,13 @@ public class MeterSphereClient {
         return JSON.toJSONString(result.getData());
     }
 
-    public String runScenario(TestCaseDTO testCaseDTO) {
+    public String runScenario(TestCaseDTO testCaseDTO, String runMode) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", UUID.randomUUID().toString());
         params.put("projectId", testCaseDTO.getProjectId());
         params.put("scenarioIds", Arrays.asList(testCaseDTO.getId()));
         params.put("executeType", "Saved");
-        params.put("triggerMode", "API");
+        params.put("runMode", runMode);
         ResultHolder result = call(ApiUrlConstants.API_AUTOMATION_RUN, RequestMethod.POST, params);
         return JSON.toJSONString(result.getData());
     }
@@ -119,10 +127,13 @@ public class MeterSphereClient {
         return jsonObject.getString("status");
     }
 
-    public void runDefinition(TestCaseDTO testCaseDTO) {
+    public void runDefinition(TestCaseDTO testCaseDTO, String runMode, String environmentId, String testPlanId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("caseId", testCaseDTO.getId());
         params.put("reportId", UUID.randomUUID().toString());
+        params.put("runMode", runMode);
+        params.put("environmentId", environmentId);
+        params.put("testPlanId", testPlanId);
         call(ApiUrlConstants.API_DEFINITION_RUN, RequestMethod.POST, params);
 
     }

@@ -21,6 +21,6 @@ public class ApiUrlConstants {
     public static final String API_DEFINITION = "/api/definition/get";//接口测详情
     public static final String API_TES_REPORT = "/api/definition/report/getReport";//接口用例测详情
     public static final String API_TES_RESULT = "/api/testcase/jenkins/exec/result";//查询单接口用例执行结果
-
+    public static final String ENVIRONMEN_LIST = "/api/environment/list";
 
 }
