@@ -205,6 +205,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             }
             try {
                 countDownLatch.await();
+                meterSphereClient.testPlanNotice(testPlanId, "jenkins");
                 if (success.compareAndSet(false, true)) {
                     log("测试用例请求全部通过，可以登陆MeterSphere网站查看全部报告结果");
                 } else {
@@ -247,7 +248,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         }
                     }
                     if (StringUtils.equals(Results.SCENARIO, c.getType())) {
-                        int num = runScenario(meterSphereClient, c, testCaseId, "DELIMIT");
+                        int num = runScenario(meterSphereClient, c, testCaseId, "SCENARIO");
                         if (num == 0) {
                             flag = false;
                         }
@@ -311,10 +312,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     public int runPerformTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String id) {
         String url = meterSphereClient.getBaseInfo();
-
+        String reportId = "";
         int num = 1;
         try {
-            meterSphereClient.runPerformanceTest(id);
+            reportId = meterSphereClient.runPerformanceTest(id);
         } catch (Exception e) {
             num = 0;
             log(c.getName() + "发生异常：" + e.getMessage());
@@ -327,12 +328,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 log("性能测试【" + c.getName() + "】执行状态：" + pfmTestState);
                 if (pfmTestState.equalsIgnoreCase(Results.COMPLETED)) {
                     state = false;
-                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/performance/report/view/" + id);
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/performance/report/view/" + reportId.replace("\"", ""));
                     meterSphereClient.changeState(id, Results.PASS);
                 } else if (pfmTestState.equalsIgnoreCase(Results.ERROR)) {
                     state = false;
                     num = 0;
-                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/performance/report/view/" + id);
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/performance/report/view/" + reportId.replace("\"", ""));
                     meterSphereClient.changeState(id, Results.FAILURE);
                 }
                 Thread.sleep(1000 * 60);

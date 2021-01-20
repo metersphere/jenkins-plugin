@@ -112,7 +112,7 @@ public class MeterSphereClient {
         params.put("projectId", testCaseDTO.getProjectId());
         params.put("scenarioIds", Arrays.asList(testCaseDTO.getId()));
         params.put("executeType", "Saved");
-        params.put("runMode", runMode);
+        params.put("triggerMode", "API");
         ResultHolder result = call(ApiUrlConstants.API_AUTOMATION_RUN, RequestMethod.POST, params);
         return JSON.toJSONString(result.getData());
     }
@@ -157,11 +157,13 @@ public class MeterSphereClient {
         return listJson.replace('"', ' ').trim();
     }
 
-    public void runPerformanceTest(String testCaseId) {
+    public String runPerformanceTest(String testCaseId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", testCaseId);
         params.put("triggerMode", "API");
-        call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params);
+        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params);
+        String listJson = JSON.toJSONString(result.getData());
+        return listJson.replace('"', ' ').trim();
     }
 
     public String getApiTestState(String reportId) {
@@ -194,6 +196,12 @@ public class MeterSphereClient {
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         return jsonObject.getString("url");
     }
+
+    /*测试计划报告*/
+    public void testPlanNotice(String planId, String userId) {
+        call(ApiUrlConstants.TEST_PLAN_REPORT + "/" + planId + "/" + userId);
+    }
+
 
     private ResultHolder call(String url) {
         return call(url, RequestMethod.GET, null);
