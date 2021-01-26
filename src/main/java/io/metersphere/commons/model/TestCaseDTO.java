@@ -21,7 +21,16 @@ public class TestCaseDTO {
     private Long createTime;
     private Long updateTime;
     private String testId;
+    private String lastResultId;
     private static final long serialVersionUID = 1L;
+
+    public String getLastResultId() {
+        return lastResultId;
+    }
+
+    public void setLastResultId(String lastResultId) {
+        this.lastResultId = lastResultId;
+    }
 
     public List<String> getNodePaths() {
         return nodePaths;

@@ -254,7 +254,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         }
                     }
                     if (StringUtils.equals(Results.DEFINITION, c.getType())) {
-                        int num = runDefinition(meterSphereClient, c, testCaseId, testPlanId, "DELIMIT", environmentId);
+                        int num = runDefinition(meterSphereClient, c, testCaseId, testPlanId, "JENKINS", environmentId);
                         if (num == 0) {
                             flag = false;
                         }

@@ -134,6 +134,7 @@ public class MeterSphereClient {
         params.put("runMode", runMode);
         params.put("environmentId", environmentId);
         params.put("testPlanId", testPlanId);
+        params.put("triggerMode", "API");
         call(ApiUrlConstants.API_DEFINITION_RUN, RequestMethod.POST, params);
 
     }
@@ -154,7 +155,8 @@ public class MeterSphereClient {
         }
         ResultHolder result = call(ApiUrlConstants.API_TES_RESULT + "/" + id.replace('"', ' ').trim());
         String listJson = JSON.toJSONString(result.getData());
-        return listJson.replace('"', ' ').trim();
+        JSONObject jsonObject = JSONObject.parseObject(listJson);
+        return jsonObject.getString("execResult");
     }
 
     public String runPerformanceTest(String testCaseId) {
