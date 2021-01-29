@@ -164,7 +164,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         public void run() {
                             try {
                                 int num = 1;
-                                num = num * runDefinition(meterSphereClient, c, c.getTestId(), id, "JENKINS", _environmentId);
+                                num = num * runDefinition(meterSphereClient, c, c.getTestId(), id, "JENKINS_API_PLAN", _environmentId);
                                 if (num == 0) {
                                     success.set(true);
                                 }

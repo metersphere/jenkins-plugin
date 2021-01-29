@@ -23,6 +23,15 @@ public class TestCaseDTO {
     private String testId;
     private String lastResultId;
     private static final long serialVersionUID = 1L;
+    private String reportId;
+
+    public String getReportId() {
+        return reportId;
+    }
+
+    public void setReportId(String reportId) {
+        this.reportId = reportId;
+    }
 
     public String getLastResultId() {
         return lastResultId;
