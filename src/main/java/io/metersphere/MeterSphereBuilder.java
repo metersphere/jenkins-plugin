@@ -111,7 +111,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     public void getTestStepsByModular(MeterSphereClient meterSphereClient, List<TestCaseDTO> modelList, String id, String _environmentId) {
         final AtomicBoolean success = new AtomicBoolean(false);
         JSON.toJSONString(modelList);
+/*
         log("testList=" + "[" + JSON.toJSONString(modelList) + "]");
+*/
         final ExecutorService testThreadPool = Executors.newFixedThreadPool(modelList.size());
         final CountDownLatch countDownLatch = new CountDownLatch(modelList.size());
         if (modelList.size() > 0) {
@@ -362,11 +364,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 log("场景测试【" + c.getName() + "】执行状态：" + apiTestState);
                 if (apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
                     state = false;
-                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report");
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/reportId");
                 } else if (apiTestState.equalsIgnoreCase(Results.ERROR)) {
                     state = false;
                     num = 0;
-                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report");
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/reportId");
                 }
                 Thread.sleep(1000 * 60);
             }
@@ -395,11 +397,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 log("测试用例【" + c.getName() + "】执行状态：" + status);
                 if (status.equalsIgnoreCase("success")) {
                     state = false;
-                    log("点击链接进入" + c.getName() + "测试用例列表: " + url + "/#/track/plan/view/" + testPlanId);
                 } else if (status.equalsIgnoreCase("error")) {
                     state = false;
                     num = 0;
-                    log("点击链接进入" + c.getName() + "测试用例列表: " + url + "/#/track/plan/view/" + testPlanId);
                 }
                 Thread.sleep(1000 * 60);
             }

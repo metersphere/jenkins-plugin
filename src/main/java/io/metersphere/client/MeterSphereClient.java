@@ -110,7 +110,7 @@ public class MeterSphereClient {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", UUID.randomUUID().toString());
         params.put("projectId", testCaseDTO.getProjectId());
-        params.put("scenarioIds", Arrays.asList(testCaseDTO.getId()));
+        params.put("ids", Arrays.asList(testCaseDTO.getId()));
         params.put("executeType", "Saved");
         params.put("triggerMode", "API");
         ResultHolder result = call(ApiUrlConstants.API_AUTOMATION_RUN, RequestMethod.POST, params);
