@@ -5,12 +5,14 @@ import com.alibaba.fastjson.JSONObject;
 import io.metersphere.ResultHolder;
 import io.metersphere.commons.constants.ApiUrlConstants;
 import io.metersphere.commons.constants.RequestMethod;
+import io.metersphere.commons.constants.Results;
 import io.metersphere.commons.exception.MeterSphereException;
 import io.metersphere.commons.model.*;
 import io.metersphere.commons.utils.HttpClientConfig;
 import io.metersphere.commons.utils.HttpClientUtil;
 import io.metersphere.commons.utils.LogUtil;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.StringUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -106,14 +108,19 @@ public class MeterSphereClient {
         return JSON.toJSONString(result.getData());
     }
 
-    public String runScenario(TestCaseDTO testCaseDTO, String runMode) {
+    public String runScenario(TestCaseDTO testCaseDTO, String id, String type) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", UUID.randomUUID().toString());
-        params.put("projectId", testCaseDTO.getProjectId());
+        params.put("projectId", id);
+        params.put("planCaseIds", Arrays.asList(testCaseDTO.getId()));
+        params.put("planScenarioId", testCaseDTO.getId());
         params.put("ids", Arrays.asList(testCaseDTO.getId()));
-        params.put("executeType", "Saved");
-        params.put("triggerMode", "API");
-        ResultHolder result = call(ApiUrlConstants.API_AUTOMATION_RUN, RequestMethod.POST, params);
+        ResultHolder result;
+        if (type.equals("scenario")) {
+            result = call(ApiUrlConstants.API_AUTOMATION_RUN_SINGLE, RequestMethod.POST, params);
+        } else {
+            result = call(ApiUrlConstants.API_AUTOMATION_RUN, RequestMethod.POST, params);
+        }
         return JSON.toJSONString(result.getData());
     }
 
@@ -127,9 +134,9 @@ public class MeterSphereClient {
         return jsonObject.getString("status");
     }
 
-    public void runDefinition(TestCaseDTO testCaseDTO, String runMode, String environmentId, String testPlanId) {
+    public void runDefinition(TestCaseDTO testCaseDTO, String runMode, String environmentId, String testPlanId, String testCaseId) {
         HashMap<String, Object> params = new HashMap<>();
-        params.put("caseId", testCaseDTO.getId());
+        params.put("caseId", testCaseId);
         params.put("reportId", testCaseDTO.getReportId());
         params.put("runMode", runMode);
         params.put("environmentId", environmentId);

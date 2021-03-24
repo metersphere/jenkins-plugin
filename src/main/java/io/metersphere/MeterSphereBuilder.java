@@ -87,11 +87,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 case Method.testPlan:
                     final List<TestCaseDTO> modelList;
                     modelList = meterSphereClient.getTestCaseIdsByPlanId(testPlanId);//测试计划下全部
-                    getTestStepsByModular(meterSphereClient, modelList, testPlanId, "");
+                    getTestStepsByModular(meterSphereClient, modelList, projectId, "", testPlanId);
                     break;
                 case Method.single:
                     List<TestCaseDTO> testCaseIds = meterSphereClient.getTestCaseIds(projectId);//项目下
-                    getTestStepsBySingle(meterSphereClient, testCaseIds, environmentId);
+                    getTestStepsBySingle(meterSphereClient, testCaseIds, environmentId, projectId);
                     break;
                 default:
                     log("测试用例不存在");
@@ -108,7 +108,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     }
 
-    public void getTestStepsByModular(MeterSphereClient meterSphereClient, List<TestCaseDTO> modelList, String id, String _environmentId) {
+    public void getTestStepsByModular(MeterSphereClient meterSphereClient, List<TestCaseDTO> modelList, String projectId, String _environmentId, String testPlanId) {
         final AtomicBoolean success = new AtomicBoolean(false);
         JSON.toJSONString(modelList);
 /*
@@ -166,7 +166,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         public void run() {
                             try {
                                 int num = 1;
-                                num = num * runDefinition(meterSphereClient, c, c.getTestId(), id, "JENKINS_API_PLAN", _environmentId);
+                                num = num * runDefinition(meterSphereClient, c, c.getTestId(), testPlanId, "JENKINS_API_PLAN", _environmentId);
                                 if (num == 0) {
                                     success.set(true);
                                 }
@@ -186,7 +186,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         public void run() {
                             try {
                                 int num = 1;
-                                num = num * runScenario(meterSphereClient, c, c.getTestId(), "DELIMIT");
+                                num = num * runScenario(meterSphereClient, c, c.getId(), projectId, "DELIMIT");
                                 if (num == 0) {
                                     success.set(true);
                                 }
@@ -224,7 +224,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         }
     }
 
-    public void getTestStepsBySingle(MeterSphereClient meterSphereClient, List<TestCaseDTO> testCaseIds, String environmentId) {
+    public void getTestStepsBySingle(MeterSphereClient meterSphereClient, List<TestCaseDTO> testCaseIds, String environmentId, String projectId) {
         log("testList=" + "[" + JSON.toJSONString(testCaseIds) + "]");
         log("testCaseId=" + "[" + testCaseId + "]");
         log("environmentId=" + "[" + environmentId + "]");
@@ -249,7 +249,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         }
                     }
                     if (StringUtils.equals(Results.SCENARIO, c.getType())) {
-                        int num = runScenario(meterSphereClient, c, testCaseId, "SCENARIO");
+                        int num = runScenario(meterSphereClient, c, testCaseId, projectId, "scenario");
                         if (num == 0) {
                             flag = false;
                         }
@@ -346,12 +346,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         return num;
     }
 
-    public int runScenario(MeterSphereClient meterSphereClient, TestCaseDTO c, String id, String runMode) {
+    public int runScenario(MeterSphereClient meterSphereClient, TestCaseDTO c, String id, String projectId, String runMode) {
         String url = meterSphereClient.getBaseInfo();
         int num = 1;
         String reportId = null;
         try {
-            reportId = meterSphereClient.runScenario(c, runMode);
+            reportId = meterSphereClient.runScenario(c, projectId, runMode);
         } catch (Exception e) {
             num = 0;
             log(c.getName() + "场景测试发生异常:" + e.getMessage());
@@ -364,11 +364,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 log("场景测试【" + c.getName() + "】执行状态：" + apiTestState);
                 if (apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
                     state = false;
-                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/reportId");
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/" + reportId);
                 } else if (apiTestState.equalsIgnoreCase(Results.ERROR)) {
                     state = false;
                     num = 0;
-                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/reportId");
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/" + reportId);
                 }
                 Thread.sleep(1000 * 60);
             }
@@ -384,7 +384,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         String url = meterSphereClient.getBaseInfo();
         int num = 1;
         try {
-            meterSphereClient.runDefinition(c, runMode, environmentId, testPlanId);
+            meterSphereClient.runDefinition(c, runMode, environmentId, testPlanId, id);
         } catch (Exception e) {
             num = 0;
             log(c.getName() + "测试用例发生异常:" + e.getMessage());
