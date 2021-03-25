@@ -393,11 +393,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             boolean state = true;
             String status = "";
             while (state) {
-                status = meterSphereClient.getApiTestCaseReport(c.getId());
+                status = meterSphereClient.getApiTestCaseReport(c.getId(), runMode);
                 log("测试用例【" + c.getName() + "】执行状态：" + status);
-                if (status.equalsIgnoreCase("success")) {
+                if (status.replace("\"", "").equalsIgnoreCase("success")) {
                     state = false;
-                } else if (status.equalsIgnoreCase("error")) {
+                } else if (status.replace("\"", "").equalsIgnoreCase("error")) {
                     state = false;
                     num = 0;
                 }

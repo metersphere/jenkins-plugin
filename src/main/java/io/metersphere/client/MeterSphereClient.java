@@ -137,7 +137,7 @@ public class MeterSphereClient {
     public void runDefinition(TestCaseDTO testCaseDTO, String runMode, String environmentId, String testPlanId, String testCaseId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("caseId", testCaseId);
-        params.put("reportId", testCaseDTO.getReportId());
+        params.put("reportId", testCaseDTO.getId());
         params.put("runMode", runMode);
         params.put("environmentId", environmentId);
         params.put("testPlanId", testPlanId);
@@ -156,14 +156,22 @@ public class MeterSphereClient {
         return jsonObject.getString("status");
     }
 
-    public String getApiTestCaseReport(String id) {
+    public String getApiTestCaseReport(String id, String type) {
         if (id.equals("") || id == null) {
             id = UUID.randomUUID().toString();
         }
-        ResultHolder result = call(ApiUrlConstants.API_TES_RESULT + "/" + id.replace('"', ' ').trim());
-        String listJson = JSON.toJSONString(result.getData());
-        JSONObject jsonObject = JSONObject.parseObject(listJson);
-        return jsonObject.getString("execResult");
+        if (type.equals("JENKINS_API_PLAN")) {
+            ResultHolder result = call(ApiUrlConstants.API_TES_RESULT_TEST + "/" + id.replace('"', ' ').trim());
+            System.out.println("原始字符串:" + result.getData());
+            return JSON.toJSONString(result.getData());
+        } else {
+            ResultHolder result = call(ApiUrlConstants.API_TES_RESULT + "/" + id.replace('"', ' ').trim());
+            String listJson = JSON.toJSONString(result.getData());
+            JSONObject jsonObject = JSONObject.parseObject(listJson);
+            return jsonObject.getString("execResult");
+        }
+
+
     }
 
     public String runPerformanceTest(String testCaseId) {
