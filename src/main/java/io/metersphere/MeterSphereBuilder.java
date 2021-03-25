@@ -283,7 +283,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             reportId = meterSphereClient.runApiTest(id);
         } catch (Exception e) {
             num = 0;
-            log(c.getName() + "发生异常:" + e.getMessage());
+
         }
         try {
             boolean state = true;

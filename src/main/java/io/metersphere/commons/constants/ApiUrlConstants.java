@@ -15,10 +15,13 @@ public class ApiUrlConstants {
     public static final String PERFORMANCE_GET = "/performance/state/get";//性能测试测试报告（特定）
     public static final String CHANGE_STATE = "/test/plan/case/edit";//更新测试计划用例的结果
     public static final String BASE_INFO = "/system/base/info";//查询站点
+
     public static final String API_AUTOMATION_RUN = "/test/plan/scenario/case/jenkins/run";//测试计划下场景运行
     public static final String API_AUTOMATION_RUN_SINGLE = "api/automation/run/jenkins";//单个场景运行
+
     public static final String API_AUTOMATION_GETAPISCENARIO = "/api/scenario/report/get";//报告详情
     public static final String API_DEFINITION_RUN = "/api/testcase/jenkins/run";//接口测试用例运行
+
     public static final String API_DEFINITION = "/api/definition/get";//接口测详情
     public static final String API_TES_REPORT = "/api/definition/report/getReport";//接口用例测详情
     public static final String API_TES_RESULT = "/api/testcase/findById";//查询单接口用例执行结果
