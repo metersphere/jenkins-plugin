@@ -364,11 +364,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 log("场景测试【" + c.getName() + "】执行状态：" + apiTestState);
                 if (apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
                     state = false;
-                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/" + reportId);
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/" + reportId.replace("\"", ""));
                 } else if (apiTestState.equalsIgnoreCase(Results.ERROR)) {
                     state = false;
                     num = 0;
-                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/" + reportId);
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/" + reportId.replace("\"", ""));
                 }
                 Thread.sleep(1000 * 60);
             }
