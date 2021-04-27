@@ -111,9 +111,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     public void getTestStepsByModular(MeterSphereClient meterSphereClient, List<TestCaseDTO> modelList, String projectId, String _environmentId, String testPlanId) {
         final AtomicBoolean success = new AtomicBoolean(false);
         JSON.toJSONString(modelList);
-/*
-        log("testList=" + "[" + JSON.toJSONString(modelList) + "]");
-*/
         final ExecutorService testThreadPool = Executors.newFixedThreadPool(modelList.size());
         final CountDownLatch countDownLatch = new CountDownLatch(modelList.size());
         if (modelList.size() > 0) {
@@ -129,7 +126,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                                 if (num == 0) {
                                     success.set(true);
                                 }
-
                             } catch (Exception e) {
                                 log(e.getMessage());
                             } finally {
@@ -146,7 +142,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         public void run() {
                             try {
                                 int num = 1;
-                                num = num * runPerformTest(meterSphereClient, c, c.getId());
+                                num = num * runPerformTest(meterSphereClient, c, c.getId(), testPlanId);
                                 if (num == 0) {
                                     success.set(true);
                                 }
@@ -225,7 +221,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     }
 
     public void getTestStepsBySingle(MeterSphereClient meterSphereClient, List<TestCaseDTO> testCaseIds, String environmentId, String projectId) {
-        log("testList=" + "[" + JSON.toJSONString(testCaseIds) + "]");
+        //log("testList=" + "[" + JSON.toJSONString(testCaseIds) + "]");
         log("testCaseId=" + "[" + testCaseId + "]");
         log("environmentId=" + "[" + environmentId + "]");
         boolean flag = true;
@@ -243,7 +239,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         }
                     }
                     if (StringUtils.equals(Results.PERFORMANCE, c.getType())) {
-                        int num = runPerformTest(meterSphereClient, c, testCaseId);
+                        int num = runPerformTest(meterSphereClient, c, testCaseId, "");
                         if (num == 0) {
                             flag = false;
                         }
@@ -311,12 +307,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         return num;
     }
 
-    public int runPerformTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String id) {
+    public int runPerformTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String id, String testPlanId) {
         String url = meterSphereClient.getBaseInfo();
         String reportId = "";
         int num = 1;
         try {
-            reportId = meterSphereClient.runPerformanceTest(id);
+            reportId = meterSphereClient.runPerformanceTest(id, testPlanId);
         } catch (Exception e) {
             num = 0;
             log(c.getName() + "发生异常：" + e.getMessage());
@@ -328,10 +324,14 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 pfmTestState = meterSphereClient.getPerformanceTestState(id);
                 log("性能测试【" + c.getName() + "】执行状态：" + pfmTestState);
                 if (pfmTestState.equalsIgnoreCase(Results.COMPLETED)) {
+                    //更新测试计划下性能测试状态
+                    meterSphereClient.updateStateLoad(testPlanId, id, "success");
                     state = false;
                     log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/performance/report/view/" + reportId.replace("\"", ""));
                     meterSphereClient.changeState(id, Results.PASS);
                 } else if (pfmTestState.equalsIgnoreCase(Results.ERROR)) {
+                    //更新测试计划下性能测试状态
+                    meterSphereClient.updateStateLoad(testPlanId, id, "Error");
                     state = false;
                     num = 0;
                     log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/performance/report/view/" + reportId.replace("\"", ""));
