@@ -174,13 +174,25 @@ public class MeterSphereClient {
 
     }
 
-    public String runPerformanceTest(String testCaseId) {
+    public String runPerformanceTest(String testCaseId, String testPlanId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", testCaseId);
+        params.put("testPlanLoadId", testCaseId);
         params.put("triggerMode", "API");
-        ResultHolder result = call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params);
+        ResultHolder result;
+        result = call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params);
         String listJson = JSON.toJSONString(result.getData());
         return listJson.replace('"', ' ').trim();
+    }
+
+    public void updateStateLoad(String testPlanId, String testCaseId, String state) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("testPlanId", testPlanId);
+        params.put("loadCaseId", testCaseId);
+        params.put("status", state);
+        ResultHolder result;
+        result = call(ApiUrlConstants.PERFORMANCE_RUN_TEST_PLAN_STATE, RequestMethod.POST, params);
+        JSON.toJSONString(result.getData());
     }
 
     public String getApiTestState(String reportId) {
