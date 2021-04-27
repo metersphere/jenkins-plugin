@@ -180,11 +180,7 @@ public class MeterSphereClient {
         params.put("testPlanLoadId", testCaseId);
         params.put("triggerMode", "API");
         ResultHolder result;
-        if (testPlanId.equals("") || testPlanId == null) {
-            result = call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params);
-        } else {
-            result = call(ApiUrlConstants.PERFORMANCE_RUN_TEST_PLAN, RequestMethod.POST, params);
-        }
+        result = call(ApiUrlConstants.PERFORMANCE_RUN, RequestMethod.POST, params);
         String listJson = JSON.toJSONString(result.getData());
         return listJson.replace('"', ' ').trim();
     }

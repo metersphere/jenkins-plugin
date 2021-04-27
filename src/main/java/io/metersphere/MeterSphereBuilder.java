@@ -286,7 +286,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             String apiTestState = "";
             while (state) {
                 apiTestState = meterSphereClient.getApiTestState(reportId);
-                log("接口测试【" + c.getName() + "】执行状态：" + apiTestState);
+                log("接口测试[" + c.getName() + "]执行状态：" + apiTestState);
                 if (apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
                     state = false;
                     log("点击链接进入" + c.getName() + "测试报告页面:" + url + "/#/api/report/view/" + reportId.replace("\"", ""));
@@ -322,7 +322,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             String pfmTestState = "";
             while (state) {
                 pfmTestState = meterSphereClient.getPerformanceTestState(id);
-                log("性能测试【" + c.getName() + "】执行状态：" + pfmTestState);
+                log("性能测试[" + c.getName() + "]执行状态：" + pfmTestState);
                 if (pfmTestState.equalsIgnoreCase(Results.COMPLETED)) {
                     //更新测试计划下性能测试状态
                     meterSphereClient.updateStateLoad(testPlanId, id, "success");
@@ -361,7 +361,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             String apiTestState = "";
             while (state) {
                 apiTestState = meterSphereClient.getApiScenario(reportId);
-                log("场景测试【" + c.getName() + "】执行状态：" + apiTestState);
+                log("场景测试[" + c.getName() + "]执行状态：" + apiTestState);
                 if (apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
                     state = false;
                     log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/" + reportId.replace("\"", ""));
@@ -394,7 +394,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             String status = "";
             while (state) {
                 status = meterSphereClient.getApiTestCaseReport(c.getId(), runMode);
-                log("测试用例【" + c.getName() + "】执行状态：" + status);
+                log("测试用例[" + c.getName() + "]执行状态：" + status);
                 if (status.replace("\"", "").equalsIgnoreCase("success")) {
                     state = false;
                 } else if (status.replace("\"", "").equalsIgnoreCase("error")) {
