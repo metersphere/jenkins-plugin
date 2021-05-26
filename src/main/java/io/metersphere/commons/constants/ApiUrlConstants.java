@@ -19,7 +19,7 @@ public class ApiUrlConstants {
     public static final String BASE_INFO = "/system/base/info";//查询站点
 
     public static final String API_AUTOMATION_RUN = "/test/plan/scenario/case/jenkins/run";//测试计划下场景运行
-    public static final String API_AUTOMATION_RUN_SINGLE = "api/automation/run/jenkins";//单个场景运行
+    public static final String API_AUTOMATION_RUN_SINGLE = "/api/automation/run/jenkins";//单个场景运行
 
     public static final String API_AUTOMATION_GETAPISCENARIO = "/api/scenario/report/get";//报告详情
     public static final String API_DEFINITION_RUN = "/api/testcase/jenkins/run";//接口测试用例运行
