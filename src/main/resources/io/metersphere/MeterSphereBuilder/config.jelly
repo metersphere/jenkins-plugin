@@ -13,7 +13,9 @@
             title="验证账户" progress="验证中..."
             method="checkAccount" with="msAccessKey,msSecretKey,msEndpoint"/>
 
-
+    <f:entry title="组织名称" field="orgId">
+        <f:select style="height:40px;"/>
+    </f:entry>
     <f:entry title="工作空间名称" field="workspaceId">
         <f:select style="height:40px;"/>
     </f:entry>
@@ -37,6 +39,17 @@
             </f:entry>
         </f:radioBlock>
     </f:section>
+    <f:section title="运行模式">
+        <f:radioBlock title="串行" name="mode" value="serial" inline="true"
+                      checked="${instance.mode == 'serial'}">
+        </f:radioBlock>
+        <f:radioBlock title="并行" name="mode" value="parallel" inline="true"
+                      checked="${instance.mode == 'parallel'}">
+        </f:radioBlock>
+    </f:section>
+    <f:entry title="资源池选择" field="runEnvironmentId">
+        <f:select style="height:40px;"/>
+    </f:entry>
     <f:section title="开放配置">
         <f:radioBlock title="jenkins运行结果" name="result" value="jenkins" inline="true"
                       checked="${instance.result == 'jenkins'}">
