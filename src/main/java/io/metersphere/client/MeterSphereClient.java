@@ -55,7 +55,7 @@ public class MeterSphereClient {
 
     public List<WorkspaceDTO> getWorkspace(String orgId) {
         String userId = this.checkUser();
-        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + orgId + "/" + userId);
+        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId + "/" + orgId);
         String list = JSON.toJSONString(result.getData());
         LogUtil.info("用户所属工作空间" + list);
         return JSON.parseArray(list, WorkspaceDTO.class);
@@ -63,7 +63,7 @@ public class MeterSphereClient {
 
     public List<ProjectDTO> getProjectIds(String workspaceId) {
         String userId = this.checkUser();
-        ResultHolder result = call(ApiUrlConstants.PROJECT_LIST_ALL + "/" + workspaceId + "/" + userId);
+        ResultHolder result = call(ApiUrlConstants.PROJECT_LIST_ALL + "/" + workspaceId);
         String listJson = JSON.toJSONString(result.getData());
         LogUtil.info("用户所属项目" + listJson);
         return JSON.parseArray(listJson, ProjectDTO.class);
@@ -89,6 +89,12 @@ public class MeterSphereClient {
         params.put("mode", mode);
         params.put("resourcePoolId", runEnvironmentId);
         call(ApiUrlConstants.TEST_PLAN, RequestMethod.POST, params);
+    }
+
+    /*测试计划报告状态*/
+    public String getStatus(String testPlanId) {
+        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_STATUS + "/" + testPlanId);
+        return JSON.toJSONString(result.getData());
     }
 
     /*环境测试列表*/

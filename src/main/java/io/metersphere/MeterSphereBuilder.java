@@ -91,10 +91,26 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         try {
             switch (method) {
                 case Method.testPlan:
-                    final List<TestCaseDTO> modelList;
+                    //final List<TestCaseDTO> modelList;
                     //modelList = meterSphereClient.getTestCaseIdsByPlanId(testPlanId);//测试计划下全部
                     //getTestStepsByModular(meterSphereClient, modelList, projectId, "", testPlanId);
                     meterSphereClient.exeTestPlan(projectId, testPlanId, mode, runEnvironmentId);
+                    String url = meterSphereClient.getBaseInfo();
+                    boolean flag = true;
+                    while (flag) {
+                        String status = meterSphereClient.getStatus(testPlanId);
+                        log("测试计划开始执行");
+                        if (status.equalsIgnoreCase(Results.COMPLETED)) {
+                            flag = false;
+                            log("该测试计划已完成");
+                            log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList/" + testPlanId.replace("\"", ""));
+                        } else if (status.equalsIgnoreCase(Results.ERROR)) {
+                            flag = false;
+                            log("该测试计划已完成");
+                            log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList/" + testPlanId.replace("\"", ""));
+                        }
+                        Thread.sleep(1000 * 60);
+                    }
                     break;
                 case Method.single:
                     List<TestCaseDTO> testCaseIds = meterSphereClient.getTestCaseIds(projectId);//项目下
