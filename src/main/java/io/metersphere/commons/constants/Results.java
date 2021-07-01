@@ -14,4 +14,5 @@ public class Results {
     public static final String SCENARIO = "scenario";
     public static final String DEFINITION = "definition";
     public static final String FAIL = "Fail";
+    public static final String FAILED = "FAILED";
 }

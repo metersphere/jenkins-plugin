@@ -5,14 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import io.metersphere.ResultHolder;
 import io.metersphere.commons.constants.ApiUrlConstants;
 import io.metersphere.commons.constants.RequestMethod;
-import io.metersphere.commons.constants.Results;
 import io.metersphere.commons.exception.MeterSphereException;
 import io.metersphere.commons.model.*;
 import io.metersphere.commons.utils.HttpClientConfig;
 import io.metersphere.commons.utils.HttpClientUtil;
 import io.metersphere.commons.utils.LogUtil;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.StringUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -47,15 +45,24 @@ public class MeterSphereClient {
         return getUserResult.getData().toString();
     }
 
-    public List<WorkspaceDTO> getWorkspace() {
+    public List<OrgDTO> getOrg() {
         String userId = this.checkUser();
-        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId);
+        ResultHolder result = call(ApiUrlConstants.LIST_USER_ORGANIZATION + "/" + userId);
+        String list = JSON.toJSONString(result.getData());
+        LogUtil.info("用户所属组织" + list);
+        return JSON.parseArray(list, OrgDTO.class);
+    }
+
+    public List<WorkspaceDTO> getWorkspace(String orgId) {
+        String userId = this.checkUser();
+        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId + "/" + orgId);
         String list = JSON.toJSONString(result.getData());
         LogUtil.info("用户所属工作空间" + list);
         return JSON.parseArray(list, WorkspaceDTO.class);
     }
 
     public List<ProjectDTO> getProjectIds(String workspaceId) {
+        String userId = this.checkUser();
         ResultHolder result = call(ApiUrlConstants.PROJECT_LIST_ALL + "/" + workspaceId);
         String listJson = JSON.toJSONString(result.getData());
         LogUtil.info("用户所属项目" + listJson);
@@ -71,12 +78,40 @@ public class MeterSphereClient {
         return JSON.parseArray(listJson, TestCaseDTO.class);
     }
 
+    /*执行测试计划*/
+    public String exeTestPlan(String projectId, String testPlanId, String mode, String runEnvironmentId) {
+        String userId = this.checkUser();
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("testPlanId", testPlanId);
+        params.put("projectId", projectId);
+        params.put("triggerMode", "API");
+        params.put("userId", userId);
+        params.put("mode", mode);
+        params.put("resourcePoolId", runEnvironmentId);
+        ResultHolder result = call(ApiUrlConstants.TEST_PLAN, RequestMethod.POST, params);
+        return JSON.toJSONString(result.getData());
+    }
+
+    /*测试计划报告状态*/
+    public String getStatus(String testPlanId) {
+        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_STATUS + "/" + testPlanId.replace('"', ' ').trim());
+        return JSON.toJSONString(result.getData());
+    }
+
     /*环境测试列表*/
     public List<ApiTestEnvironmentDTO> getEnvironmentIds(String projectId) {
         ResultHolder result = call(ApiUrlConstants.ENVIRONMEN_LIST + "/" + projectId);
         String listJson = JSON.toJSONString(result.getData());
         LogUtil.info("该项目下的环境列表" + listJson);
         return JSON.parseArray(listJson, ApiTestEnvironmentDTO.class);
+    }
+
+    /*资源池列表*/
+    public List<EnvironmentPoolDTO> getPoolEnvironmentIds() {
+        ResultHolder result = call(ApiUrlConstants.TEST_POOL);
+        String listJson = JSON.toJSONString(result.getData());
+        LogUtil.info("该项目下的资源池列表" + listJson);
+        return JSON.parseArray(listJson, EnvironmentPoolDTO.class);
     }
 
     public List<TestCaseDTO> getTestCaseIdsByPlanId(String testPlanId) {

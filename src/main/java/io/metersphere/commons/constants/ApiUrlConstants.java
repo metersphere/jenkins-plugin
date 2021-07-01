@@ -2,7 +2,9 @@ package io.metersphere.commons.constants;
 
 public class ApiUrlConstants {
     public static final String USER_INFO = "/user/key/validate";//身份验证
-    public static final String LIST_USER_WORKSPACE = "/workspace/list/userworkspace";//工作空间
+    public static final String LIST_USER_ORGANIZATION = "/organization/list/userorg";//所属组织
+    //public static final String LIST_USER_WORKSPACE = "/workspace/list/userworkspace";//工作空间/workspace/list/orgworkspace/
+    public static final String LIST_USER_WORKSPACE = "/workspace/list/orgworkspace";//所属工作空间
     public static final String PROJECT_LIST_ALL = "/project/listAll";//项目列表
     public static final String TEST_CASE_LIST_METHOD = "/test/case/list/method";//项目下所有接口和性能测试
     public static final String PLAN_LIST_ALL = "/test/plan/list/all";//测试计划项目下
@@ -30,5 +32,8 @@ public class ApiUrlConstants {
     public static final String API_TES_RESULT_TEST = "/api/testcase/getStateByTestPlan";//计划下接口用例执行结果
     public static final String ENVIRONMEN_LIST = "/api/environment/list";
     public static final String TEST_PLAN_REPORT = "/test/plan/report/apiExecuteFinish";
+    public static final String TEST_POOL = "/testresourcepool/list/quota/valid";
+    public static final String TEST_PLAN = "/test/plan/testplan/jenkins";//测试计划执行
+    public static final String TEST_PLAN_STATUS = "/test/plan/report/status";//测试计划执行
 
 }

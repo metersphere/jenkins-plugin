@@ -46,6 +46,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     private final String msAccessKey;
     private final String msSecretKey;
     private final String workspaceId;
+    private final String orgId;
     private final String projectId;
     private PrintStream logger;
     private final String testPlanId;
@@ -55,14 +56,17 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     private final String method;
     private final String result;
     private final String environmentId;
+    private final String mode;//运行模式
+    private final String runEnvironmentId;//运行环境
 
 
     @DataBoundConstructor
-    public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId, String projectId, PrintStream logger, String testPlanId, String testCaseNodeId, String testId, String testCaseId, String method, String result, String environmentId) {
+    public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId, String orgId, String projectId, PrintStream logger, String testPlanId, String testCaseNodeId, String testId, String testCaseId, String method, String result, String environmentId, String mode, String runEnvironmentId) {
         this.msEndpoint = msEndpoint;
         this.msAccessKey = msAccessKey;
         this.msSecretKey = msSecretKey;
         this.workspaceId = workspaceId;
+        this.orgId = orgId;
         this.projectId = projectId;
         this.logger = logger;
         this.testPlanId = testPlanId;
@@ -72,6 +76,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.method = StringUtils.isBlank(method) ? Method.testPlan : method;
         this.result = result;
         this.environmentId = environmentId;
+        this.mode = mode;
+        this.runEnvironmentId = runEnvironmentId;
     }
 
     @Override
@@ -85,9 +91,26 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         try {
             switch (method) {
                 case Method.testPlan:
-                    final List<TestCaseDTO> modelList;
-                    modelList = meterSphereClient.getTestCaseIdsByPlanId(testPlanId);//测试计划下全部
-                    getTestStepsByModular(meterSphereClient, modelList, projectId, "", testPlanId);
+                    //final List<TestCaseDTO> modelList;
+                    //modelList = meterSphereClient.getTestCaseIdsByPlanId(testPlanId);//测试计划下全部
+                    //getTestStepsByModular(meterSphereClient, modelList, projectId, "", testPlanId);
+                    String id = meterSphereClient.exeTestPlan(projectId, testPlanId, mode, runEnvironmentId);
+                    String url = meterSphereClient.getBaseInfo();
+                    boolean flag = true;
+                    while (flag) {
+                        String status = meterSphereClient.getStatus(id);
+                        log("测试计划开始执行");
+                        if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.COMPLETED)) {
+                            flag = false;
+                            log("该测试计划已完成");
+                            log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
+                        } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.FAILED)) {
+                            flag = false;
+                            log("该测试计划已完成");
+                            log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
+                        }
+                        Thread.sleep(5000);
+                    }
                     break;
                 case Method.single:
                     List<TestCaseDTO> testCaseIds = meterSphereClient.getTestCaseIds(projectId);//项目下
@@ -101,7 +124,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             if (result.equals(Results.METERSPHERE)) {
                 run.setResult(Result.FAILURE);
             } else {
-                log("该测试用例请求未能通过，登陆MeterSphere网站查看该报告结果");
+                log("该测试请求未能通过，登陆MeterSphere网站查看该报告结果");
             }
 
         }
@@ -442,16 +465,39 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             return FormValidation.ok("验证MeterSphere帐号成功！");
         }
 
+        //用户所属组织
+        public ListBoxModel doFillOrgIdItems(@QueryParameter String msAccessKey,
+                                             @QueryParameter String msSecretKey,
+                                             @QueryParameter String msEndpoint
+        ) {
+            ListBoxModel items = new ListBoxModel();
+            items.add("请选择所属组织", "");
+            try {
+                MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
+                List<OrgDTO> list = MeterSphereClient.getOrg();
+                if (list != null && list.size() > 0) {
+                    for (OrgDTO c : list) {
+                        items.add(c.getName(), String.valueOf(c.getId()));
+                    }
+                }
+            } catch (Exception e) {
+                LogUtil.error(e.getMessage(), e);
+            }
+            return items;
+
+        }
+
         //用户所属工作空间
         public ListBoxModel doFillWorkspaceIdItems(@QueryParameter String msAccessKey,
                                                    @QueryParameter String msSecretKey,
-                                                   @QueryParameter String msEndpoint
+                                                   @QueryParameter String msEndpoint,
+                                                   @QueryParameter String orgId
         ) {
             ListBoxModel items = new ListBoxModel();
             items.add("请选择工作空间", "");
             try {
                 MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
-                List<WorkspaceDTO> list = MeterSphereClient.getWorkspace();
+                List<WorkspaceDTO> list = MeterSphereClient.getWorkspace(orgId);
                 if (list != null && list.size() > 0) {
                     for (WorkspaceDTO c : list) {
                         items.add(c.getName(), String.valueOf(c.getId()));
@@ -567,6 +613,31 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             return items;
         }
 
+        //资源池的选择
+        public ListBoxModel doFillRunEnvironmentIdItems(@QueryParameter String msAccessKey,
+                                                        @QueryParameter String msSecretKey,
+                                                        @QueryParameter String msEndpoint
+        ) {
+            ListBoxModel items = new ListBoxModel();
+            try {
+                MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
+                items.add("请选择资源池", "");
+                List<EnvironmentPoolDTO> list = new ArrayList<>();
+                list = MeterSphereClient.getPoolEnvironmentIds();
+
+                if (list != null && list.size() > 0) {
+                    for (EnvironmentPoolDTO c : list) {
+                        items.add(c.getName(), String.valueOf(c.getId()));
+                    }
+                }
+
+            } catch (Exception e) {
+                LogUtil.error(e.getMessage(), e);
+            }
+            return items;
+        }
+
+
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             req.bindParameters(this);
@@ -651,5 +722,17 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     public String getEnvironmentId() {
         return environmentId;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public String getRunEnvironmentId() {
+        return runEnvironmentId;
+    }
+
+    public String getOrgId() {
+        return orgId;
     }
 }
