@@ -94,22 +94,22 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     //final List<TestCaseDTO> modelList;
                     //modelList = meterSphereClient.getTestCaseIdsByPlanId(testPlanId);//测试计划下全部
                     //getTestStepsByModular(meterSphereClient, modelList, projectId, "", testPlanId);
-                    meterSphereClient.exeTestPlan(projectId, testPlanId, mode, runEnvironmentId);
+                    String id = meterSphereClient.exeTestPlan(projectId, testPlanId, mode, runEnvironmentId);
                     String url = meterSphereClient.getBaseInfo();
                     boolean flag = true;
                     while (flag) {
-                        String status = meterSphereClient.getStatus(testPlanId);
+                        String status = meterSphereClient.getStatus(id);
                         log("测试计划开始执行");
-                        if (status.equalsIgnoreCase(Results.COMPLETED)) {
+                        if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.COMPLETED)) {
                             flag = false;
                             log("该测试计划已完成");
-                            log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList/" + testPlanId.replace("\"", ""));
-                        } else if (status.equalsIgnoreCase(Results.ERROR)) {
+                            log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
+                        } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.FAILED)) {
                             flag = false;
                             log("该测试计划已完成");
-                            log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList/" + testPlanId.replace("\"", ""));
+                            log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
                         }
-                        Thread.sleep(1000 * 60);
+                        Thread.sleep(5000);
                     }
                     break;
                 case Method.single:
@@ -124,7 +124,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             if (result.equals(Results.METERSPHERE)) {
                 run.setResult(Result.FAILURE);
             } else {
-                log("该测试用例请求未能通过，登陆MeterSphere网站查看该报告结果");
+                log("该测试请求未能通过，登陆MeterSphere网站查看该报告结果");
             }
 
         }

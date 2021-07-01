@@ -79,7 +79,7 @@ public class MeterSphereClient {
     }
 
     /*执行测试计划*/
-    public void exeTestPlan(String projectId, String testPlanId, String mode, String runEnvironmentId) {
+    public String exeTestPlan(String projectId, String testPlanId, String mode, String runEnvironmentId) {
         String userId = this.checkUser();
         HashMap<String, Object> params = new HashMap<>();
         params.put("testPlanId", testPlanId);
@@ -88,12 +88,13 @@ public class MeterSphereClient {
         params.put("userId", userId);
         params.put("mode", mode);
         params.put("resourcePoolId", runEnvironmentId);
-        call(ApiUrlConstants.TEST_PLAN, RequestMethod.POST, params);
+        ResultHolder result = call(ApiUrlConstants.TEST_PLAN, RequestMethod.POST, params);
+        return JSON.toJSONString(result.getData());
     }
 
     /*测试计划报告状态*/
     public String getStatus(String testPlanId) {
-        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_STATUS + "/" + testPlanId);
+        ResultHolder result = call(ApiUrlConstants.TEST_PLAN_STATUS + "/" + testPlanId.replace('"', ' ').trim());
         return JSON.toJSONString(result.getData());
     }
 
