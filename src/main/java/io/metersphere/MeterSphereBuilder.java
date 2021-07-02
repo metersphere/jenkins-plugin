@@ -100,11 +100,15 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     while (flag) {
                         String status = meterSphereClient.getStatus(id);
                         log("测试计划开始执行");
-                        if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.COMPLETED)) {
+                        if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.SUCCESS)) {
                             flag = false;
                             log("该测试计划已完成");
                             log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
                         } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.FAILED)) {
+                            flag = false;
+                            log("该测试计划已完成");
+                            log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
+                        } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.COMPLETED)) {
                             flag = false;
                             log("该测试计划已完成");
                             log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
