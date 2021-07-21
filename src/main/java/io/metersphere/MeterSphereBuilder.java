@@ -1,6 +1,4 @@
 package io.metersphere;
-
-import com.alibaba.fastjson.JSON;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -27,17 +25,12 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Serializable {
 
@@ -91,22 +84,22 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         try {
             switch (method) {
                 case Method.testPlan:
-                    //final List<TestCaseDTO> modelList;
-                    //modelList = meterSphereClient.getTestCaseIdsByPlanId(testPlanId);//测试计划下全部
-                    //getTestStepsByModular(meterSphereClient, modelList, projectId, "", testPlanId);
+                    log("测试计划开始执行");
                     String id = meterSphereClient.exeTestPlan(projectId, testPlanId, mode, runEnvironmentId);
+                    log("生成测试报告id:" + id.replace('"', ' ').trim());
                     String url = meterSphereClient.getBaseInfo();
+                    log("当前站点url:" + url);
                     boolean flag = true;
                     while (flag) {
                         String status = meterSphereClient.getStatus(id);
-                        log("测试计划开始执行");
                         if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.SUCCESS)) {
                             flag = false;
                             log("该测试计划已完成");
                             log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
                         } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.FAILED)) {
                             flag = false;
-                            log("该测试计划已完成");
+                            run.setResult(Result.FAILURE);
+                            log("该测试计划失败");
                             log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
                         } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.COMPLETED)) {
                             flag = false;
@@ -134,119 +127,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         }
 
     }
-
-    public void getTestStepsByModular(MeterSphereClient meterSphereClient, List<TestCaseDTO> modelList, String projectId, String _environmentId, String testPlanId) {
-        final AtomicBoolean success = new AtomicBoolean(false);
-        JSON.toJSONString(modelList);
-        final ExecutorService testThreadPool = Executors.newFixedThreadPool(modelList.size());
-        final CountDownLatch countDownLatch = new CountDownLatch(modelList.size());
-        if (modelList.size() > 0) {
-            for (final TestCaseDTO c : modelList) {
-                if (StringUtils.equals(Results.API, c.getType())) {
-                    log("接口测试[" + c.getName() + "]开始执行");
-                    testThreadPool.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                int num = 1;
-                                num = num * runApiTest(meterSphereClient, c, c.getId());
-                                if (num == 0) {
-                                    success.set(true);
-                                }
-                            } catch (Exception e) {
-                                log(e.getMessage());
-                            } finally {
-                                countDownLatch.countDown();
-                            }
-                        }
-                    });
-                }
-
-                if (StringUtils.equals(Results.PERFORMANCE, c.getType())) {
-                    log("性能测试[" + c.getName() + "]开始执行");
-                    testThreadPool.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                int num = 1;
-                                num = num * runPerformTest(meterSphereClient, c, c.getId(), testPlanId);
-                                if (num == 0) {
-                                    success.set(true);
-                                }
-                            } catch (Exception e) {
-                                log(e.getMessage());
-                            } finally {
-                                countDownLatch.countDown();
-                            }
-                        }
-                    });
-                }
-
-                if (StringUtils.equals(Results.DEFINITION, c.getType())) {
-                    log("测试用例[" + c.getName() + "]开始执行");
-                    testThreadPool.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                int num = 1;
-                                num = num * runDefinition(meterSphereClient, c, c.getTestId(), testPlanId, "JENKINS_API_PLAN", _environmentId);
-                                if (num == 0) {
-                                    success.set(true);
-                                }
-                            } catch (Exception e) {
-                                log(e.getMessage());
-                            } finally {
-                                countDownLatch.countDown();
-                            }
-                        }
-                    });
-                }
-
-                if (StringUtils.equals(Results.SCENARIO, c.getType())) {
-                    log("接口场景测试[" + c.getName() + "]开始执行");
-                    testThreadPool.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                int num = 1;
-                                num = num * runScenario(meterSphereClient, c, c.getId(), projectId, "DELIMIT");
-                                if (num == 0) {
-                                    success.set(true);
-                                }
-
-                            } catch (Exception e) {
-                                log(e.getMessage());
-                            } finally {
-                                countDownLatch.countDown();
-                            }
-                        }
-                    });
-                }
-
-                if (c.getType().equals(Results.FUNCTIONAL)) {
-                    countDownLatch.countDown();
-                }
-            }
-            try {
-                countDownLatch.await();
-                meterSphereClient.testPlanNotice(testPlanId, "jenkins");
-                if (success.compareAndSet(false, true)) {
-                    log("测试用例请求全部通过，可以登陆MeterSphere网站查看全部报告结果");
-                } else {
-                    if (result.equals(Results.METERSPHERE)) {
-                        throw new MeterSphereException("测试用例未能全部完成");
-                    } else {
-                        log("测试用例请求未能全部通过，可以登陆MeterSphere网站查看全部报告结果");
-                    }
-                }
-            } catch (InterruptedException e) {
-                log(e.getMessage());
-            } finally {
-
-            }
-        }
-    }
-
     public void getTestStepsBySingle(MeterSphereClient meterSphereClient, List<TestCaseDTO> testCaseIds, String environmentId, String projectId) {
         //log("testList=" + "[" + JSON.toJSONString(testCaseIds) + "]");
         log("testCaseId=" + "[" + testCaseId + "]");
@@ -464,7 +344,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 MeterSphereClient.checkUser();
             } catch (Exception e) {
                 LogUtil.error(e.getMessage(), e);
-                return FormValidation.error("验证MeterSphere帐号失败！" + e.getMessage());
+                return FormValidation.error("验证MeterSphere帐号失败！" + e + "," + e.getMessage());
             }
             return FormValidation.ok("验证MeterSphere帐号成功！");
         }
@@ -514,7 +394,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
         }
 
-        //所属项目
+        //在工作空间下与用户有关的项目
         public ListBoxModel doFillProjectIdItems(@QueryParameter String msAccessKey,
                                                  @QueryParameter String msSecretKey,
                                                  @QueryParameter String msEndpoint,
