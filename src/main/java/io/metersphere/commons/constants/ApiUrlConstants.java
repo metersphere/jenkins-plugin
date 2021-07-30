@@ -1,7 +1,7 @@
 package io.metersphere.commons.constants;
 
 public class ApiUrlConstants {
-    public static final String USER_INFO = "user/key/validate";//身份验证
+    public static final String USER_INFO = "/user/key/validate";//身份验证
     public static final String LIST_USER_ORGANIZATION = "/organization/list/userorg";//所属组织
     public static final String LIST_USER_WORKSPACE = "/workspace/list/orgworkspace";//所属工作空间
     public static final String PROJECT_LIST_ALL = "/project/list/related";//项目列表
