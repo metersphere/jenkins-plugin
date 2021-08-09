@@ -143,13 +143,14 @@ public class MeterSphereClient {
         return JSON.toJSONString(result.getData());
     }
 
-    public String runScenario(TestCaseDTO testCaseDTO, String id, String type) {
+    public String runScenario(TestCaseDTO testCaseDTO, String id, String type, RunModeConfig config) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", UUID.randomUUID().toString());
         params.put("projectId", id);
         params.put("planCaseIds", Arrays.asList(testCaseDTO.getId()));
         params.put("planScenarioId", testCaseDTO.getId());
         params.put("ids", Arrays.asList(testCaseDTO.getId()));
+        params.put("config", config);
         ResultHolder result;
         if (type.equals("scenario")) {
             result = call(ApiUrlConstants.API_AUTOMATION_RUN_SINGLE, RequestMethod.POST, params);

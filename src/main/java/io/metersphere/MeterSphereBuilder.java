@@ -378,7 +378,16 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         int num = 1;
         String reportId = null;
         try {
-            reportId = meterSphereClient.runScenario(c, projectId, runMode);
+            RunModeConfig config = null;
+            if (StringUtils.isNotEmpty(runEnvironmentId)) {
+                config = new RunModeConfig();
+                config.setResourcePoolId(runEnvironmentId);
+                config.setMode(runMode);
+                config.setReportName("");
+                config.setReportType("iddReport");
+                config.setOnSampleError(true);
+            }
+            reportId = meterSphereClient.runScenario(c, projectId, runMode, config);
         } catch (Exception e) {
             num = 0;
             log(c.getName() + "场景测试发生异常:" + e.getMessage());
