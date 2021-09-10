@@ -11,6 +11,7 @@ import io.metersphere.commons.utils.HttpClientConfig;
 import io.metersphere.commons.utils.HttpClientUtil;
 import io.metersphere.commons.utils.LogUtil;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -111,7 +112,9 @@ public class MeterSphereClient {
         ResultHolder result = call(ApiUrlConstants.TEST_POOL);
         String listJson = JSON.toJSONString(result.getData());
         LogUtil.info("该项目下的资源池列表" + listJson);
-        return JSON.parseArray(listJson, EnvironmentPoolDTO.class);
+        List<EnvironmentPoolDTO> environmentPoolDTOS = JSON.parseArray(listJson, EnvironmentPoolDTO.class);
+        environmentPoolDTOS.removeIf(environmentPoolDTO -> StringUtils.equalsIgnoreCase(environmentPoolDTO.getType(), "K8S"));
+        return environmentPoolDTOS;
     }
 
     public List<TestCaseDTO> getTestCaseIdsByPlanId(String testPlanId) {
