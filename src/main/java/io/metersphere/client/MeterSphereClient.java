@@ -168,14 +168,14 @@ public class MeterSphereClient {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", UUID.randomUUID().toString());
         params.put("projectId", id);
-        params.put("planCaseIds", Arrays.asList(testCaseDTO.getId()));
-        params.put("planScenarioId", testCaseDTO.getId());
         params.put("ids", Arrays.asList(testCaseDTO.getId()));
         params.put("config", config);
         ResultHolder result;
         if (type.equals("scenario")) {
             result = call(ApiUrlConstants.API_AUTOMATION_RUN_SINGLE, RequestMethod.POST, params);
         } else {
+            params.put("planCaseIds", Arrays.asList(testCaseDTO.getId()));
+            params.put("planScenarioId", testCaseDTO.getId());
             result = call(ApiUrlConstants.API_AUTOMATION_RUN, RequestMethod.POST, params);
         }
         return JSON.toJSONString(result.getData());
