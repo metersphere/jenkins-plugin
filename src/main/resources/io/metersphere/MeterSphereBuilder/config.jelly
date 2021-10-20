@@ -13,9 +13,6 @@
             title="验证账户" progress="验证中..."
             method="checkAccount" with="msAccessKey,msSecretKey,msEndpoint"/>
 
-    <f:entry title="组织名称" field="orgId">
-        <f:select style="height:40px;"/>
-    </f:entry>
     <f:entry title="工作空间名称" field="workspaceId">
         <f:select style="height:40px;"/>
     </f:entry>

@@ -44,19 +44,10 @@ public class MeterSphereClient {
         return getUserResult.getData().toString();
     }
 
-    /*获取所属组织*/
-    public List<OrgDTO> getOrg() {
-        String userId = this.checkUser();
-        ResultHolder result = call(ApiUrlConstants.LIST_USER_ORGANIZATION + "/" + userId);
-        String list = JSON.toJSONString(result.getData());
-        LogUtil.info("用户所属组织" + list);
-        return JSON.parseArray(list, OrgDTO.class);
-    }
-
     /*获取组织下工作空间*/
-    public List<WorkspaceDTO> getWorkspace(String orgId) {
+    public List<WorkspaceDTO> getWorkspace() {
         String userId = this.checkUser();
-        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId + "/" + orgId);
+        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId);
         String list = JSON.toJSONString(result.getData());
         LogUtil.info("用户所属工作空间" + list);
         return JSON.parseArray(list, WorkspaceDTO.class);

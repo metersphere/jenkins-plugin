@@ -360,39 +360,16 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             return FormValidation.ok("验证MeterSphere帐号成功！");
         }
 
-        //用户所属组织
-        public ListBoxModel doFillOrgIdItems(@QueryParameter String msAccessKey,
-                                             @QueryParameter String msSecretKey,
-                                             @QueryParameter String msEndpoint
-        ) {
-            ListBoxModel items = new ListBoxModel();
-            items.add("请选择所属组织", "");
-            try {
-                MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
-                List<OrgDTO> list = MeterSphereClient.getOrg();
-                if (list != null && list.size() > 0) {
-                    for (OrgDTO c : list) {
-                        items.add(c.getName(), String.valueOf(c.getId()));
-                    }
-                }
-            } catch (Exception e) {
-                LogUtil.error(e.getMessage(), e);
-            }
-            return items;
-
-        }
-
         //用户所属工作空间
         public ListBoxModel doFillWorkspaceIdItems(@QueryParameter String msAccessKey,
                                                    @QueryParameter String msSecretKey,
-                                                   @QueryParameter String msEndpoint,
-                                                   @QueryParameter String orgId
+                                                   @QueryParameter String msEndpoint
         ) {
             ListBoxModel items = new ListBoxModel();
             items.add("请选择工作空间", "");
             try {
                 MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
-                List<WorkspaceDTO> list = MeterSphereClient.getWorkspace(orgId);
+                List<WorkspaceDTO> list = MeterSphereClient.getWorkspace();
                 if (list != null && list.size() > 0) {
                     for (WorkspaceDTO c : list) {
                         items.add(c.getName(), String.valueOf(c.getId()));
