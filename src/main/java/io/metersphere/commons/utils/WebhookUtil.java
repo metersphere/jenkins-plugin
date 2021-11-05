@@ -22,7 +22,13 @@ public class WebhookUtil {
             return;
         }
 
-        JSONObject jsonObject = new JSONObject();
+        ResultHolder resultHolder = meterSphereClient.getTestPlanReportDetail(reportId);
+
+        if (!resultHolder.isSuccess()) {
+            return;
+        }
+
+        JSONObject jsonObject = (JSONObject) JSONObject.toJSON(resultHolder.getData());
 
         jsonObject.put("reportUrl", meterSphereClient.getBaseInfo() + "/#/track/testPlan/reportList");
 

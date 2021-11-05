@@ -27,4 +27,8 @@ public class ApiUrlConstants {
     public static final String TEST_PLAN = "/test/plan/testplan/jenkins";//测试计划执行
     public static final String TEST_PLAN_STATUS = "/test/plan/report/status";//测试计划执行
 
+    /**
+     * 测试计划的报告详情 GET请求
+     */
+    public static final String TEST_PLAN_REPORT_DETAIL = "/test/plan/report/db";
 }
