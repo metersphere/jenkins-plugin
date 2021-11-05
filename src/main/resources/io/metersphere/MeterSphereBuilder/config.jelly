@@ -58,4 +58,9 @@
                       checked="${instance.result == 'MeterSphere'}">
         </f:radioBlock>
     </f:section>
+
+    <!--webhook回调-->
+    <f:entry title="Webhook地址" field="callbackUrls">
+        <f:textbox/>
+    </f:entry>
 </j:jelly>
