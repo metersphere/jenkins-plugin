@@ -13,13 +13,11 @@ import hudson.util.ListBoxModel;
 import io.metersphere.client.MeterSphereClient;
 import io.metersphere.commons.constants.Method;
 import io.metersphere.commons.constants.Results;
-import io.metersphere.commons.exception.MeterSphereException;
 import io.metersphere.commons.model.*;
 import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.MeterSphereUtils;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -85,18 +83,18 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         listener.getLogger().println("workspace=" + workspace);
         listener.getLogger().println("number=" + run.getNumber());
         listener.getLogger().println("url=" + run.getUrl());
-        final MeterSphereClient meterSphereClient = new MeterSphereClient(this.msAccessKey, this.msSecretKey, this.msEndpoint);
+        final MeterSphereClient client = new MeterSphereClient(this.msAccessKey, this.msSecretKey, this.msEndpoint);
         log("执行方式: " + method);
         try {
             switch (method) {
                 case Method.TEST_PLAN:
-                    execTestPlan(run, meterSphereClient, testPlanId);
+                    MeterSphereUtils.execTestPlan(run, client, projectId, mode, testPlanId, resourcePoolId);
                     break;
                 case Method.TEST_PLAN_NAME:
                     EnvVars environment = run.getEnvironment(listener);
                     String testPlanName = Util.replaceMacro(this.testPlanName, environment);
 
-                    List<TestPlanDTO> testPlans = meterSphereClient.getTestPlanIds(projectId, workspaceId);
+                    List<TestPlanDTO> testPlans = client.getTestPlanIds(projectId, workspaceId);
                     Optional<TestPlanDTO> first = testPlans.stream()
                             .filter(plan -> StringUtils.equals(testPlanName, plan.getId()) || StringUtils.equals(testPlanName, plan.getName()))
                             .findFirst();
@@ -105,11 +103,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         log("测试计划不存在");
                         return;
                     }
-                    execTestPlan(run, meterSphereClient, first.get().getId());
+                    MeterSphereUtils.execTestPlan(run, client, projectId, mode, first.get().getId(), resourcePoolId);
                     break;
                 case Method.SINGLE:
-                    List<TestCaseDTO> testCaseIds = meterSphereClient.getTestCaseIds(projectId);//项目下
-                    getTestStepsBySingle(meterSphereClient, testCaseIds, environmentId, projectId);
+                    List<TestCaseDTO> testCaseIds = client.getTestCases(projectId);//项目下
+                    MeterSphereUtils.getTestStepsBySingle(client, testCaseIds, environmentId, projectId, testCaseId, testPlanId, resourcePoolId);
                     break;
                 default:
                     log("测试用例不存在");
@@ -124,83 +122,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
         }
 
-    }
-
-    private void execTestPlan(Run<?, ?> run, MeterSphereClient meterSphereClient, String testPlanId) throws InterruptedException {
-        log("测试计划开始执行");
-        String id = meterSphereClient.exeTestPlan(projectId, testPlanId, mode, resourcePoolId);
-        log("生成测试报告id:" + id.replace('"', ' ').trim());
-        String url = meterSphereClient.getBaseInfo();
-        log("当前站点url:" + url);
-        boolean flag = true;
-        while (flag) {
-            String status = meterSphereClient.getStatus(id);
-            if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.SUCCESS)) {
-                flag = false;
-                log("该测试计划已完成");
-                log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
-            } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.FAILED)) {
-                flag = false;
-                run.setResult(Result.FAILURE);
-                log("该测试计划失败");
-                log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
-            } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.COMPLETED)) {
-                flag = false;
-                log("该测试计划已完成");
-                log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
-            }
-            Thread.sleep(5000);
-        }
-    }
-
-    public void getTestStepsBySingle(MeterSphereClient meterSphereClient, List<TestCaseDTO> testCaseIds, String environmentId, String projectId) {
-        //log("testList=" + "[" + JSON.toJSONString(testCaseIds) + "]");
-        log("testCaseId=" + "[" + testCaseId + "]");
-        log("environmentId=" + "[" + environmentId + "]");
-        boolean flag = true;
-        if (CollectionUtils.isNotEmpty(testCaseIds)) {
-            for (TestCaseDTO c : testCaseIds) {
-                if (StringUtils.equals(testCaseId, c.getId())) {
-                    if (StringUtils.equals(Results.API, c.getType())) {
-                        int num = 1;
-                        num = num * MeterSphereUtils.runApiTest(meterSphereClient, c, testCaseId);
-                        if (num == 0) {
-                            flag = false;
-                        }
-                        if (num == 0) {
-                            flag = false;
-                        }
-                    }
-                    if (StringUtils.equals(Results.PERFORMANCE, c.getType())) {
-                        int num = MeterSphereUtils.runPerformTest(meterSphereClient, c, testCaseId, "");
-                        if (num == 0) {
-                            flag = false;
-                        }
-                    }
-                    if (StringUtils.equals(Results.SCENARIO, c.getType())) {
-                        int num = MeterSphereUtils.runScenario(meterSphereClient, c, testCaseId, projectId, "scenario", resourcePoolId);
-                        if (num == 0) {
-                            flag = false;
-                        }
-                    }
-                    if (StringUtils.equals(Results.DEFINITION, c.getType())) {
-                        int num = MeterSphereUtils.runDefinition(meterSphereClient, c, testCaseId, testPlanId, "JENKINS", environmentId);
-                        if (num == 0) {
-                            flag = false;
-                        }
-                    }
-                }
-            }
-            if (flag) {
-                log("该测试用例请求通过，登陆MeterSphere网站查看该报告结果");
-            } else {
-                if (result.equals(Results.METERSPHERE)) {
-                    throw new MeterSphereException("该测试用例未能完成");
-                } else {
-                    log("该测试用例请求未能通过，登陆MeterSphere网站查看该报告结果");
-                }
-            }
-        }
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -319,7 +240,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 items.add("请选择测试名称", "");
                 List<TestCaseDTO> list = new ArrayList<>();
                 if (projectId != null && !projectId.equals("")) {
-                    list = meterSphereClient.getTestCaseIds(projectId);
+                    list = meterSphereClient.getTestCases(projectId);
                 }
                 if (list != null && list.size() > 0) {
                     for (TestCaseDTO c : list) {
@@ -360,8 +281,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
         //资源池的选择
         public ListBoxModel doFillResourcePoolIdItems(@QueryParameter String msAccessKey,
-                                                        @QueryParameter String msSecretKey,
-                                                        @QueryParameter String msEndpoint
+                                                      @QueryParameter String msSecretKey,
+                                                      @QueryParameter String msEndpoint
         ) {
             ListBoxModel items = new ListBoxModel();
             try {

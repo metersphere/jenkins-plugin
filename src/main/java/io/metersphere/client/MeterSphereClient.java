@@ -29,12 +29,14 @@ public class MeterSphereClient {
     private final String accessKey;
     private final String secretKey;
     private final String endpoint;
+
     public MeterSphereClient(String accessKey, String secretKey, String endpoint) {
 
         this.accessKey = accessKey;
         this.secretKey = secretKey;
         this.endpoint = endpoint;
     }
+
     /*校验账号*/
     public String checkUser() {
         ResultHolder getUserResult = call(ApiUrlConstants.USER_INFO);
@@ -67,7 +69,7 @@ public class MeterSphereClient {
     }
 
     /*查询该项目下所有测试用例(接口+性能)*/
-    public List<TestCaseDTO> getTestCaseIds(String projectId) {
+    public List<TestCaseDTO> getTestCases(String projectId) {
         ResultHolder result = call(ApiUrlConstants.TEST_CASE_LIST_METHOD + "/" + projectId);
         String listJson = JSON.toJSONString(result.getData());
         LogUtil.info("该项目下所有的接口和性能测试" + listJson);
@@ -293,6 +295,7 @@ public class MeterSphereClient {
         httpClientConfig.addHeader("signature", signature);
         return httpClientConfig;
     }
+
     private static String aesEncrypt(String src, String secretKey, String iv) throws Exception {
         byte[] raw = secretKey.getBytes(StandardCharsets.UTF_8);
         SecretKeySpec secretKeySpec = new SecretKeySpec(raw, "AES");
