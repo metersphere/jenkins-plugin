@@ -99,7 +99,7 @@ public class MeterSphereClient {
     }
 
     /*执行测试计划*/
-    public String exeTestPlan(String projectId, String testPlanId, String mode, String runEnvironmentId) {
+    public String exeTestPlan(String projectId, String testPlanId, String mode, String resourcePoolId) {
         String userId = this.checkUser();
         HashMap<String, Object> params = new HashMap<>();
         params.put("testPlanId", testPlanId);
@@ -107,7 +107,7 @@ public class MeterSphereClient {
         params.put("triggerMode", "API");
         params.put("userId", userId);
         params.put("mode", mode);
-        params.put("resourcePoolId", runEnvironmentId);
+        params.put("resourcePoolId", resourcePoolId);
         ResultHolder result = call(ApiUrlConstants.TEST_PLAN, RequestMethod.POST, params);
         return JSON.toJSONString(result.getData());
     }

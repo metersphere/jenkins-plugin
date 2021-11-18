@@ -50,7 +50,7 @@
                       checked="${instance.mode == 'parallel'}">
         </f:radioBlock>
     </f:section>
-    <f:entry title="资源池选择" field="runEnvironmentId">
+    <f:entry title="资源池选择" field="resourcePoolId">
         <f:select/>
     </f:entry>
     <f:section title="开放配置">

@@ -52,14 +52,14 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     private final String result;
     private final String environmentId;
     private final String mode;//运行模式
-    private final String runEnvironmentId;//运行环境
+    private final String resourcePoolId;//运行环境
 
 
     @DataBoundConstructor
     public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId,
                               String projectId, PrintStream logger, String testPlanId, String testCaseNodeId,
                               String testId, String testCaseId, String method, String result, String testPlanName,
-                              String environmentId, String mode, String runEnvironmentId) {
+                              String environmentId, String mode, String resourcePoolId) {
         this.msEndpoint = msEndpoint;
         this.msAccessKey = msAccessKey;
         this.msSecretKey = msSecretKey;
@@ -75,7 +75,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.result = result;
         this.environmentId = environmentId;
         this.mode = mode;
-        this.runEnvironmentId = runEnvironmentId;
+        this.resourcePoolId = resourcePoolId;
         MeterSphereUtils.logger = logger;
     }
 
@@ -128,7 +128,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     private void execTestPlan(Run<?, ?> run, MeterSphereClient meterSphereClient, String testPlanId) throws InterruptedException {
         log("测试计划开始执行");
-        String id = meterSphereClient.exeTestPlan(projectId, testPlanId, mode, runEnvironmentId);
+        String id = meterSphereClient.exeTestPlan(projectId, testPlanId, mode, resourcePoolId);
         log("生成测试报告id:" + id.replace('"', ' ').trim());
         String url = meterSphereClient.getBaseInfo();
         log("当前站点url:" + url);
@@ -178,7 +178,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         }
                     }
                     if (StringUtils.equals(Results.SCENARIO, c.getType())) {
-                        int num = MeterSphereUtils.runScenario(meterSphereClient, c, testCaseId, projectId, "scenario", runEnvironmentId);
+                        int num = MeterSphereUtils.runScenario(meterSphereClient, c, testCaseId, projectId, "scenario", resourcePoolId);
                         if (num == 0) {
                             flag = false;
                         }
@@ -359,7 +359,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         }
 
         //资源池的选择
-        public ListBoxModel doFillRunEnvironmentIdItems(@QueryParameter String msAccessKey,
+        public ListBoxModel doFillResourcePoolIdItems(@QueryParameter String msAccessKey,
                                                         @QueryParameter String msSecretKey,
                                                         @QueryParameter String msEndpoint
         ) {
@@ -476,7 +476,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         return mode;
     }
 
-    public String getRunEnvironmentId() {
-        return runEnvironmentId;
+    public String getResourcePoolId() {
+        return resourcePoolId;
     }
 }

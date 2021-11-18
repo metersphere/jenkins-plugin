@@ -91,15 +91,15 @@ public class MeterSphereUtils {
         return num;
     }
 
-    public static int runScenario(MeterSphereClient meterSphereClient, TestCaseDTO c, String id, String projectId, String runMode, String runEnvironmentId) {
+    public static int runScenario(MeterSphereClient meterSphereClient, TestCaseDTO c, String id, String projectId, String runMode, String resourcePoolId) {
         String url = meterSphereClient.getBaseInfo();
         int num = 1;
         String reportId = null;
         try {
             RunModeConfig config = null;
-            if (StringUtils.isNotEmpty(runEnvironmentId)) {
+            if (StringUtils.isNotEmpty(resourcePoolId)) {
                 config = new RunModeConfig();
-                config.setResourcePoolId(runEnvironmentId);
+                config.setResourcePoolId(resourcePoolId);
                 config.setMode(runMode);
                 config.setReportName("");
                 config.setReportType("iddReport");
