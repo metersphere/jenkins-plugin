@@ -74,12 +74,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.environmentId = environmentId;
         this.mode = mode;
         this.resourcePoolId = resourcePoolId;
-        MeterSphereUtils.logger = logger;
     }
 
     @Override
     public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
         this.logger = listener.getLogger();
+        MeterSphereUtils.logger = logger;
         listener.getLogger().println("workspace=" + workspace);
         listener.getLogger().println("number=" + run.getNumber());
         listener.getLogger().println("url=" + run.getUrl());
