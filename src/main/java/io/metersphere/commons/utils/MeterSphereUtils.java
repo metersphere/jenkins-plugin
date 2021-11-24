@@ -138,11 +138,11 @@ public class MeterSphereUtils {
         return num;
     }
 
-    public static int runDefinition(MeterSphereClient meterSphereClient, TestCaseDTO c, String id, String testPlanId, String runMode, String environmentId) {
+    public static int runDefinition(MeterSphereClient meterSphereClient, TestCaseDTO c, String id, String testPlanId, String runMode) {
         String url = meterSphereClient.getBaseInfo();
         int num = 1;
         try {
-            meterSphereClient.runDefinition(c, runMode, environmentId, testPlanId, id);
+            meterSphereClient.runDefinition(c, runMode, testPlanId, id);
         } catch (Exception e) {
             num = 0;
             log(c.getName() + "测试用例发生异常:" + e.getMessage());
@@ -196,11 +196,10 @@ public class MeterSphereUtils {
         }
     }
 
-    public static void getTestStepsBySingle(MeterSphereClient meterSphereClient, List<TestCaseDTO> testCaseIds, String environmentId,
+    public static void getTestStepsBySingle(MeterSphereClient meterSphereClient, List<TestCaseDTO> testCaseIds,
                                             String projectId, String testCaseId, String testPlanId, String resourcePoolId) {
         //log("testList=" + "[" + JSON.toJSONString(testCaseIds) + "]");
         log("testCaseId=" + "[" + testCaseId + "]");
-        log("environmentId=" + "[" + environmentId + "]");
         boolean flag = true;
         if (CollectionUtils.isNotEmpty(testCaseIds)) {
             for (TestCaseDTO c : testCaseIds) {
@@ -228,7 +227,7 @@ public class MeterSphereUtils {
                         }
                     }
                     if (StringUtils.equals(Results.DEFINITION, c.getType())) {
-                        int num = MeterSphereUtils.runDefinition(meterSphereClient, c, testCaseId, testPlanId, "JENKINS", environmentId);
+                        int num = MeterSphereUtils.runDefinition(meterSphereClient, c, testCaseId, testPlanId, "JENKINS");
                         if (num == 0) {
                             flag = false;
                         }

@@ -185,12 +185,11 @@ public class MeterSphereClient {
     }
 
     /*单独执行接口定义*/
-    public void runDefinition(TestCaseDTO testCaseDTO, String runMode, String environmentId, String testPlanId, String testCaseId) {
+    public void runDefinition(TestCaseDTO testCaseDTO, String runMode, String testPlanId, String testCaseId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("caseId", testCaseId);
         params.put("reportId", testCaseDTO.getId());
         params.put("runMode", runMode);
-        params.put("environmentId", environmentId);
         params.put("testPlanId", testPlanId);
         params.put("triggerMode", "API");
         call(ApiUrlConstants.API_DEFINITION_RUN, RequestMethod.POST, params);

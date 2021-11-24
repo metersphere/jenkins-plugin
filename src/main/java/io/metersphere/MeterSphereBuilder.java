@@ -48,7 +48,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     private final String testCaseId;
     private final String method;
     private final String result;
-    private final String environmentId;
     private final String mode;//运行模式
     private final String resourcePoolId;//运行环境
 
@@ -57,7 +56,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId,
                               String projectId, PrintStream logger, String testPlanId, String testCaseNodeId,
                               String testId, String testCaseId, String method, String result, String testPlanName,
-                              String environmentId, String mode, String resourcePoolId) {
+                              String mode, String resourcePoolId) {
         this.msEndpoint = msEndpoint;
         this.msAccessKey = msAccessKey;
         this.msSecretKey = msSecretKey;
@@ -71,7 +70,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.testCaseId = testCaseId;
         this.method = StringUtils.isBlank(method) ? Method.TEST_PLAN : method;
         this.result = result;
-        this.environmentId = environmentId;
         this.mode = mode;
         this.resourcePoolId = resourcePoolId;
     }
@@ -107,7 +105,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     break;
                 case Method.SINGLE:
                     List<TestCaseDTO> testCaseIds = client.getTestCases(projectId);//项目下
-                    MeterSphereUtils.getTestStepsBySingle(client, testCaseIds, environmentId, projectId, testCaseId, testPlanId, resourcePoolId);
+                    MeterSphereUtils.getTestStepsBySingle(client, testCaseIds, projectId, testCaseId, testPlanId, resourcePoolId);
                     break;
                 default:
                     log("测试用例不存在");
@@ -387,10 +385,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     public String getResult() {
         return result;
-    }
-
-    public String getEnvironmentId() {
-        return environmentId;
     }
 
     public String getMode() {
