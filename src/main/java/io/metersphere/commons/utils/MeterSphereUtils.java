@@ -217,7 +217,7 @@ public class MeterSphereUtils {
                         break;
                     case Results.DEFINITION:
                     case Results.API_CASE:
-                        num = runDefinition(meterSphereClient, c, testCaseId, testPlanId, "JENKINS");
+                        num = runDefinition(meterSphereClient, c, testCaseId, testPlanId, "JENKINS_API_PLAN");
                         break;
                     default:
                         break;
