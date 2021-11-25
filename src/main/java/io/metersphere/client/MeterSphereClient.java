@@ -130,22 +130,15 @@ public class MeterSphereClient {
         return JSON.toJSONString(result.getData());
     }
 
-    public String getApiTestCaseReport(String id, String type) {
+    public String getApiTestCaseReport(String id) {
         if (id.equals("") || id == null) {
             id = UUID.randomUUID().toString();
         }
-        if (type.equals("JENKINS_API_PLAN")) {
-            ResultHolder result = call(ApiUrlConstants.API_TES_RESULT_TEST + "/" + id.replace('"', ' ').trim());
-            System.out.println("原始字符串:" + result.getData());
-            return JSON.toJSONString(result.getData());
-        } else {
-            ResultHolder result = call(ApiUrlConstants.API_TES_RESULT + "/" + id.replace('"', ' ').trim());
-            String listJson = JSON.toJSONString(result.getData());
-            JSONObject jsonObject = JSONObject.parseObject(listJson);
-            return jsonObject.getString("execResult");
-        }
 
-
+        ResultHolder result = call(ApiUrlConstants.API_TES_RESULT + "/" + id.replace('"', ' ').trim());
+        String listJson = JSON.toJSONString(result.getData());
+        JSONObject jsonObject = JSONObject.parseObject(listJson);
+        return jsonObject.getString("execResult");
     }
 
     public String getApiTestState(String reportId) {
@@ -157,10 +150,10 @@ public class MeterSphereClient {
     }
 
     /*单独执行场景测试*/
-    public String runScenario(TestCaseDTO testCaseDTO, String id, String type, RunModeConfig config) {
+    public String runScenario(TestCaseDTO testCaseDTO, String projectId, String type, RunModeConfig config) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", UUID.randomUUID().toString());
-        params.put("projectId", id);
+        params.put("projectId", projectId);
         params.put("ids", Arrays.asList(testCaseDTO.getId()));
         params.put("config", config);
         ResultHolder result;
@@ -185,12 +178,12 @@ public class MeterSphereClient {
     }
 
     /*单独执行接口定义*/
-    public void runDefinition(TestCaseDTO testCaseDTO, String runMode, String testPlanId, String testCaseId) {
+    public void runDefinition(TestCaseDTO testCaseDTO, String environmentId, String runMode) {
         HashMap<String, Object> params = new HashMap<>();
-        params.put("caseId", testCaseId);
+        params.put("caseId", testCaseDTO.getId());
         params.put("reportId", testCaseDTO.getId());
+        params.put("environmentId", environmentId);
         params.put("runMode", runMode);
-        params.put("testPlanId", testPlanId);
         params.put("triggerMode", "API");
         call(ApiUrlConstants.API_DEFINITION_RUN, RequestMethod.POST, params);
 

@@ -18,6 +18,7 @@ import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.MeterSphereUtils;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -31,6 +32,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Serializable {
 
@@ -49,14 +51,15 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     private final String method;
     private final String result;
     private final String mode;//运行模式
-    private final String resourcePoolId;//运行环境
+    private final String resourcePoolId;
+    private final String environmentId;
 
 
     @DataBoundConstructor
     public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId,
                               String projectId, PrintStream logger, String testPlanId, String testCaseNodeId,
                               String testId, String testCaseId, String method, String result, String testPlanName,
-                              String mode, String resourcePoolId) {
+                              String mode, String resourcePoolId, String environmentId) {
         this.msEndpoint = msEndpoint;
         this.msAccessKey = msAccessKey;
         this.msSecretKey = msSecretKey;
@@ -68,6 +71,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.testCaseNodeId = testCaseNodeId;
         this.testId = testId;
         this.testCaseId = testCaseId;
+        this.environmentId = environmentId;
         this.method = StringUtils.isBlank(method) ? Method.TEST_PLAN : method;
         this.result = result;
         this.mode = mode;
@@ -78,19 +82,20 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
         this.logger = listener.getLogger();
         MeterSphereUtils.logger = logger;
-        listener.getLogger().println("workspace=" + workspace);
-        listener.getLogger().println("number=" + run.getNumber());
-        listener.getLogger().println("url=" + run.getUrl());
+        logger.println("workspace=" + workspace);
+        logger.println("number=" + run.getNumber());
+        logger.println("url=" + run.getUrl());
         final MeterSphereClient client = new MeterSphereClient(this.msAccessKey, this.msSecretKey, this.msEndpoint);
-        log("执行方式: " + method);
         try {
             switch (method) {
                 case Method.TEST_PLAN:
+                    log("测试计划执行: " + testPlanName);
                     MeterSphereUtils.execTestPlan(run, client, projectId, mode, testPlanId, resourcePoolId);
                     break;
                 case Method.TEST_PLAN_NAME:
                     EnvVars environment = run.getEnvironment(listener);
                     String testPlanName = Util.replaceMacro(this.testPlanName, environment);
+                    log("测试计划执行: " + testPlanName);
 
                     List<TestPlanDTO> testPlans = client.getTestPlanIds(projectId, workspaceId);
                     Optional<TestPlanDTO> first = testPlans.stream()
@@ -104,8 +109,14 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     MeterSphereUtils.execTestPlan(run, client, projectId, mode, first.get().getId(), resourcePoolId);
                     break;
                 case Method.SINGLE:
-                    List<TestCaseDTO> testCaseIds = client.getTestCases(projectId);//项目下
-                    MeterSphereUtils.getTestStepsBySingle(client, testCaseIds, projectId, testCaseId, testPlanId, resourcePoolId);
+
+                    List<TestCaseDTO> testCases = client.getTestCases(projectId);//项目下
+                    List<TestCaseDTO> collect = testCases.stream().filter(t -> StringUtils.equals(t.getId(), testCaseId)).collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(collect)) {
+                        TestCaseDTO testCaseDTO = collect.get(0);
+                        log("测试执行: " + testCaseDTO.getName());
+                        MeterSphereUtils.runTestBySingle(client, testCaseDTO, projectId, environmentId, resourcePoolId);
+                    }
                     break;
                 default:
                     log("测试用例不存在");
@@ -389,6 +400,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     public String getMode() {
         return mode;
+    }
+
+    public String getEnvironmentId() {
+        return environmentId;
     }
 
     public String getResourcePoolId() {

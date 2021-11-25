@@ -37,6 +37,9 @@
             <f:entry title="测试名称" field="testCaseId">
                 <f:select/>
             </f:entry>
+            <f:entry title="运行环境(接口用例)" field="environmentId">
+                <f:select/>
+            </f:entry>
         </f:radioBlock>
     </f:section>
     <f:section title="运行模式">
