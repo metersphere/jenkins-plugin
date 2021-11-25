@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Serializable {
 
-    private static final String LOG_PREFIX = "[MeterSphere，代码测试]";
+    private static final String LOG_PREFIX = "[MeterSphere] ";
     private final String msEndpoint;
     private final String msAccessKey;
     private final String msSecretKey;
