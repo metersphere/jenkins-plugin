@@ -198,42 +198,45 @@ public class MeterSphereUtils {
 
     public static void getTestStepsBySingle(MeterSphereClient meterSphereClient, List<TestCaseDTO> testCaseIds,
                                             String projectId, String testCaseId, String testPlanId, String resourcePoolId) {
-        //log("testList=" + "[" + JSON.toJSONString(testCaseIds) + "]");
         log("testCaseId=" + "[" + testCaseId + "]");
         boolean flag = true;
         if (CollectionUtils.isNotEmpty(testCaseIds)) {
-            for (TestCaseDTO c : testCaseIds) {
-                if (StringUtils.equals(testCaseId, c.getId())) {
-                    if (StringUtils.equals(Results.API, c.getType())) {
-                        int num = 1;
-                        num = num * MeterSphereUtils.runApiTest(meterSphereClient, c, testCaseId);
-                        if (num == 0) {
-                            flag = false;
-                        }
-                        if (num == 0) {
-                            flag = false;
-                        }
+            TestCaseDTO c = testCaseIds.stream()
+                    .filter(testCaseDTO -> StringUtils.equals(testCaseId, testCaseDTO.getId()))
+                    .findFirst()
+                    .get();
+
+            int num = 1;
+            switch (c.getType()) {
+                case Results.API:
+                    num = num * MeterSphereUtils.runApiTest(meterSphereClient, c, testCaseId);
+                    if (num == 0) {
+                        flag = false;
                     }
-                    if (StringUtils.equals(Results.PERFORMANCE, c.getType())) {
-                        int num = MeterSphereUtils.runPerformTest(meterSphereClient, c, testCaseId, "");
-                        if (num == 0) {
-                            flag = false;
-                        }
+                    break;
+                case Results.PERFORMANCE:
+                case Results.LOAD_TEST:
+                    num = MeterSphereUtils.runPerformTest(meterSphereClient, c, testCaseId, "");
+                    if (num == 0) {
+                        flag = false;
                     }
-                    if (StringUtils.equals(Results.SCENARIO, c.getType())) {
-                        int num = MeterSphereUtils.runScenario(meterSphereClient, c, testCaseId, projectId, "scenario", resourcePoolId);
-                        if (num == 0) {
-                            flag = false;
-                        }
+                    break;
+                case Results.SCENARIO:
+                case Results.API_SCENARIO:
+                    num = MeterSphereUtils.runScenario(meterSphereClient, c, testCaseId, projectId, "scenario", resourcePoolId);
+                    if (num == 0) {
+                        flag = false;
                     }
-                    if (StringUtils.equals(Results.DEFINITION, c.getType())) {
-                        int num = MeterSphereUtils.runDefinition(meterSphereClient, c, testCaseId, testPlanId, "JENKINS");
-                        if (num == 0) {
-                            flag = false;
-                        }
+                    break;
+                case Results.DEFINITION:
+                case Results.API_CASE:
+                    num = MeterSphereUtils.runDefinition(meterSphereClient, c, testCaseId, testPlanId, "JENKINS");
+                    if (num == 0) {
+                        flag = false;
                     }
-                }
+                    break;
             }
+
             if (flag) {
                 log("该测试用例请求通过，登陆MeterSphere网站查看该报告结果");
             } else {
