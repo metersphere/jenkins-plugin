@@ -169,7 +169,7 @@ public class MeterSphereUtils {
     public static void execTestPlan(Run<?, ?> run, MeterSphereClient meterSphereClient, String projectId, String mode, String testPlanId, String resourcePoolId) throws InterruptedException {
         log("测试计划开始执行");
         String id = meterSphereClient.exeTestPlan(projectId, testPlanId, mode, resourcePoolId);
-        log("生成测试报告id:" + id.replace('"', ' ').trim());
+        log("生成测试报告id:" + id);
         String url = meterSphereClient.getBaseInfo();
         log("当前站点url:" + url);
         boolean flag = true;
@@ -178,7 +178,7 @@ public class MeterSphereUtils {
             if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.SUCCESS)) {
                 flag = false;
                 log("该测试计划已完成");
-                log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
+                log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList?resourceId=" + id);
             } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.FAILED)) {
                 flag = false;
                 run.setResult(Result.FAILURE);
@@ -187,7 +187,7 @@ public class MeterSphereUtils {
             } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.COMPLETED)) {
                 flag = false;
                 log("该测试计划已完成");
-                log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
+                log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList?resourceId=" + id);
             }
             Thread.sleep(5000);
         }

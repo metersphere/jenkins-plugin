@@ -111,6 +111,9 @@ public class MeterSphereClient {
         params.put("mode", mode);
         params.put("resourcePoolId", resourcePoolId);
         ResultHolder result = call(ApiUrlConstants.TEST_PLAN, RequestMethod.POST, params);
+        if (result.getData() instanceof String) {
+            return (String) result.getData();
+        }
         return JSON.toJSONString(result.getData());
     }
 
