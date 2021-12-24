@@ -171,7 +171,6 @@ public class MeterSphereUtils {
         String id = meterSphereClient.exeTestPlan(projectId, testPlanId, mode, resourcePoolId);
         log("生成测试报告id:" + id);
         String url = meterSphereClient.getBaseInfo();
-        log("当前站点url:" + url);
         boolean flag = true;
         while (flag) {
             String status = meterSphereClient.getStatus(id);
