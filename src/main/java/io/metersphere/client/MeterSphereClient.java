@@ -188,7 +188,7 @@ public class MeterSphereClient {
     public void runDefinition(TestCaseDTO testCaseDTO, String runMode, String testPlanId, String testCaseId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("caseId", testCaseId);
-        params.put("reportId", testCaseDTO.getId());
+        params.put("reportId", UUID.randomUUID().toString());
         params.put("runMode", runMode);
         params.put("testPlanId", testPlanId);
         params.put("triggerMode", "API");
