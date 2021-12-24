@@ -171,7 +171,7 @@ public class MeterSphereClient {
             params.put("planScenarioId", testCaseDTO.getId());
             result = call(ApiUrlConstants.API_AUTOMATION_RUN, RequestMethod.POST, params);
         }
-        return JSON.toJSONString(result.getData());
+        return JSON.parseArray(JSON.toJSONString(result.getData())).getJSONObject(0).getString("reportId");
     }
 
     public String getApiScenario(String id) {

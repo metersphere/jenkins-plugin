@@ -46,7 +46,7 @@ public class MeterSphereUtils {
                     log("点击链接进入" + c.getName() + "测试报告页面:" + url + "/#/api/report/view/" + reportId.replace("\"", ""));
                     meterSphereClient.changeState(id, Results.FAILURE);
                 }
-                Thread.sleep(1000 * 60);
+                Thread.sleep(5000);
             }
         } catch (InterruptedException e) {
             log(c.getName() + "发生异常：" + e.getMessage());
@@ -86,7 +86,7 @@ public class MeterSphereUtils {
                     log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/performance/report/view/" + reportId.replace("\"", ""));
                     meterSphereClient.changeState(id, Results.FAILURE);
                 }
-                Thread.sleep(1000 * 60);
+                Thread.sleep(5000);
             }
         } catch (InterruptedException e) {
             log(c.getName() + "发生异常：" + e.getMessage());
@@ -100,15 +100,12 @@ public class MeterSphereUtils {
         int num = 1;
         String reportId = null;
         try {
-            RunModeConfig config = null;
-            if (StringUtils.isNotEmpty(resourcePoolId)) {
-                config = new RunModeConfig();
-                config.setResourcePoolId(resourcePoolId);
-                config.setMode(runMode);
-                config.setReportName("");
-                config.setReportType("iddReport");
-                config.setOnSampleError(true);
-            }
+            RunModeConfig config = new RunModeConfig();
+            config.setResourcePoolId(resourcePoolId);
+            config.setMode(runMode);
+            config.setReportName("");
+            config.setReportType("iddReport");
+            config.setOnSampleError(true);
             reportId = meterSphereClient.runScenario(c, projectId, runMode, config);
         } catch (Exception e) {
             num = 0;
@@ -128,7 +125,7 @@ public class MeterSphereUtils {
                     num = 0;
                     log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/" + reportId.replace("\"", ""));
                 }
-                Thread.sleep(1000 * 60);
+                Thread.sleep(5000);
             }
         } catch (InterruptedException e) {
             log(c.getName() + "发生异常：" + e.getMessage());
@@ -159,7 +156,7 @@ public class MeterSphereUtils {
                     state = false;
                     num = 0;
                 }
-                Thread.sleep(1000 * 60);
+                Thread.sleep(5000);
             }
         } catch (InterruptedException e) {
             log(c.getName() + "发生异常：" + e.getMessage());
