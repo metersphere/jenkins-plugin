@@ -70,7 +70,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.testCaseId = testCaseId;
         this.method = StringUtils.isBlank(method) ? Method.TEST_PLAN : method;
         this.result = result;
-        this.mode = mode;
+        this.mode = StringUtils.isBlank(mode) ? "serial" : mode;
         this.resourcePoolId = resourcePoolId;
     }
 
