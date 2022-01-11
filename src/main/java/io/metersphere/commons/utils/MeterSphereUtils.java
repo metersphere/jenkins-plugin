@@ -182,7 +182,7 @@ public class MeterSphereUtils {
                 flag = false;
                 run.setResult(Result.FAILURE);
                 log("该测试计划失败");
-                log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList");
+                log("点击链接进入测试计划报告页面:" + url + "/#/track/testPlan/reportList?resourceId=" + id);
             } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.COMPLETED)) {
                 flag = false;
                 log("该测试计划已完成");
