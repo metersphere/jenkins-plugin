@@ -1,9 +1,10 @@
 package io.metersphere.commons.model;
 
 
+import java.io.Serializable;
 import java.util.List;
 
-public class TestCaseDTO {
+public class TestCaseDTO implements Serializable {
     private List<String> nodePaths;
     private String id;
     private String maintainerName;

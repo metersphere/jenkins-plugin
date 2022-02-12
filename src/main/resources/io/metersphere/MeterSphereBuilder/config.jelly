@@ -22,20 +22,26 @@
     <f:section title="执行方式">
         <f:radioBlock title="选择测试计划" name="method" value="testPlan" inline="true"
                       checked="${instance.method == 'testPlan'}">
-            <f:entry title="选择测试计划" field="testPlanId">
+            <f:entry title="" field="testPlanId">
                 <f:select/>
             </f:entry>
         </f:radioBlock>
         <f:radioBlock title="输入计划名称" name="method" value="testPlanName" inline="true"
                       checked="${instance.method == 'testPlanName'}">
-            <f:entry title="测试计划名称" field="testPlanName">
+            <f:entry title="" field="testPlanName">
                 <f:textbox/>
             </f:entry>
         </f:radioBlock>
         <f:radioBlock title="选择测试执行" name="method" value="single" inline="true"
                       checked="${instance.method == 'single'}">
-            <f:entry title="测试名称" field="testCaseId">
+            <f:entry title="" field="testCaseId">
                 <f:select/>
+            </f:entry>
+        </f:radioBlock>
+        <f:radioBlock title="输入测试名称" name="method" value="singleName" inline="true"
+                      checked="${instance.method == 'singleName'}">
+            <f:entry title="" field="testCaseName">
+                <f:textbox/>
             </f:entry>
         </f:radioBlock>
     </f:section>

@@ -2,10 +2,7 @@ package io.metersphere;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.*;
-import hudson.model.AbstractProject;
-import hudson.model.Result;
-import hudson.model.Run;
-import hudson.model.TaskListener;
+import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
@@ -19,6 +16,7 @@ import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.MeterSphereUtils;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -45,6 +43,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     private String testPlanId;
     private String testPlanName;
     private String testCaseId;
+    private String testCaseName;
     private String method;
     private String result;
     private String mode;//运行模式
@@ -68,6 +67,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         final MeterSphereClient client = new MeterSphereClient(this.msAccessKey, this.msSecretKey, this.msEndpoint);
         log("执行方式: " + method);
         try {
+            List<TestCaseDTO> testCases;
+            Optional<TestCaseDTO> firstCase;
             switch (method) {
                 case Method.TEST_PLAN:
                     MeterSphereUtils.execTestPlan(run, client, projectId, mode, testPlanId, resourcePoolId);
@@ -88,8 +89,29 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     MeterSphereUtils.execTestPlan(run, client, projectId, mode, first.get().getId(), resourcePoolId);
                     break;
                 case Method.SINGLE:
-                    List<TestCaseDTO> testCaseIds = client.getTestCases(projectId);//项目下
-                    MeterSphereUtils.getTestStepsBySingle(client, testCaseIds, projectId, testCaseId, testPlanId, resourcePoolId);
+                    testCases = client.getTestCases(projectId);//项目下
+                    firstCase = testCases.stream()
+                            .filter(testCase -> StringUtils.equals(testCaseId, testCase.getId()))
+                            .findFirst();
+                    if (!firstCase.isPresent()) {
+                        log("测试不存在");
+                        return;
+                    }
+                    MeterSphereUtils.getTestStepsBySingle(client, projectId, firstCase.get(), testPlanId, resourcePoolId);
+                    break;
+                case Method.SINGLE_NAME:
+                    String testCaseName = Util.replaceMacro(this.testCaseName, env);
+                    testCases = client.getTestCases(projectId);//项目下
+                    firstCase = testCases.stream()
+                            .filter(testCase -> StringUtils.equals(testCaseName, testCase.getId()) ||
+                                    StringUtils.equals(testCaseName, testCase.getName() + "（" + testCase.getType() + "）"))
+                            .findFirst();
+
+                    if (!firstCase.isPresent()) {
+                        log("测试不存在");
+                        return;
+                    }
+                    MeterSphereUtils.getTestStepsBySingle(client, projectId, firstCase.get(), testPlanId, resourcePoolId);
                     break;
                 default:
                     log("测试用例不存在");
@@ -113,6 +135,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     @Symbol("meterSphere")
     @Extension // This indicates to Jenkins that this is an implementation of an extension point.
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+        private List<TestPlanDTO> testPlanList = new ArrayList<>();
+        private List<TestCaseDTO> testList = new ArrayList<>();
+
         public FormValidation doCheckAccount(
                 @QueryParameter String msAccessKey,
                 @QueryParameter String msSecretKey,
@@ -177,6 +202,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         items.add(c.getName(), c.getId());
                     }
                 }
+
+//                testList = meterSphereClient.getTestCases(projectId);
+//                testPlanList = meterSphereClient.getTestPlanIds(projectId, workspaceId);
+
             } catch (Exception e) {
                 LogUtil.error(e.getMessage(), e);
             }
@@ -193,12 +222,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             try {
                 MeterSphereClient meterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
                 items.add("请选择测试计划", "");
-                List<TestPlanDTO> list = new ArrayList<>();
+
                 if (projectId != null && !projectId.equals("")) {
-                    list = meterSphereClient.getTestPlanIds(projectId, workspaceId);
+                    testPlanList = meterSphereClient.getTestPlanIds(projectId, workspaceId);
                 }
-                if (list != null && list.size() > 0) {
-                    for (TestPlanDTO c : list) {
+                if (testPlanList != null && testPlanList.size() > 0) {
+                    for (TestPlanDTO c : testPlanList) {
                         items.add(c.getName(), c.getId());
                     }
                 }
@@ -220,12 +249,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             try {
                 MeterSphereClient meterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
                 items.add("请选择测试名称", "");
-                List<TestCaseDTO> list = new ArrayList<>();
                 if (projectId != null && !projectId.equals("")) {
-                    list = meterSphereClient.getTestCases(projectId);
+                    testList = meterSphereClient.getTestCases(projectId);
                 }
-                if (list != null && list.size() > 0) {
-                    for (TestCaseDTO c : list) {
+                if (testList != null && testList.size() > 0) {
+                    for (TestCaseDTO c : testList) {
                         items.add(c.getName() + "（" + c.getType() + "）", c.getId());
                     }
                 }
@@ -282,6 +310,47 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 LogUtil.error(e.getMessage(), e);
             }
             return items;
+        }
+
+        public AutoCompletionCandidates doAutoCompleteTestPlanName(@QueryParameter String value) {
+            AutoCompletionCandidates c = new AutoCompletionCandidates();
+            if (StringUtils.isBlank(value)) {
+                testPlanList.stream().map(TestPlanDTO::getName).forEach(c::add);
+            } else {
+                testPlanList.stream().map(TestPlanDTO::getName).forEach(v -> {
+                    if (v.toLowerCase().contains(value.toLowerCase())) {
+                        c.add(v);
+                    }
+                });
+            }
+
+            return c;
+        }
+
+        public AutoCompletionCandidates doAutoCompleteTestCaseName(@QueryParameter String value) {
+            AutoCompletionCandidates c = new AutoCompletionCandidates();
+            List<TestCaseDTO> list = new ArrayList<>();
+            testList.forEach(test -> {
+                try {
+                    TestCaseDTO clone = (TestCaseDTO) BeanUtils.cloneBean(test);
+                    clone.setName(clone.getName() + "（" + clone.getType() + "）");
+                    list.add(clone);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+            if (StringUtils.isBlank(value)) {
+                list.stream().map(TestCaseDTO::getName).forEach(c::add);
+            } else {
+                list.stream().map(TestCaseDTO::getName).forEach(v -> {
+                    if (v.toLowerCase().contains(value.toLowerCase())) {
+                        c.add(v);
+                    }
+                });
+            }
+
+            return c;
         }
 
 
@@ -357,6 +426,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         this.mode = StringUtils.isBlank(mode) ? "serial" : mode;
     }
 
+    @DataBoundSetter
+    public void setTestCaseName(String testCaseName) {
+        this.testCaseName = testCaseName;
+    }
+
     public String getMsEndpoint() {
         return msEndpoint;
     }
@@ -385,7 +459,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         return testPlanName;
     }
 
-
     public String getTestCaseId() {
         return testCaseId;
     }
@@ -404,5 +477,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     public String getResourcePoolId() {
         return resourcePoolId;
+    }
+
+    public String getTestCaseName() {
+        return testCaseName;
     }
 }
