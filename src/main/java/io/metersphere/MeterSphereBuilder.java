@@ -1,5 +1,6 @@
 package io.metersphere;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.*;
 import hudson.model.AbstractProject;
 import hudson.model.Result;
@@ -21,12 +22,11 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,49 +35,33 @@ import java.util.Optional;
 public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Serializable {
 
     private static final String LOG_PREFIX = "[MeterSphere] ";
+
     private final String msEndpoint;
     private final String msAccessKey;
     private final String msSecretKey;
-    private final String workspaceId;
-    private final String projectId;
-    private PrintStream logger;
-    private final String testPlanId;
-    private final String testPlanName;
-    private final String testCaseNodeId;
-    private final String testId;
-    private final String testCaseId;
-    private final String method;
-    private final String result;
-    private final String mode;//运行模式
-    private final String resourcePoolId;//运行环境
+
+    private String workspaceId;
+    private String projectId;
+    private String testPlanId;
+    private String testPlanName;
+    private String testCaseId;
+    private String method;
+    private String result;
+    private String mode;//运行模式
+    private String resourcePoolId;//运行环境
 
 
     @DataBoundConstructor
-    public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey, String workspaceId,
-                              String projectId, PrintStream logger, String testPlanId, String testCaseNodeId,
-                              String testId, String testCaseId, String method, String result, String testPlanName,
-                              String mode, String resourcePoolId) {
+    public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey) {
         this.msEndpoint = msEndpoint;
         this.msAccessKey = msAccessKey;
         this.msSecretKey = msSecretKey;
-        this.workspaceId = workspaceId;
-        this.projectId = projectId;
-        this.logger = logger;
-        this.testPlanId = testPlanId;
-        this.testPlanName = testPlanName;
-        this.testCaseNodeId = testCaseNodeId;
-        this.testId = testId;
-        this.testCaseId = testCaseId;
-        this.method = StringUtils.isBlank(method) ? Method.TEST_PLAN : method;
-        this.result = result;
-        this.mode = StringUtils.isBlank(mode) ? "serial" : mode;
-        this.resourcePoolId = resourcePoolId;
     }
 
     @Override
-    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-        this.logger = listener.getLogger();
-        MeterSphereUtils.logger = logger;
+    public void perform(@NonNull Run<?, ?> run, @NonNull FilePath workspace, @NonNull EnvVars env, @NonNull Launcher launcher,
+                        @NonNull TaskListener listener) throws InterruptedException, IOException {
+        MeterSphereUtils.logger = listener.getLogger();
         listener.getLogger().println("workspace=" + workspace);
         listener.getLogger().println("number=" + run.getNumber());
         listener.getLogger().println("url=" + run.getUrl());
@@ -324,8 +308,53 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     }
 
 
-    public static String getLogPrefix() {
-        return LOG_PREFIX;
+    private void log(String msg) {
+        MeterSphereUtils.logger.println(LOG_PREFIX + msg);
+    }
+
+    @DataBoundSetter
+    public void setWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
+    @DataBoundSetter
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @DataBoundSetter
+    public void setTestPlanId(String testPlanId) {
+        this.testPlanId = testPlanId;
+    }
+
+    @DataBoundSetter
+    public void setTestPlanName(String testPlanName) {
+        this.testPlanName = testPlanName;
+    }
+
+    @DataBoundSetter
+    public void setTestCaseId(String testCaseId) {
+        this.testCaseId = testCaseId;
+    }
+
+    @DataBoundSetter
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    @DataBoundSetter
+    public void setResourcePoolId(String resourcePoolId) {
+        this.resourcePoolId = resourcePoolId;
+    }
+
+    @DataBoundSetter
+    public void setMethod(String method) {
+        this.method = StringUtils.isBlank(method) ? Method.TEST_PLAN : method;
+    }
+
+    @DataBoundSetter
+    public void setMode(String mode) {
+        this.mode = StringUtils.isBlank(mode) ? "serial" : mode;
     }
 
     public String getMsEndpoint() {
@@ -348,11 +377,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         return projectId;
     }
 
-
-    public PrintStream getLogger() {
-        return logger;
-    }
-
     public String getTestPlanId() {
         return testPlanId;
     }
@@ -361,26 +385,13 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         return testPlanName;
     }
 
-    public String getTestId() {
-        return testId;
-    }
-
-    private void log(String msg) {
-        logger.println(LOG_PREFIX + msg);
-    }
-
-
-    public String getMethod() {
-        return method;
-    }
-
-    public String getTestCaseNodeId() {
-        return testCaseNodeId;
-    }
-
 
     public String getTestCaseId() {
         return testCaseId;
+    }
+
+    public String getMethod() {
+        return method;
     }
 
     public String getResult() {
