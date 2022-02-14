@@ -33,7 +33,7 @@
 
     <properties>
         <jackson.version>2.1.1</jackson.version>
-        <jenkins.version>2.277.1</jenkins.version>
+        <jenkins.version>2.319.3</jenkins.version>
         <java.level>8</java.level>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <aetherVersion>1.13.1</aetherVersion>
