@@ -194,7 +194,7 @@ public class MeterSphereUtils {
 
     public static void getTestStepsBySingle(MeterSphereClient meterSphereClient, String projectId, TestCaseDTO testCase, String testPlanId, String resourcePoolId) {
         log("测试ID: " + testCase.getId());
-        log("测试名称: " + testCase.getName() + "（" + testCase.getType() + "）");
+        log("测试名称: " + testCase.getName() + " [" + testCase.getType() + "]" + " [" + testCase.getVersionName() + "]");
         boolean flag = true;
         int num = 1;
         switch (testCase.getType()) {

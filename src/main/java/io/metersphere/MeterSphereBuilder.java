@@ -104,7 +104,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     testCases = client.getTestCases(projectId);//项目下
                     firstCase = testCases.stream()
                             .filter(testCase -> StringUtils.equals(testCaseName, testCase.getId()) ||
-                                    StringUtils.equals(testCaseName, testCase.getName() + "（" + testCase.getType() + "）"))
+                                    StringUtils.equals(testCaseName, testCase.getName() + " [" + testCase.getType() + "]" + " [" + testCase.getVersionName() + "]"))
                             .findFirst();
 
                     if (!firstCase.isPresent()) {
@@ -254,7 +254,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 }
                 if (testList != null && testList.size() > 0) {
                     for (TestCaseDTO c : testList) {
-                        items.add(c.getName() + "（" + c.getType() + "）", c.getId());
+                        items.add(c.getName() + " [" + c.getType() + "]" + " [" + c.getVersionName() + "]", c.getId());
                     }
                 }
 
@@ -333,7 +333,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             testList.forEach(test -> {
                 try {
                     TestCaseDTO clone = (TestCaseDTO) BeanUtils.cloneBean(test);
-                    clone.setName(clone.getName() + "（" + clone.getType() + "）");
+                    clone.setName(clone.getName() + " [" + clone.getType() + "]" + " [" + clone.getVersionName() + "]");
                     list.add(clone);
                 } catch (Exception e) {
                     e.printStackTrace();

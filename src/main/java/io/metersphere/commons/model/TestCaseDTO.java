@@ -25,6 +25,7 @@ public class TestCaseDTO implements Serializable {
     private String lastResultId;
     private static final long serialVersionUID = 1L;
     private String reportId;
+    private String versionName;
 
     public String getReportId() {
         return reportId;
@@ -176,6 +177,14 @@ public class TestCaseDTO implements Serializable {
 
     public void setTestId(String testId) {
         this.testId = testId;
+    }
+
+    public String getVersionName() {
+        return versionName;
+    }
+
+    public void setVersionName(String versionName) {
+        this.versionName = versionName;
     }
 
     public static long getSerialVersionUID() {
