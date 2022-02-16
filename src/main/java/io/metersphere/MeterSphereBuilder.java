@@ -58,7 +58,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     }
 
     @Override
-    public void perform(@NonNull Run<?, ?> run, @NonNull FilePath workspace, @NonNull EnvVars env, @NonNull Launcher launcher,
+    public void perform(@NonNull Run<?, ?> run, @NonNull FilePath workspace, @NonNull Launcher launcher,
                         @NonNull TaskListener listener) throws InterruptedException, IOException {
         MeterSphereUtils.logger = listener.getLogger();
         listener.getLogger().println("workspace=" + workspace);
@@ -69,12 +69,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         try {
             List<TestCaseDTO> testCases;
             Optional<TestCaseDTO> firstCase;
+            EnvVars environment = run.getEnvironment(listener);
             switch (method) {
                 case Method.TEST_PLAN:
                     MeterSphereUtils.execTestPlan(run, client, projectId, mode, testPlanId, resourcePoolId);
                     break;
                 case Method.TEST_PLAN_NAME:
-                    EnvVars environment = run.getEnvironment(listener);
                     String testPlanName = Util.replaceMacro(this.testPlanName, environment);
 
                     List<TestPlanDTO> testPlans = client.getTestPlanIds(projectId, workspaceId);
@@ -100,7 +100,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     MeterSphereUtils.getTestStepsBySingle(client, projectId, firstCase.get(), testPlanId, resourcePoolId);
                     break;
                 case Method.SINGLE_NAME:
-                    String testCaseName = Util.replaceMacro(this.testCaseName, env);
+                    String testCaseName = Util.replaceMacro(this.testCaseName, environment);
                     testCases = client.getTestCases(projectId);//项目下
                     firstCase = testCases.stream()
                             .filter(testCase -> StringUtils.equals(testCaseName, testCase.getId()) ||
