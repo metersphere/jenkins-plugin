@@ -13,29 +13,35 @@
             title="验证账户" progress="验证中..."
             method="checkAccount" with="msAccessKey,msSecretKey,msEndpoint"/>
 
-    <f:entry title="组织名称" field="orgId">
-        <f:select style="height:40px;"/>
-    </f:entry>
     <f:entry title="工作空间名称" field="workspaceId">
-        <f:select style="height:40px;"/>
+        <f:select/>
     </f:entry>
     <f:entry title="项目名称" field="projectId">
-        <f:select style="height:40px;"/>
+        <f:select/>
     </f:entry>
     <f:section title="执行方式">
-        <f:radioBlock title="执行测试计划中用例" name="method" value="testPlan" inline="true"
+        <f:radioBlock title="选择测试计划" name="method" value="testPlan" inline="true"
                       checked="${instance.method == 'testPlan'}">
-            <f:entry title="测试计划" field="testPlanId">
-                <f:select style="height:40px;"/>
+            <f:entry title="" field="testPlanId">
+                <f:select/>
             </f:entry>
         </f:radioBlock>
-        <f:radioBlock title="单独选择测试执行" name="method" value="single" inline="true"
-                      checked="${instance.method == 'single'}">
-            <f:entry title="测试名称" field="testCaseId">
-                <f:select style="height:40px;"/>
+        <f:radioBlock title="输入计划名称" name="method" value="testPlanName" inline="true"
+                      checked="${instance.method == 'testPlanName'}">
+            <f:entry title="" field="testPlanName">
+                <f:textbox/>
             </f:entry>
-            <f:entry title="运行环境" field="environmentId">
-                <f:select style="height:40px;"/>
+        </f:radioBlock>
+        <f:radioBlock title="选择测试执行" name="method" value="single" inline="true"
+                      checked="${instance.method == 'single'}">
+            <f:entry title="" field="testCaseId">
+                <f:select/>
+            </f:entry>
+        </f:radioBlock>
+        <f:radioBlock title="输入测试名称" name="method" value="singleName" inline="true"
+                      checked="${instance.method == 'singleName'}">
+            <f:entry title="" field="testCaseName">
+                <f:textbox/>
             </f:entry>
         </f:radioBlock>
     </f:section>
@@ -47,8 +53,8 @@
                       checked="${instance.mode == 'parallel'}">
         </f:radioBlock>
     </f:section>
-    <f:entry title="资源池选择" field="runEnvironmentId">
-        <f:select style="height:40px;"/>
+    <f:entry title="资源池选择" field="resourcePoolId">
+        <f:select/>
     </f:entry>
     <f:section title="开放配置">
         <f:radioBlock title="jenkins运行结果" name="result" value="jenkins" inline="true"

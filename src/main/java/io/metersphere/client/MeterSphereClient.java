@@ -29,12 +29,14 @@ public class MeterSphereClient {
     private final String accessKey;
     private final String secretKey;
     private final String endpoint;
+
     public MeterSphereClient(String accessKey, String secretKey, String endpoint) {
 
         this.accessKey = accessKey;
         this.secretKey = secretKey;
         this.endpoint = endpoint;
     }
+
     /*校验账号*/
     public String checkUser() {
         ResultHolder getUserResult = call(ApiUrlConstants.USER_INFO);
@@ -44,19 +46,10 @@ public class MeterSphereClient {
         return getUserResult.getData().toString();
     }
 
-    /*获取所属组织*/
-    public List<OrgDTO> getOrg() {
-        String userId = this.checkUser();
-        ResultHolder result = call(ApiUrlConstants.LIST_USER_ORGANIZATION + "/" + userId);
-        String list = JSON.toJSONString(result.getData());
-        LogUtil.info("用户所属组织" + list);
-        return JSON.parseArray(list, OrgDTO.class);
-    }
-
     /*获取组织下工作空间*/
-    public List<WorkspaceDTO> getWorkspace(String orgId) {
+    public List<WorkspaceDTO> getWorkspace() {
         String userId = this.checkUser();
-        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId + "/" + orgId);
+        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId);
         String list = JSON.toJSONString(result.getData());
         LogUtil.info("用户所属工作空间" + list);
         return JSON.parseArray(list, WorkspaceDTO.class);
@@ -76,7 +69,7 @@ public class MeterSphereClient {
     }
 
     /*查询该项目下所有测试用例(接口+性能)*/
-    public List<TestCaseDTO> getTestCaseIds(String projectId) {
+    public List<TestCaseDTO> getTestCases(String projectId) {
         ResultHolder result = call(ApiUrlConstants.TEST_CASE_LIST_METHOD + "/" + projectId);
         String listJson = JSON.toJSONString(result.getData());
         LogUtil.info("该项目下所有的接口和性能测试" + listJson);
@@ -108,7 +101,7 @@ public class MeterSphereClient {
     }
 
     /*执行测试计划*/
-    public String exeTestPlan(String projectId, String testPlanId, String mode, String runEnvironmentId) {
+    public String exeTestPlan(String projectId, String testPlanId, String mode, String resourcePoolId) {
         String userId = this.checkUser();
         HashMap<String, Object> params = new HashMap<>();
         params.put("testPlanId", testPlanId);
@@ -116,8 +109,11 @@ public class MeterSphereClient {
         params.put("triggerMode", "API");
         params.put("userId", userId);
         params.put("mode", mode);
-        params.put("resourcePoolId", runEnvironmentId);
+        params.put("resourcePoolId", resourcePoolId);
         ResultHolder result = call(ApiUrlConstants.TEST_PLAN, RequestMethod.POST, params);
+        if (result.getData() instanceof String) {
+            return (String) result.getData();
+        }
         return JSON.toJSONString(result.getData());
     }
 
@@ -174,17 +170,17 @@ public class MeterSphereClient {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", UUID.randomUUID().toString());
         params.put("projectId", id);
-        params.put("planCaseIds", Arrays.asList(testCaseDTO.getId()));
-        params.put("planScenarioId", testCaseDTO.getId());
         params.put("ids", Arrays.asList(testCaseDTO.getId()));
         params.put("config", config);
         ResultHolder result;
         if (type.equals("scenario")) {
             result = call(ApiUrlConstants.API_AUTOMATION_RUN_SINGLE, RequestMethod.POST, params);
         } else {
+            params.put("planCaseIds", Arrays.asList(testCaseDTO.getId()));
+            params.put("planScenarioId", testCaseDTO.getId());
             result = call(ApiUrlConstants.API_AUTOMATION_RUN, RequestMethod.POST, params);
         }
-        return JSON.toJSONString(result.getData());
+        return JSON.parseArray(JSON.toJSONString(result.getData())).getJSONObject(0).getString("reportId");
     }
 
     public String getApiScenario(String id) {
@@ -198,12 +194,11 @@ public class MeterSphereClient {
     }
 
     /*单独执行接口定义*/
-    public void runDefinition(TestCaseDTO testCaseDTO, String runMode, String environmentId, String testPlanId, String testCaseId) {
+    public void runDefinition(TestCaseDTO testCaseDTO, String runMode, String testPlanId, String testCaseId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("caseId", testCaseId);
-        params.put("reportId", testCaseDTO.getId());
+        params.put("reportId", UUID.randomUUID().toString());
         params.put("runMode", runMode);
-        params.put("environmentId", environmentId);
         params.put("testPlanId", testPlanId);
         params.put("triggerMode", "API");
         call(ApiUrlConstants.API_DEFINITION_RUN, RequestMethod.POST, params);
@@ -308,6 +303,7 @@ public class MeterSphereClient {
         httpClientConfig.addHeader("signature", signature);
         return httpClientConfig;
     }
+
     private static String aesEncrypt(String src, String secretKey, String iv) throws Exception {
         byte[] raw = secretKey.getBytes(StandardCharsets.UTF_8);
         SecretKeySpec secretKeySpec = new SecretKeySpec(raw, "AES");

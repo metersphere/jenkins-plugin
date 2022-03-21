@@ -31,3 +31,5 @@ target/
 .classpath
 .factorypath
 work/
+.mvn
+!.mvn/maven-wrapper.properties
