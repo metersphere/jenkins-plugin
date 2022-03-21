@@ -12,7 +12,6 @@ import io.metersphere.client.MeterSphereClient;
 import io.metersphere.commons.constants.Method;
 import io.metersphere.commons.constants.Results;
 import io.metersphere.commons.model.*;
-import io.metersphere.commons.utils.HttpClientUtil;
 import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.MeterSphereUtils;
 import jenkins.tasks.SimpleBuildStep;
@@ -50,7 +49,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     private String mode;//运行模式
     private String resourcePoolId;//运行环境
 
-    private final String callbackUrls;
 
     @DataBoundConstructor
     public MeterSphereBuilder(String msEndpoint, String msAccessKey, String msSecretKey) {
@@ -74,7 +72,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             EnvVars environment = run.getEnvironment(listener);
             switch (method) {
                 case Method.TEST_PLAN:
-                    MeterSphereUtils.execTestPlan(run, client, projectId, mode, testPlanId, resourcePoolId);
+                    MeterSphereUtils.execTestPlan(run, client, projectId, mode, testPlanId, resourcePoolId, workspace.getRemote());
                     break;
                 case Method.TEST_PLAN_NAME:
                     String testPlanName = Util.replaceMacro(this.testPlanName, environment);
@@ -88,7 +86,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         log("测试计划不存在");
                         return;
                     }
-                    MeterSphereUtils.execTestPlan(run, client, projectId, mode, first.get().getId(), resourcePoolId);
+                    MeterSphereUtils.execTestPlan(run, client, projectId, mode, first.get().getId(), resourcePoolId, workspace.getRemote());
                     break;
                 case Method.SINGLE:
                     testCases = client.getTestCases(projectId);//项目下
@@ -120,7 +118,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             }
 
         } catch (Exception e) {
-            log("出现异常:" + e.getMessage());
             if (result.equals(Results.METERSPHERE)) {
                 run.setResult(Result.FAILURE);
             } else {
@@ -129,64 +126,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
         }
 
-    }
-
-    /**
-     * 执行回调.
-     *
-     * @param meterSphereClient
-     * @param reportId
-     * @param callbackUrls
-     * @param workspacePath
-     */
-    private void call(MeterSphereClient meterSphereClient, String reportId, String callbackUrls, String workspacePath) {
-        if (org.apache.commons.lang3.StringUtils.isEmpty(callbackUrls)) {
-            log("Metersphere回调地址为空，退出回调");
-            return;
-        }
-
-        log("Metersphere查询报告详情，开始=====");
-        ResultHolder resultHolder = meterSphereClient.getTestPlanReportDetail(reportId);
-        log("Metersphere查询报告详情，结束=====");
-
-        if (!resultHolder.isSuccess()) {
-            log("Metersphere查询报告详情，结果返回失败");
-            return;
-        }
-
-        com.alibaba.fastjson.JSONObject jsonObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.toJSON(resultHolder.getData());
-
-        jsonObject.put("reportUrl", meterSphereClient.getBaseInfo() + "/#/track/testPlan/reportList");
-
-        jsonObject.put("reportId", reportId);
-
-        parseWorkspace(workspacePath, jsonObject);
-
-        String[] callbackUrlArray = callbackUrls.split(",");
-
-        for (String callbackUrl : callbackUrlArray) {
-            log("Metersphere回调的报文内容是：" + jsonObject.toJSONString());
-
-            HttpClientUtil.post(callbackUrl, jsonObject.toJSONString());
-
-            log("Metersphere回调完成");
-        }
-    }
-
-    /**
-     * 解析JobName中的工程名和环境.
-     *
-     * @param workspacePath
-     * @param jsonObject
-     */
-    private void parseWorkspace(String workspacePath, com.alibaba.fastjson.JSONObject jsonObject) {
-        String jobName = workspacePath.substring(workspacePath.indexOf("/AUTO_") + 1, workspacePath.length());
-
-        String[] jobArray = jobName.split("_");
-
-        jsonObject.put("projectName", jobArray[2]);
-
-        jsonObject.put("env", jobArray[3]);
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -542,9 +481,5 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     public String getTestCaseName() {
         return testCaseName;
-    }
-
-    public String getCallbackUrls() {
-        return callbackUrls;
     }
 }

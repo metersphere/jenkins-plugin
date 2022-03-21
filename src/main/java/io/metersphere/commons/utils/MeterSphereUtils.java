@@ -166,7 +166,8 @@ public class MeterSphereUtils {
         return num;
     }
 
-    public static void execTestPlan(Run<?, ?> run, MeterSphereClient meterSphereClient, String projectId, String mode, String testPlanId, String resourcePoolId) throws InterruptedException {
+    public static void execTestPlan(Run<?, ?> run, MeterSphereClient meterSphereClient, String projectId, String mode,
+                                    String testPlanId, String resourcePoolId, String workspacePath) throws InterruptedException {
         log("测试计划开始执行");
         String id = meterSphereClient.exeTestPlan(projectId, testPlanId, mode, resourcePoolId);
         log("生成测试报告id:" + id);
@@ -190,6 +191,13 @@ public class MeterSphereUtils {
             }
             Thread.sleep(5000);
         }
+
+        // 发送报告详情
+        if (!flag) {
+            log("测试计划执行完成，开始发送报告详情.");
+            WebhookUtil.sendReportDetail(meterSphereClient, id, workspacePath);
+        }
+
     }
 
     public static void getTestStepsBySingle(MeterSphereClient meterSphereClient, String projectId, TestCaseDTO testCase, String testPlanId, String resourcePoolId) {
