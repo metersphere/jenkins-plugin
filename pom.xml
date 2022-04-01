@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>metersphere-jenkins-plugin</artifactId>
-    <version>1.18</version>
+    <version>1.19</version>
     <packaging>hpi</packaging>
     <groupId>io.metersphere</groupId>
 
