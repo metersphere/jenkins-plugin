@@ -6,11 +6,8 @@ import io.metersphere.client.MeterSphereClient;
 import io.metersphere.commons.constants.Results;
 import io.metersphere.commons.model.RunModeConfig;
 import io.metersphere.commons.model.TestCaseDTO;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.PrintStream;
-import java.util.List;
 
 public class MeterSphereUtils {
     public static PrintStream logger;
@@ -20,10 +17,11 @@ public class MeterSphereUtils {
         logger.println(LOG_PREFIX + msg);
     }
 
-    public static int runApiTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String id) {
+    public static int runApiTest(MeterSphereClient meterSphereClient, TestCaseDTO c) {
         String url = meterSphereClient.getBaseInfo();
         int num = 1;
         String reportId = "";
+        String id = c.getId();
         try {
             reportId = meterSphereClient.runApiTest(id);
         } catch (Exception e) {
@@ -56,10 +54,11 @@ public class MeterSphereUtils {
         return num;
     }
 
-    public static int runPerformTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String id, String testPlanId) {
+    public static int runPerformTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String testPlanId) {
         String url = meterSphereClient.getBaseInfo();
         String reportId = "";
         int num = 1;
+        String id = c.getId();
         try {
             reportId = meterSphereClient.runPerformanceTest(id, testPlanId);
         } catch (Exception e) {
@@ -95,7 +94,7 @@ public class MeterSphereUtils {
         return num;
     }
 
-    public static int runScenario(MeterSphereClient meterSphereClient, TestCaseDTO c, String id, String projectId, String runMode, String resourcePoolId) {
+    public static int runScenario(MeterSphereClient meterSphereClient, TestCaseDTO c, String projectId, String runMode, String resourcePoolId) {
         String url = meterSphereClient.getBaseInfo();
         int num = 1;
         String reportId = null;
@@ -135,9 +134,10 @@ public class MeterSphereUtils {
         return num;
     }
 
-    public static int runDefinition(MeterSphereClient meterSphereClient, TestCaseDTO c, String id, String testPlanId, String runMode) {
+    public static int runDefinition(MeterSphereClient meterSphereClient, TestCaseDTO c, String testPlanId, String runMode) {
         String url = meterSphereClient.getBaseInfo();
         int num = 1;
+        String id = c.getId();
         try {
             meterSphereClient.runDefinition(c, runMode, testPlanId, id);
         } catch (Exception e) {
@@ -192,53 +192,47 @@ public class MeterSphereUtils {
         }
     }
 
-    public static void getTestStepsBySingle(MeterSphereClient meterSphereClient, List<TestCaseDTO> testCaseIds,
-                                            String projectId, String testCaseId, String testPlanId, String resourcePoolId) {
-        log("testCaseId=" + "[" + testCaseId + "]");
+    public static void getTestStepsBySingle(MeterSphereClient meterSphereClient, String projectId, TestCaseDTO testCase, String testPlanId, String resourcePoolId) {
+        log("测试ID: " + testCase.getId());
+        log("测试名称: " + testCase.getName() + " [" + testCase.getType() + "]" + " [" + testCase.getVersionName() + "]");
         boolean flag = true;
-        if (CollectionUtils.isNotEmpty(testCaseIds)) {
-            TestCaseDTO c = testCaseIds.stream()
-                    .filter(testCaseDTO -> StringUtils.equals(testCaseId, testCaseDTO.getId()))
-                    .findFirst()
-                    .get();
-
-            int num = 1;
-            switch (c.getType()) {
-                case Results.API:
-                    num = num * MeterSphereUtils.runApiTest(meterSphereClient, c, testCaseId);
-                    if (num == 0) {
-                        flag = false;
-                    }
-                    break;
-                case Results.PERFORMANCE:
-                case Results.LOAD_TEST:
-                    num = MeterSphereUtils.runPerformTest(meterSphereClient, c, testCaseId, "");
-                    if (num == 0) {
-                        flag = false;
-                    }
-                    break;
-                case Results.SCENARIO:
-                case Results.API_SCENARIO:
-                    num = MeterSphereUtils.runScenario(meterSphereClient, c, testCaseId, projectId, "scenario", resourcePoolId);
-                    if (num == 0) {
-                        flag = false;
-                    }
-                    break;
-                case Results.DEFINITION:
-                case Results.API_CASE:
-                    num = MeterSphereUtils.runDefinition(meterSphereClient, c, testCaseId, testPlanId, "JENKINS");
-                    if (num == 0) {
-                        flag = false;
-                    }
-                    break;
-            }
-
-            if (flag) {
-                log("该测试用例请求通过，登陆MeterSphere网站查看该报告结果");
-            } else {
-                log("该测试用例请求未能通过，登陆MeterSphere网站查看该报告结果");
-            }
+        int num = 1;
+        switch (testCase.getType()) {
+            case Results.API:
+                num = num * MeterSphereUtils.runApiTest(meterSphereClient, testCase);
+                if (num == 0) {
+                    flag = false;
+                }
+                break;
+            case Results.PERFORMANCE:
+            case Results.LOAD_TEST:
+                num = MeterSphereUtils.runPerformTest(meterSphereClient, testCase, "");
+                if (num == 0) {
+                    flag = false;
+                }
+                break;
+            case Results.SCENARIO:
+            case Results.API_SCENARIO:
+                num = MeterSphereUtils.runScenario(meterSphereClient, testCase, projectId, "scenario", resourcePoolId);
+                if (num == 0) {
+                    flag = false;
+                }
+                break;
+            case Results.DEFINITION:
+            case Results.API_CASE:
+                num = MeterSphereUtils.runDefinition(meterSphereClient, testCase, testPlanId, "JENKINS");
+                if (num == 0) {
+                    flag = false;
+                }
+                break;
         }
+
+        if (flag) {
+            log("该测试用例请求通过，登陆MeterSphere网站查看该报告结果");
+        } else {
+            log("该测试用例请求未能通过，登陆MeterSphere网站查看该报告结果");
+        }
+
     }
 
 
