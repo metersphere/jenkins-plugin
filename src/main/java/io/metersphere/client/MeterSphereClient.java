@@ -11,6 +11,7 @@ import io.metersphere.commons.utils.HttpClientConfig;
 import io.metersphere.commons.utils.HttpClientUtil;
 import io.metersphere.commons.utils.LogUtil;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -108,8 +109,16 @@ public class MeterSphereClient {
         params.put("projectId", projectId);
         params.put("triggerMode", "API");
         params.put("userId", userId);
-        params.put("mode", mode);
-        params.put("resourcePoolId", resourcePoolId);
+        params.put("mode", "serial");
+        params.put("reportType", "iddReport");
+        params.put("onSampleError", false);
+        params.put("requestOriginator", "TEST_PLAN");
+        if (StringUtils.isEmpty(resourcePoolId)) {
+            params.put("runWithinResourcePool", false);
+        } else {
+            params.put("runWithinResourcePool", true);
+            params.put("resourcePoolId", resourcePoolId);
+        }
         ResultHolder result = call(ApiUrlConstants.TEST_PLAN, RequestMethod.POST, params);
         if (result.getData() instanceof String) {
             return (String) result.getData();

@@ -23,7 +23,7 @@ public class ApiUrlConstants {
     public static final String ENVIRONMEN_LIST = "/api/environment/list";//环境列表
     public static final String TEST_PLAN_REPORT = "/test/plan/report/apiExecuteFinish";
     public static final String TEST_POOL = "/testresourcepool/list/quota/valid";
-    public static final String TEST_PLAN = "/test/plan/testplan/jenkins";//测试计划执行
+    public static final String TEST_PLAN = "/test/plan/run";//测试计划执行
     public static final String TEST_PLAN_STATUS = "/test/plan/report/status";//测试计划执行
 
 }
