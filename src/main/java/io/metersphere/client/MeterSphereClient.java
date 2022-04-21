@@ -11,7 +11,7 @@ import io.metersphere.commons.utils.HttpClientConfig;
 import io.metersphere.commons.utils.HttpClientUtil;
 import io.metersphere.commons.utils.LogUtil;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
