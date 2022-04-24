@@ -263,12 +263,6 @@ public class MeterSphereClient {
         return jsonObject.getString("url");
     }
 
-    /*测试计划报告*/
-    public void testPlanNotice(String planId, String userId) {
-        call(ApiUrlConstants.TEST_PLAN_REPORT + "/" + planId + "/" + userId);
-    }
-
-
     private ResultHolder call(String url) {
         return call(url, RequestMethod.GET, null);
     }
