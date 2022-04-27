@@ -56,12 +56,4 @@
     <f:entry title="资源池选择" field="resourcePoolId">
         <f:select/>
     </f:entry>
-    <f:section title="开放配置">
-        <f:radioBlock title="jenkins运行结果" name="result" value="jenkins" inline="true"
-                      checked="${instance.result == 'jenkins'}">
-        </f:radioBlock>
-        <f:radioBlock title="插件运行结果" name="result" value="MeterSphere" inline="true"
-                      checked="${instance.result == 'MeterSphere'}">
-        </f:radioBlock>
-    </f:section>
 </j:jelly>

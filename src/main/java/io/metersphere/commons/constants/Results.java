@@ -1,8 +1,6 @@
 package io.metersphere.commons.constants;
 
 public class Results {
-    public static final String JENKINS = "jenkins";
-    public static final String METERSPHERE = "MeterSphere";
     public static final String COMPLETED = "Completed";
     public static final String ERROR = "Error";
     public static final String FAILURE = "Failure";

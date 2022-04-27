@@ -1,6 +1,5 @@
 package io.metersphere;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.*;
 import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
@@ -10,7 +9,6 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.metersphere.client.MeterSphereClient;
 import io.metersphere.commons.constants.Method;
-import io.metersphere.commons.constants.Results;
 import io.metersphere.commons.model.*;
 import io.metersphere.commons.utils.LogUtil;
 import io.metersphere.commons.utils.MeterSphereUtils;
@@ -24,6 +22,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -58,8 +57,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     }
 
     @Override
-    public void perform(@NonNull Run<?, ?> run, @NonNull FilePath workspace, @NonNull Launcher launcher,
-                        @NonNull TaskListener listener) throws InterruptedException, IOException {
+    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher,
+                        @Nonnull TaskListener listener) throws InterruptedException, IOException {
         MeterSphereUtils.logger = listener.getLogger();
         listener.getLogger().println("workspace=" + workspace);
         listener.getLogger().println("number=" + run.getNumber());
@@ -118,12 +117,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             }
 
         } catch (Exception e) {
-            if (result.equals(Results.METERSPHERE)) {
-                run.setResult(Result.FAILURE);
-            } else {
-                log("该测试请求未能通过，登陆MeterSphere网站查看该报告结果");
-            }
-
+            run.setResult(Result.FAILURE);
+            log("该测试请求未能通过，登陆MeterSphere网站查看该报告结果");
         }
 
     }
