@@ -192,7 +192,7 @@ public class MeterSphereUtils {
         }
     }
 
-    public static void getTestStepsBySingle(MeterSphereClient meterSphereClient, String projectId, TestCaseDTO testCase, String testPlanId, String resourcePoolId) {
+    public static int getTestStepsBySingle(MeterSphereClient meterSphereClient, String projectId, TestCaseDTO testCase, String testPlanId, String resourcePoolId) {
         log("测试ID: " + testCase.getId());
         log("测试名称: " + testCase.getName() + " [" + testCase.getType() + "]" + " [" + testCase.getVersionName() + "]");
         boolean flag = true;
@@ -232,7 +232,7 @@ public class MeterSphereUtils {
         } else {
             log("该测试用例请求未能通过，登陆MeterSphere网站查看该报告结果");
         }
-
+        return num;
     }
 
 

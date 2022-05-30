@@ -65,6 +65,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
         listener.getLogger().println("url=" + run.getUrl());
         final MeterSphereClient client = new MeterSphereClient(this.msAccessKey, this.msSecretKey, this.msEndpoint);
         log("执行方式: " + method);
+        int num = 1;
         try {
             List<TestCaseDTO> testCases;
             Optional<TestCaseDTO> firstCase;
@@ -82,6 +83,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                             .findFirst();
 
                     if (!first.isPresent()) {
+                        run.setResult(Result.FAILURE);
                         log("测试计划不存在");
                         return;
                     }
@@ -93,10 +95,14 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                             .filter(testCase -> StringUtils.equals(testCaseId, testCase.getId()))
                             .findFirst();
                     if (!firstCase.isPresent()) {
+                        run.setResult(Result.FAILURE);
                         log("测试不存在");
                         return;
                     }
-                    MeterSphereUtils.getTestStepsBySingle(client, projectId, firstCase.get(), testPlanId, resourcePoolId);
+                    num = MeterSphereUtils.getTestStepsBySingle(client, projectId, firstCase.get(), testPlanId, resourcePoolId);
+                    if (num == 0) {
+                        run.setResult(Result.FAILURE);
+                    }
                     break;
                 case Method.SINGLE_NAME:
                     String testCaseName = Util.replaceMacro(this.testCaseName, environment);
@@ -107,12 +113,17 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                             .findFirst();
 
                     if (!firstCase.isPresent()) {
+                        run.setResult(Result.FAILURE);
                         log("测试不存在");
                         return;
                     }
-                    MeterSphereUtils.getTestStepsBySingle(client, projectId, firstCase.get(), testPlanId, resourcePoolId);
+                    num = MeterSphereUtils.getTestStepsBySingle(client, projectId, firstCase.get(), testPlanId, resourcePoolId);
+                    if (num == 0) {
+                        run.setResult(Result.FAILURE);
+                    }
                     break;
                 default:
+                    run.setResult(Result.FAILURE);
                     log("测试用例不存在");
             }
 
