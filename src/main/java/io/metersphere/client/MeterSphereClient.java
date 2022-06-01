@@ -109,7 +109,7 @@ public class MeterSphereClient {
         params.put("projectId", projectId);
         params.put("triggerMode", "API");
         params.put("userId", userId);
-        params.put("mode", mode);
+        params.put("mode", StringUtils.isBlank(mode) ? "serial" : mode);
         params.put("reportType", "iddReport");
         params.put("onSampleError", false);
         params.put("requestOriginator", "TEST_PLAN");
