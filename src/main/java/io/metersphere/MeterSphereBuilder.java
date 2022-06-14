@@ -147,8 +147,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 return FormValidation.error("MeterSphere EndPoint不能为空！");
             }
             try {
-                MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
-                MeterSphereClient.checkUser();
+                MeterSphereClient meterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
+                meterSphereClient.checkUser();
+                meterSphereClient.getWorkspace();
             } catch (Exception e) {
                 LogUtil.error(e.getMessage(), e);
                 return FormValidation.error("验证MeterSphere帐号失败！" + e + "," + e.getMessage());
@@ -164,8 +165,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             ListBoxModel items = new ListBoxModel();
             items.add("请选择工作空间", "");
             try {
-                MeterSphereClient MeterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
-                List<WorkspaceDTO> list = MeterSphereClient.getWorkspace();
+                MeterSphereClient meterSphereClient = new MeterSphereClient(msAccessKey, msSecretKey, msEndpoint);
+                List<WorkspaceDTO> list = meterSphereClient.getWorkspace();
                 if (list != null && list.size() > 0) {
                     for (WorkspaceDTO c : list) {
                         items.add(c.getName(), c.getId());
