@@ -49,8 +49,7 @@ public class MeterSphereClient {
 
     /*获取组织下工作空间*/
     public List<WorkspaceDTO> getWorkspace() {
-        String userId = this.checkUser();
-        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE + "/" + userId);
+        ResultHolder result = call(ApiUrlConstants.LIST_USER_WORKSPACE);
         String list = JSON.toJSONString(result.getData());
         LogUtil.info("用户所属工作空间" + list);
         return JSON.parseArray(list, WorkspaceDTO.class);
@@ -109,7 +108,7 @@ public class MeterSphereClient {
         params.put("projectId", projectId);
         params.put("triggerMode", "API");
         params.put("userId", userId);
-        params.put("mode", "serial");
+        params.put("mode", StringUtils.isBlank(mode) ? "serial" : mode);
         params.put("reportType", "iddReport");
         params.put("onSampleError", false);
         params.put("requestOriginator", "TEST_PLAN");
