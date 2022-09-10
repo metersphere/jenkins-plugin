@@ -9,7 +9,13 @@ pipeline {
         stage('Build/Test') {
             steps {
                 configFileProvider([configFile(fileId: 'metersphere-maven', targetLocation: 'settings.xml')]) {
-                    sh "./mvnw clean package --settings ./settings.xml"
+                    sh """#!/bin/bash -e
+                    export JAVA_HOME=/opt/jdk-8
+                    export CLASSPATH=$JAVA_HOME/lib:$CLASSPATH
+                    export PATH=$JAVA_HOME/bin:$PATH
+                    java -version
+                    ./mvnw clean package --settings ./settings.xml
+                    """
                 }
             }
         }
@@ -19,7 +25,7 @@ pipeline {
             }
         }
         stage('Release') {
-            when { tag "v*" }
+            when { tag pattern: "^v.*", comparator: "REGEXP" }
             steps {
                 withCredentials([string(credentialsId: 'gitrelease', variable: 'TOKEN')]) {
                     withEnv(["TOKEN=$TOKEN"]) {
