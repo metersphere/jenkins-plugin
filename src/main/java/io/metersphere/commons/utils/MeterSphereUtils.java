@@ -123,6 +123,10 @@ public class MeterSphereUtils {
                     state = false;
                     num = 0;
                     log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/" + reportId.replace("\"", ""));
+                } else if (apiTestState.equalsIgnoreCase(Results.FAKE_ERROR)) {
+                    state = false;
+                    num = 0;
+                    log("点击链接进入" + c.getName() + "测试报告页面: " + url + "/#/api/automation/report/view/" + reportId.replace("\"", ""));
                 }
                 Thread.sleep(5000);
             }
@@ -153,6 +157,9 @@ public class MeterSphereUtils {
                 if (status.replace("\"", "").equalsIgnoreCase("success")) {
                     state = false;
                 } else if (status.replace("\"", "").equalsIgnoreCase("error")) {
+                    state = false;
+                    num = 0;
+                } else if (status.replace("\"", "").equalsIgnoreCase(Results.FAKE_ERROR)) {
                     state = false;
                     num = 0;
                 }
