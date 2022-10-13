@@ -21,6 +21,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MeterSphereClient {
 
@@ -30,6 +34,8 @@ public class MeterSphereClient {
     private final String accessKey;
     private final String secretKey;
     private final String endpoint;
+
+    private final static ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     public MeterSphereClient(String accessKey, String secretKey, String endpoint) {
 
@@ -70,10 +76,51 @@ public class MeterSphereClient {
 
     /*查询该项目下所有测试用例(接口+性能)*/
     public List<TestCaseDTO> getTestCases(String projectId) {
-        ResultHolder result = call(ApiUrlConstants.TEST_CASE_LIST_METHOD + "/" + projectId);
-        String listJson = JSON.toJSONString(result.getData());
-        LogUtil.info("该项目下所有的接口和性能测试" + listJson);
-        return JSON.parseArray(listJson, TestCaseDTO.class);
+        CountDownLatch count = new CountDownLatch(4);
+        List<TestCaseDTO> result = new CopyOnWriteArrayList<>();
+        executorService.submit(() -> {
+            try {
+                ResultHolder perfResult = call(ApiUrlConstants.PERFORMANCE_LIST_PROJECT + "/" + projectId);
+                result.addAll(JSON.parseArray(JSON.toJSONString(perfResult.getData()), TestCaseDTO.class));
+            } finally {
+                count.countDown();
+            }
+        });
+        executorService.submit(() -> {
+            try {
+                ResultHolder apiCaseResult = call(ApiUrlConstants.API_CASE_LIST_PROJECT + "/" + projectId);
+                result.addAll(JSON.parseArray(JSON.toJSONString(apiCaseResult.getData()), TestCaseDTO.class));
+            } finally {
+                count.countDown();
+            }
+        });
+        executorService.submit(() -> {
+            try {
+                ResultHolder apiScenarioResult = call(ApiUrlConstants.API_SCENARIO_LIST_PROJECT + "/" + projectId);
+                result.addAll(JSON.parseArray(JSON.toJSONString(apiScenarioResult.getData()), TestCaseDTO.class));
+            } finally {
+                count.countDown();
+            }
+        });
+        executorService.submit(() -> {
+            try {
+                HashMap<Object, Object> params = new HashMap<>();
+                params.put("projectId", projectId);
+                ResultHolder uiResult = call(ApiUrlConstants.UI_LIST_PROJECT, RequestMethod.POST, params);
+                List<TestCaseDTO> c = JSON.parseArray(JSON.toJSONString(uiResult.getData()), TestCaseDTO.class);
+                c.forEach(ui -> ui.setType("UI场景"));
+                result.addAll(c);
+            } finally {
+                count.countDown();
+            }
+        });
+        try {
+            count.await();
+        } catch (Exception e) {
+            LogUtil.error(e);
+        }
+
+        return result;
     }
 
     /*单独执行所选测试环境列表*/

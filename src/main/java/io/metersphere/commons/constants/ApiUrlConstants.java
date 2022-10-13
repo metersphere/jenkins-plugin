@@ -4,7 +4,10 @@ public class ApiUrlConstants {
     public static final String USER_INFO = "/setting/user/key/validate";//身份验证
     public static final String LIST_USER_WORKSPACE = "/setting/workspace/list/userworkspace";//所属工作空间
     public static final String PROJECT_LIST_ALL = "/setting/project/list/related";//项目列表
-    public static final String TEST_CASE_LIST_METHOD = "/track/test/case/list/method";//项目下所有接口和性能测试
+    public static final String API_CASE_LIST_PROJECT = "/api/api/definition/get-base-case";//项目下所有接口测试
+    public static final String API_SCENARIO_LIST_PROJECT = "/api/api/automation/get-base-case";//项目下所有接口测试
+    public static final String PERFORMANCE_LIST_PROJECT = "/performance/performance/get-base-case";//项目下所有性能测试
+    public static final String UI_LIST_PROJECT = "/ui/ui/automation/list";//项目下所有UI测试
     public static final String PLAN_LIST_ALL = "/track/test/plan/list/all";//测试计划项目下
     public static final String PERFORMANCE_RUN = "/performance/performance/run";//性能测试单个
     public static final String PERFORMANCE_RUN_TEST_PLAN_STATE = "/track/test/plan/load/case/update/api";//性能测试测试计划下状态修改
