@@ -188,22 +188,14 @@ public class MeterSphereClient {
         return JSON.toJSONString(result.getData());
     }
 
-    public String getApiTestCaseReport(String id, String type) {
-        if (id.equals("") || id == null) {
+    public String getApiTestCaseReport(String id) {
+        if (StringUtils.isEmpty(id)) {
             id = UUID.randomUUID().toString();
         }
-        if (type.equals("JENKINS_API_PLAN")) {
-            ResultHolder result = call(ApiUrlConstants.API_TES_RESULT_TEST + "/" + id.replace('"', ' ').trim());
-            System.out.println("原始字符串:" + result.getData());
-            return JSON.toJSONString(result.getData());
-        } else {
-            ResultHolder result = call(ApiUrlConstants.API_TES_RESULT + "/" + id.replace('"', ' ').trim());
-            String listJson = JSON.toJSONString(result.getData());
-            JSONObject jsonObject = JSONObject.parseObject(listJson);
-            return jsonObject.getString("execResult");
-        }
-
-
+        ResultHolder result = call(ApiUrlConstants.API_TES_RESULT + "/" + id.replace('"', ' ').trim());
+        String listJson = JSON.toJSONString(result.getData());
+        JSONObject jsonObject = JSONObject.parseObject(listJson);
+        return jsonObject.getString("execResult");
     }
 
     public String getApiTestState(String reportId) {
