@@ -21,8 +21,7 @@ public class ApiUrlConstants {
     public static final String API_AUTOMATION_GETAPISCENARIO = "/api/api/scenario/report/get";//报告详情
     public static final String API_DEFINITION_RUN = "/api/api/testcase/jenkins/run";//接口测试用例运行
     public static final String API_DEFINITION = "/api/api/definition/get";//接口测详情
-    public static final String API_TES_RESULT = "/api/api/testcase/findById";//查询单接口用例执行结果
-    public static final String API_TES_RESULT_TEST = "/api/api/testcase/getStateByTestPlan";//计划下接口用例执行结果
+    public static final String API_TES_RESULT = "/api/api/testcase/get-details";//查询单接口用例执行结果
     public static final String ENVIRONMEN_LIST = "/api/api/environment/list";//环境列表
     public static final String TEST_POOL = "/setting/testresourcepool/list/quota/valid";
     public static final String TEST_PLAN = "/track/test/plan/run";//测试计划执行

@@ -139,7 +139,6 @@ public class MeterSphereUtils {
     }
 
     public static int runDefinition(MeterSphereClient meterSphereClient, TestCaseDTO c, String testPlanId, String runMode) {
-        String url = meterSphereClient.getBaseInfo();
         int num = 1;
         String id = c.getId();
         try {
@@ -152,7 +151,7 @@ public class MeterSphereUtils {
             boolean state = true;
             String status = "";
             while (state) {
-                status = meterSphereClient.getApiTestCaseReport(c.getId(), runMode);
+                status = meterSphereClient.getApiTestCaseReport(c.getId());
                 log("测试用例[" + c.getName() + "]执行状态：" + status);
                 if (status.replace("\"", "").equalsIgnoreCase("success")) {
                     state = false;
