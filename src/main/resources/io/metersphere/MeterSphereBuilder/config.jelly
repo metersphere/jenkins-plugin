@@ -53,7 +53,9 @@
                       checked="${instance.mode == 'parallel'}">
         </f:radioBlock>
     </f:section>
-    <f:entry title="资源池选择" field="resourcePoolId">
-        <f:select/>
-    </f:entry>
+    <f:section title="资源池(不支持接口用例)">
+        <f:entry title="资源池选择" field="resourcePoolId">
+          <f:select/>
+        </f:entry>
+    </f:section>
 </j:jelly>
