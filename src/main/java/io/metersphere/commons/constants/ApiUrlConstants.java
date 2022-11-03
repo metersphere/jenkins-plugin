@@ -12,7 +12,9 @@ public class ApiUrlConstants {
     public static final String PERFORMANCE_RUN = "/performance/performance/run";//性能测试单个
     public static final String PERFORMANCE_RUN_TEST_PLAN_STATE = "/track/test/plan/load/case/update/api";//性能测试测试计划下状态修改
     public static final String API_RUN = "/api/api/definition/run";//api测试
+    public static final String UI_RUN = "/ui/ui/automation/run/batch";//ui测试
     public static final String API_GET = "/api/api/definition/report/get";//API测试报告（特定）
+    public static final String UI_GET = "/ui/ui/scenario/report/get";//UI测试报告（特定）
     public static final String PERFORMANCE_GET = "/performance/performance/state/get";//性能测试测试报告（特定）
     public static final String CHANGE_STATE = "/track/test/plan/case/edit";//更新测试计划用例的结果
     public static final String BASE_INFO = "/setting/system/base/info";//查询站点

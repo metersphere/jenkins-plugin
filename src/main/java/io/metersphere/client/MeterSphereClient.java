@@ -17,10 +17,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -188,6 +185,23 @@ public class MeterSphereClient {
         return JSON.toJSONString(result.getData());
     }
 
+    public String runUiTest(String testCaseId,String projectId) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("id", UUID.randomUUID().toString());
+        List<String> ids = new ArrayList<>();
+        ids.add(testCaseId);
+        params.put("ids", ids);
+        params.put("projectId", projectId);
+        HashMap<String, Object> uiConfigParams = new HashMap<>();
+        uiConfigParams.put("mode", "serial");
+        uiConfigParams.put("reportType", "iddReport");
+        uiConfigParams.put("browser", "CHROME");
+        uiConfigParams.put("headlessEnabled", true);
+        params.put("uiConfig", uiConfigParams);
+        ResultHolder result = call(ApiUrlConstants.UI_RUN, RequestMethod.POST, params);
+        return JSON.toJSONString(result.getData());
+    }
+
     public String getApiTestCaseReport(String id) {
         if (StringUtils.isEmpty(id)) {
             id = UUID.randomUUID().toString();
@@ -201,6 +215,14 @@ public class MeterSphereClient {
     public String getApiTestState(String reportId) {
         String newReportId = reportId.replace("\"", "");
         ResultHolder result = call(ApiUrlConstants.API_GET + "/" + newReportId);
+        String listJson = JSON.toJSONString(result.getData());
+        JSONObject jsonObject = JSONObject.parseObject(listJson);
+        return jsonObject.getString("status");
+    }
+
+    public String getUiTestState(String reportId) {
+        String newReportId = reportId.replace("\"", "");
+        ResultHolder result = call(ApiUrlConstants.UI_GET + "/" + newReportId);
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         return jsonObject.getString("status");

@@ -1,13 +1,17 @@
 package io.metersphere.commons.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import hudson.model.Result;
 import hudson.model.Run;
 import io.metersphere.client.MeterSphereClient;
 import io.metersphere.commons.constants.Results;
+import io.metersphere.commons.model.MsExecResponseDTO;
 import io.metersphere.commons.model.RunModeConfig;
 import io.metersphere.commons.model.TestCaseDTO;
 
 import java.io.PrintStream;
+import java.util.List;
 
 public class MeterSphereUtils {
     public static PrintStream logger;
@@ -42,6 +46,43 @@ public class MeterSphereUtils {
                     state = false;
                     num = 0;
                     log("点击链接进入" + c.getName() + "测试报告页面:" + url + "/#/api/report/view/" + reportId.replace("\"", ""));
+                    meterSphereClient.changeState(id, Results.FAILURE);
+                }
+                Thread.sleep(5000);
+            }
+        } catch (InterruptedException e) {
+            log(c.getName() + "发生异常：" + e.getMessage());
+            num = 0;
+
+        }
+        return num;
+    }
+
+    public static int runUiTest(MeterSphereClient meterSphereClient, TestCaseDTO c) {
+        String url = meterSphereClient.getBaseInfo();
+        int num = 1;
+        String result = "";
+        String id = c.getId();
+        try {
+            result = meterSphereClient.runUiTest(id,c.getProjectId());
+        } catch (Exception e) {
+            num = 0;
+        }
+        try {
+            List<MsExecResponseDTO> dto = JSON.parseObject(result, new TypeReference<List<MsExecResponseDTO>>(){});
+            String reportId = dto.get(0).getReportId();
+            boolean state = true;
+            String apiTestState = "";
+            while (state) {
+                apiTestState = meterSphereClient.getUiTestState(reportId);
+                if (apiTestState.equalsIgnoreCase(Results.SUCCESS)) {
+                    state = false;
+                    log("点击链接进入" + c.getName() + "测试报告页面:" + url + "/#/ui/report/view/" + reportId.replace("\"", ""));
+                    meterSphereClient.changeState(id, Results.PASS);
+                } else if (apiTestState.equalsIgnoreCase(Results.ERROR)) {
+                    state = false;
+                    num = 0;
+                    log("点击链接进入" + c.getName() + "测试报告页面:" + url + "/#/ui/report/view/" + reportId.replace("\"", ""));
                     meterSphereClient.changeState(id, Results.FAILURE);
                 }
                 Thread.sleep(5000);
@@ -230,6 +271,11 @@ public class MeterSphereUtils {
                     flag = false;
                 }
                 break;
+            case Results.UI:
+                num = MeterSphereUtils.runUiTest(meterSphereClient, testCase);
+                if (num == 0) {
+                    flag = false;
+                }
         }
 
         if (flag) {
