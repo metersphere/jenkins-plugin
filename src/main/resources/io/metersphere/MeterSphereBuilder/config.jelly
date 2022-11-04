@@ -16,9 +16,18 @@
     <f:entry title="工作空间名称" field="workspaceId">
         <f:select/>
     </f:entry>
-    <f:entry title="项目名称" field="projectId">
-        <f:select/>
-    </f:entry>
+    <f:radioBlock title="选择项目" name="projectType" value="projectId" inline="true"
+                          checked="${instance.projectType == null || instance.projectType == 'projectId'}">
+        <f:entry title="" field="projectId">
+            <f:select/>
+        </f:entry>
+    </f:radioBlock>
+    <f:radioBlock title="输入项目名称(将覆盖上方选中的项目)" name="projectType" value="projectName" inline="true"
+                  checked="${instance.projectType == 'projectName'}">
+        <f:entry title="" field="projectName">
+            <f:textbox/>
+        </f:entry>
+    </f:radioBlock>
     <f:section title="执行方式">
         <f:radioBlock title="选择测试计划" name="method" value="testPlan" inline="true"
                       checked="${instance.method == 'testPlan'}">

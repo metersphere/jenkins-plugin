@@ -113,6 +113,7 @@ public class MeterSphereClient {
         });
         try {
             count.await();
+            LogUtil.debug("该项目下的所有的测试" + JSON.toJSONString(result));
         } catch (Exception e) {
             LogUtil.error(e);
         }
@@ -124,7 +125,7 @@ public class MeterSphereClient {
     public List<ApiTestEnvironmentDTO> getEnvironmentIds(String projectId) {
         ResultHolder result = call(ApiUrlConstants.ENVIRONMEN_LIST + "/" + projectId);
         String listJson = JSON.toJSONString(result.getData());
-        LogUtil.info("该项目下的环境列表" + listJson);
+        LogUtil.debug("该项目下的环境列表" + listJson);
         return JSON.parseArray(listJson, ApiTestEnvironmentDTO.class);
     }
 
@@ -132,7 +133,7 @@ public class MeterSphereClient {
     public List<TestPlanDTO> getTestPlanIds(String projectId, String workspaceId) {
         ResultHolder result = call(ApiUrlConstants.PLAN_LIST_ALL + "/" + projectId + "/" + workspaceId);
         String listJson = JSON.toJSONString(result.getData());
-        LogUtil.info("该项目下的所有的测试计划" + listJson);
+        LogUtil.debug("该项目下的所有的测试计划" + listJson);
         return JSON.parseArray(listJson, TestPlanDTO.class);
     }
 
@@ -140,7 +141,7 @@ public class MeterSphereClient {
     public List<EnvironmentPoolDTO> getPoolEnvironmentIds() {
         ResultHolder result = call(ApiUrlConstants.TEST_POOL);
         String listJson = JSON.toJSONString(result.getData());
-        LogUtil.info("该项目下的资源池列表" + listJson);
+        LogUtil.debug("该项目下的资源池列表" + listJson);
         return JSON.parseArray(listJson, EnvironmentPoolDTO.class);
     }
 
