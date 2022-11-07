@@ -192,6 +192,7 @@ public class MeterSphereClient {
         ids.add(testCaseId);
         params.put("ids", ids);
         params.put("projectId", projectId);
+        params.put("triggerMode", "API");
         HashMap<String, Object> uiConfigParams = new HashMap<>();
         uiConfigParams.put("mode", "serial");
         uiConfigParams.put("reportType", "iddReport");
