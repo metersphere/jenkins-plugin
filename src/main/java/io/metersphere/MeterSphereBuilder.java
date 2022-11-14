@@ -75,8 +75,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             String realProjectId = Util.replaceMacro(this.projectName, environment);
             if (StringUtils.isNotBlank(realProjectId)) {
                 List<ProjectDTO> projectIds = client.getProjectIds(workspaceId);
+                String finalRealProjectId = realProjectId;
                 Optional<ProjectDTO> project = projectIds.stream()
-                        .filter(projectDTO -> projectDTO.getName().equals(projectName) || projectDTO.getId().equals(projectName))
+                        .filter(projectDTO -> projectDTO.getName().equals(finalRealProjectId) || projectDTO.getId().equals(finalRealProjectId))
                         .findFirst();
                 if (project.isPresent()) {
                     realProjectId = project.get().getId();
