@@ -39,6 +39,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     private String workspaceId;
     private String projectId;
+    private String projectType;
     private String projectName;
     private String testPlanId;
     private String testPlanName;
@@ -72,18 +73,21 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             EnvVars environment = run.getEnvironment(listener);
 
             // 找到实际的project
-            String realProjectId = Util.replaceMacro(this.projectName, environment);
-            if (StringUtils.isNotBlank(realProjectId)) {
-                List<ProjectDTO> projectIds = client.getProjectIds(workspaceId);
-                String finalRealProjectId = realProjectId;
-                Optional<ProjectDTO> project = projectIds.stream()
-                        .filter(projectDTO -> projectDTO.getName().equals(finalRealProjectId) || projectDTO.getId().equals(finalRealProjectId))
-                        .findFirst();
-                if (project.isPresent()) {
-                    realProjectId = project.get().getId();
+            String realProjectId = this.projectId;
+            if (StringUtils.equals(projectType, "projectName")) {
+                realProjectId = Util.replaceMacro(this.projectName, environment);
+                if (StringUtils.isNotBlank(realProjectId)) {
+                    List<ProjectDTO> projectIds = client.getProjectIds(workspaceId);
+                    String finalRealProjectId = realProjectId;
+                    Optional<ProjectDTO> project = projectIds.stream()
+                            .filter(projectDTO -> projectDTO.getName().equals(finalRealProjectId) || projectDTO.getId().equals(finalRealProjectId))
+                            .findFirst();
+                    if (project.isPresent()) {
+                        realProjectId = project.get().getId();
+                    }
+                } else {
+                    realProjectId = projectId;
                 }
-            } else {
-                realProjectId = projectId;
             }
             switch (method) {
                 case Method.TEST_PLAN:
@@ -425,6 +429,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     }
 
     @DataBoundSetter
+    public void setProjectType(String projectType) {
+        this.projectType = projectType;
+    }
+
+    @DataBoundSetter
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
@@ -487,6 +496,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     public String getProjectId() {
         return projectId;
+    }
+
+    public String getProjectType() {
+        return projectType;
     }
 
     public String getProjectName() {
