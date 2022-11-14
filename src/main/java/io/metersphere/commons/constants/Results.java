@@ -3,7 +3,7 @@ package io.metersphere.commons.constants;
 public class Results {
     public static final String COMPLETED = "Completed";
     public static final String ERROR = "Error";
-    public static final String FAKE_ERROR = "errorReportResult";
+    public static final String FAKE_ERROR = "FAKE_ERROR";
     public static final String FAILURE = "Failure";
     public static final String SUCCESS = "Success";
     public static final String PASS = "Pass";
