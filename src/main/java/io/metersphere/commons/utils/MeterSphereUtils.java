@@ -199,7 +199,7 @@ public class MeterSphereUtils {
                 } else if (status.replace("\"", "").equalsIgnoreCase("error")) {
                     state = false;
                     num = 0;
-                } else if (status.replace("\"", "").equalsIgnoreCase(Results.FAKE_ERROR)) {
+                } else if (status.replace("\"", "").equalsIgnoreCase(Results.FAKE_ERROR) || status.replace("\"", "").equalsIgnoreCase("errorReportResult")) {
                     state = false;
                     num = 0;
                 }
