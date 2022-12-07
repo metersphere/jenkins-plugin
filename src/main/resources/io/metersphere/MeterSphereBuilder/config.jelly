@@ -67,4 +67,12 @@
           <f:select/>
         </f:entry>
     </f:section>
+    <f:section title="报告打开方式">
+        <f:radioBlock title="登录" name="openMode" value="auth" inline="true"
+                      checked="${instance.openMode == 'auth' || instance.openMode == null}">
+        </f:radioBlock>
+        <f:radioBlock title="免登录（企业版）" name="openMode" value="anon" inline="true"
+                      checked="${instance.openMode == 'anon'}">
+        </f:radioBlock>
+    </f:section>
 </j:jelly>

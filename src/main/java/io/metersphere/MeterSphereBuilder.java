@@ -47,8 +47,9 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     private String testCaseName;
     private String method;
     private String result;
-    private String mode;//运行模式
-    private String resourcePoolId;//运行环境
+    private String mode; //运行模式
+    private String openMode; //报告打开方式
+    private String resourcePoolId; //运行环境
 
 
     @DataBoundConstructor
@@ -89,9 +90,12 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                     realProjectId = projectId;
                 }
             }
+            if (!client.checkLicense()) {
+                openMode = "auth";
+            }
             switch (method) {
                 case Method.TEST_PLAN:
-                    MeterSphereUtils.execTestPlan(run, client, realProjectId, mode, testPlanId, resourcePoolId);
+                    MeterSphereUtils.runTestPlan(run, client, realProjectId, mode, testPlanId, resourcePoolId, openMode);
                     break;
                 case Method.TEST_PLAN_NAME:
                     String testPlanName = Util.replaceMacro(this.testPlanName, environment);
@@ -105,7 +109,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         log("测试计划不存在");
                         return;
                     }
-                    MeterSphereUtils.execTestPlan(run, client, realProjectId, mode, first.get().getId(), resourcePoolId);
+                    MeterSphereUtils.runTestPlan(run, client, realProjectId, mode, first.get().getId(), resourcePoolId, openMode);
                     break;
                 case Method.SINGLE:
                     testCases = client.getTestCases(realProjectId);//项目下
@@ -116,7 +120,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         log("测试不存在");
                         return;
                     }
-                    MeterSphereUtils.getTestStepsBySingle(client, realProjectId, firstCase.get(), testPlanId, resourcePoolId);
+                    MeterSphereUtils.getTestStepsBySingle(client, realProjectId, firstCase.get(), testPlanId, resourcePoolId, openMode);
                     break;
                 case Method.SINGLE_NAME:
                     String testCaseName = Util.replaceMacro(this.testCaseName, environment);
@@ -130,7 +134,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         log("测试不存在");
                         return;
                     }
-                    MeterSphereUtils.getTestStepsBySingle(client, realProjectId, firstCase.get(), testPlanId, resourcePoolId);
+                    MeterSphereUtils.getTestStepsBySingle(client, realProjectId, firstCase.get(), testPlanId, resourcePoolId, openMode);
                     break;
                 default:
                     log("测试用例不存在");
@@ -474,6 +478,11 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     }
 
     @DataBoundSetter
+    public void setOpenMode(String openMode) {
+        this.openMode = StringUtils.isBlank(openMode) ? "auth" : openMode;
+    }
+
+    @DataBoundSetter
     public void setTestCaseName(String testCaseName) {
         this.testCaseName = testCaseName;
     }
@@ -528,6 +537,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
     public String getMode() {
         return mode;
+    }
+
+    public String getOpenMode() {
+        return openMode;
     }
 
     public String getResourcePoolId() {

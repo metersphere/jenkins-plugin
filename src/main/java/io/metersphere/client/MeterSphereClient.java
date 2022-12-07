@@ -176,17 +176,7 @@ public class MeterSphereClient {
         return JSON.toJSONString(result.getData());
     }
 
-
-    /*单独执行接口测试用例*/
-    public String runApiTest(String testCaseId) {
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("id", testCaseId);
-        params.put("triggerMode", "API");
-        ResultHolder result = call(ApiUrlConstants.API_RUN, RequestMethod.POST, params);
-        return JSON.toJSONString(result.getData());
-    }
-
-    public String runUiTest(String testCaseId,String projectId) {
+    public String runUiTest(String testCaseId, String projectId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", UUID.randomUUID().toString());
         List<String> ids = new ArrayList<>();
@@ -278,6 +268,12 @@ public class MeterSphereClient {
         String listJson = JSON.toJSONString(result.getData());
         JSONObject jsonObject = JSONObject.parseObject(listJson);
         return jsonObject.getString("status");
+    }
+
+    public String getShareInfo(Map<String, String> params) {
+        ResultHolder result = call(ApiUrlConstants.API_SHARE_GENERATE, RequestMethod.POST, params);
+        JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(result.getData()));
+        return jsonObject.getString("shareUrl");
     }
 
     /*单独执行性能测试*/
@@ -374,5 +370,10 @@ public class MeterSphereClient {
     }
 
 
+    public boolean checkLicense() {
+        ResultHolder result = call(ApiUrlConstants.API_LICENSE_VALIDATE);
+        JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(result.getData()));
+        return StringUtils.equals("valid", jsonObject.getString("status"));
+    }
 }
 

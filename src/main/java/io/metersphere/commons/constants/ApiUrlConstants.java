@@ -11,7 +11,6 @@ public class ApiUrlConstants {
     public static final String PLAN_LIST_ALL = "/track/test/plan/list/all";//测试计划项目下
     public static final String PERFORMANCE_RUN = "/performance/performance/run";//性能测试单个
     public static final String PERFORMANCE_RUN_TEST_PLAN_STATE = "/track/test/plan/load/case/update/api";//性能测试测试计划下状态修改
-    public static final String API_RUN = "/api/api/definition/run";//api测试
     public static final String UI_RUN = "/ui/ui/automation/run/batch";//ui测试
     public static final String API_GET = "/api/api/definition/report/get";//API测试报告（特定）
     public static final String UI_GET = "/ui/ui/scenario/report/get";//UI测试报告（特定）
@@ -24,6 +23,8 @@ public class ApiUrlConstants {
     public static final String API_DEFINITION_RUN = "/api/api/testcase/jenkins/run";//接口测试用例运行
     public static final String API_DEFINITION = "/api/api/definition/get";//接口测详情
     public static final String API_TES_RESULT = "/api/api/testcase/get-details";//查询单接口用例执行结果
+    public static final String API_SHARE_GENERATE = "/api/share/generate/expired";//查询单接口用例执行结果
+    public static final String API_LICENSE_VALIDATE = "/api/license/validate";//查询单接口用例执行结果
     public static final String ENVIRONMEN_LIST = "/api/api/environment/list";//环境列表
     public static final String TEST_POOL = "/setting/testresourcepool/list/quota/valid";
     public static final String TEST_PLAN = "/track/test/plan/run";//测试计划执行
