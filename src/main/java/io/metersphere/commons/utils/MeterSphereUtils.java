@@ -8,7 +8,7 @@ import io.metersphere.commons.constants.Results;
 import io.metersphere.commons.model.MsExecResponseDTO;
 import io.metersphere.commons.model.RunModeConfig;
 import io.metersphere.commons.model.TestCaseDTO;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.PrintStream;
 import java.util.HashMap;
