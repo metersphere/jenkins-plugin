@@ -157,6 +157,7 @@ public class MeterSphereClient {
         params.put("reportType", "iddReport");
         params.put("onSampleError", false);
         params.put("requestOriginator", "TEST_PLAN");
+        params.put("executionWay", "RUN");
         if (StringUtils.isEmpty(resourcePoolId)) {
             params.put("runWithinResourcePool", false);
         } else {
