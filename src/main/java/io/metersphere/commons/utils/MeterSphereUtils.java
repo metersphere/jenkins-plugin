@@ -23,15 +23,15 @@ public class MeterSphereUtils {
         logger.println(LOG_PREFIX + msg);
     }
 
-    public static int runUiTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String openMode) {
+    public static boolean runUiTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String openMode) {
         String url = meterSphereClient.getBaseInfo();
-        int num = 1;
+        boolean flag = true;
         String result = "";
         String id = c.getId();
         try {
             result = meterSphereClient.runUiTest(id, c.getProjectId());
         } catch (Exception e) {
-            num = 0;
+            flag = false;
         }
         try {
             List<MsExecResponseDTO> dto = JSON.parseObject(result, new TypeReference<List<MsExecResponseDTO>>() {
@@ -47,7 +47,7 @@ public class MeterSphereUtils {
                     meterSphereClient.changeState(id, Results.PASS);
                 } else if (apiTestState.equalsIgnoreCase(Results.ERROR)) {
                     state = false;
-                    num = 0;
+                    flag = false;
                     meterSphereClient.changeState(id, Results.FAILURE);
                 }
                 Thread.sleep(5000);
@@ -62,21 +62,20 @@ public class MeterSphereUtils {
             log("点击链接进入" + c.getName() + "测试报告页面:" + url + reportView);
         } catch (InterruptedException e) {
             log(c.getName() + "发生异常：" + e.getMessage());
-            num = 0;
-
+            flag = false;
         }
-        return num;
+        return flag;
     }
 
-    public static int runPerformTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String testPlanId, String openMode) {
+    public static boolean runPerformTest(MeterSphereClient meterSphereClient, TestCaseDTO c, String testPlanId, String openMode) {
         String url = meterSphereClient.getBaseInfo();
         String reportId = "";
-        int num = 1;
+        boolean flag = true;
         String id = c.getId();
         try {
             reportId = meterSphereClient.runPerformanceTest(id, testPlanId);
         } catch (Exception e) {
-            num = 0;
+            flag = false;
             log(c.getName() + "发生异常：" + e.getMessage());
         }
         try {
@@ -95,7 +94,7 @@ public class MeterSphereUtils {
                     //更新测试计划下性能测试状态
                     meterSphereClient.updateStateLoad(testPlanId, id, "Error");
                     state = false;
-                    num = 0;
+                    flag = false;
                     meterSphereClient.changeState(id, Results.FAILURE);
                 }
                 Thread.sleep(5000);
@@ -110,14 +109,14 @@ public class MeterSphereUtils {
             log("点击链接进入" + c.getName() + "测试报告页面: " + url + reportView);
         } catch (InterruptedException e) {
             log(c.getName() + "发生异常：" + e.getMessage());
-            num = 0;
+            flag = false;
         }
-        return num;
+        return flag;
     }
 
-    public static int runScenario(MeterSphereClient meterSphereClient, TestCaseDTO c, String projectId, String runMode, String resourcePoolId, String openMode) {
+    public static boolean runScenario(MeterSphereClient meterSphereClient, TestCaseDTO c, String projectId, String runMode, String resourcePoolId, String openMode) {
         String url = meterSphereClient.getBaseInfo();
-        int num = 1;
+        boolean flag = true;
         String reportId = null;
         try {
             RunModeConfig config = new RunModeConfig();
@@ -128,7 +127,7 @@ public class MeterSphereUtils {
             config.setOnSampleError(true);
             reportId = meterSphereClient.runScenario(c, projectId, runMode, config);
         } catch (Exception e) {
-            num = 0;
+            flag = false;
             log(c.getName() + "场景测试发生异常:" + e.getMessage());
         }
         try {
@@ -142,10 +141,11 @@ public class MeterSphereUtils {
                     state = false;
                 } else if (apiTestState.equalsIgnoreCase(Results.ERROR)) {
                     state = false;
-                    num = 0;
+                    flag = false;
                 } else if (apiTestState.equalsIgnoreCase(Results.FAKE_ERROR)) {
                     state = false;
-                    num = 0;
+                    // 误报属于失败
+                    flag = false;
                 }
                 Thread.sleep(5000);
             }
@@ -159,18 +159,18 @@ public class MeterSphereUtils {
             log("点击链接进入" + c.getName() + "测试报告页面: " + url + reportView);
         } catch (InterruptedException e) {
             log(c.getName() + "发生异常：" + e.getMessage());
-            num = 0;
+            flag = false;
         }
-        return num;
+        return flag;
     }
 
-    public static int runDefinition(MeterSphereClient meterSphereClient, TestCaseDTO c, String testPlanId, String runMode) {
-        int num = 1;
+    public static boolean runDefinition(MeterSphereClient meterSphereClient, TestCaseDTO c, String testPlanId, String runMode) {
+        boolean flag = true;
         String id = c.getId();
         try {
             meterSphereClient.runDefinition(c, runMode, testPlanId, id);
         } catch (Exception e) {
-            num = 0;
+            flag = false;
             log(c.getName() + "测试用例发生异常:" + e.getMessage());
         }
         try {
@@ -183,23 +183,23 @@ public class MeterSphereUtils {
                     state = false;
                 } else if (status.replace("\"", "").equalsIgnoreCase("error")) {
                     state = false;
-                    num = 0;
+                    flag = false;
                 } else if (status.replace("\"", "").equalsIgnoreCase(Results.FAKE_ERROR) || status.replace("\"", "").equalsIgnoreCase("errorReportResult")) {
                     state = false;
-                    num = 0;
+                    flag = false;
                 }
                 Thread.sleep(5000);
             }
         } catch (InterruptedException e) {
             log(c.getName() + "发生异常：" + e.getMessage());
-            num = 0;
+            flag = false;
 
         }
-        return num;
+        return flag;
     }
 
-    public static void runTestPlan(Run<?, ?> run, MeterSphereClient meterSphereClient, String projectId,
-                                   String mode, String testPlanId, String resourcePoolId, String openMode) throws InterruptedException {
+    public static boolean runTestPlan(Run<?, ?> run, MeterSphereClient meterSphereClient, String projectId,
+                                      String mode, String testPlanId, String resourcePoolId, String openMode) throws InterruptedException {
         log("测试计划开始执行");
         String id = meterSphereClient.exeTestPlan(projectId, testPlanId, mode, resourcePoolId);
         log("生成测试报告id:" + id);
@@ -228,41 +228,32 @@ public class MeterSphereUtils {
             reportView = "/track/share-plan-report" + shareUrl;
         }
         log("点击链接进入测试计划报告页面:" + url + reportView);
+        return flag;
     }
 
-    public static void getTestStepsBySingle(MeterSphereClient meterSphereClient, String projectId, TestCaseDTO testCase,
-                                            String testPlanId, String resourcePoolId, String openMode) {
+    public static boolean getTestStepsBySingle(MeterSphereClient meterSphereClient, String projectId, TestCaseDTO testCase,
+                                               String testPlanId, String resourcePoolId, String openMode) {
         log("测试ID: " + testCase.getId());
         log("测试名称: " + testCase.getName() + " [" + testCase.getType() + "]" + " [" + testCase.getVersionName() + "]");
         boolean flag = true;
-        int num = 1;
         switch (testCase.getType()) {
             case Results.PERFORMANCE:
             case Results.LOAD_TEST:
-                num = MeterSphereUtils.runPerformTest(meterSphereClient, testCase, "", openMode);
-                if (num == 0) {
-                    flag = false;
-                }
+                flag = MeterSphereUtils.runPerformTest(meterSphereClient, testCase, "", openMode);
                 break;
             case Results.SCENARIO:
             case Results.API_SCENARIO:
-                num = MeterSphereUtils.runScenario(meterSphereClient, testCase, projectId, "scenario", resourcePoolId, openMode);
-                if (num == 0) {
-                    flag = false;
-                }
+                flag = MeterSphereUtils.runScenario(meterSphereClient, testCase, projectId, "scenario", resourcePoolId, openMode);
                 break;
             case Results.DEFINITION:
             case Results.API_CASE:
-                num = MeterSphereUtils.runDefinition(meterSphereClient, testCase, testPlanId, "JENKINS");
-                if (num == 0) {
-                    flag = false;
-                }
+                flag = MeterSphereUtils.runDefinition(meterSphereClient, testCase, testPlanId, "JENKINS");
                 break;
             case Results.UI:
-                num = MeterSphereUtils.runUiTest(meterSphereClient, testCase, openMode);
-                if (num == 0) {
-                    flag = false;
-                }
+                flag = MeterSphereUtils.runUiTest(meterSphereClient, testCase, openMode);
+                break;
+            default:
+                break;
         }
 
         if (flag) {
@@ -270,7 +261,7 @@ public class MeterSphereUtils {
         } else {
             log("该测试用例请求未能通过，登陆MeterSphere网站查看该报告结果");
         }
-
+        return flag;
     }
 
 

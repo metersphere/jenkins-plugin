@@ -93,9 +93,10 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             if (!client.checkLicense()) {
                 openMode = "auth";
             }
+            boolean result = false;
             switch (method) {
                 case Method.TEST_PLAN:
-                    MeterSphereUtils.runTestPlan(run, client, realProjectId, mode, testPlanId, resourcePoolId, openMode);
+                    result = MeterSphereUtils.runTestPlan(run, client, realProjectId, mode, testPlanId, resourcePoolId, openMode);
                     break;
                 case Method.TEST_PLAN_NAME:
                     String testPlanName = Util.replaceMacro(this.testPlanName, environment);
@@ -109,7 +110,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         log("测试计划不存在");
                         return;
                     }
-                    MeterSphereUtils.runTestPlan(run, client, realProjectId, mode, first.get().getId(), resourcePoolId, openMode);
+                    result = MeterSphereUtils.runTestPlan(run, client, realProjectId, mode, first.get().getId(), resourcePoolId, openMode);
                     break;
                 case Method.SINGLE:
                     testCases = client.getTestCases(realProjectId);//项目下
@@ -120,7 +121,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         log("测试不存在");
                         return;
                     }
-                    MeterSphereUtils.getTestStepsBySingle(client, realProjectId, firstCase.get(), testPlanId, resourcePoolId, openMode);
+                    result = MeterSphereUtils.getTestStepsBySingle(client, realProjectId, firstCase.get(), testPlanId, resourcePoolId, openMode);
                     break;
                 case Method.SINGLE_NAME:
                     String testCaseName = Util.replaceMacro(this.testCaseName, environment);
@@ -134,12 +135,13 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                         log("测试不存在");
                         return;
                     }
-                    MeterSphereUtils.getTestStepsBySingle(client, realProjectId, firstCase.get(), testPlanId, resourcePoolId, openMode);
+                    result = MeterSphereUtils.getTestStepsBySingle(client, realProjectId, firstCase.get(), testPlanId, resourcePoolId, openMode);
                     break;
                 default:
                     log("测试用例不存在");
             }
-
+            // 使用case的结果
+            run.setResult(result ? Result.SUCCESS : Result.FAILURE);
         } catch (Exception e) {
             run.setResult(Result.FAILURE);
             log("该测试请求未能通过，登陆MeterSphere网站查看该报告结果");
