@@ -108,6 +108,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
                     if (!first.isPresent()) {
                         log("测试计划不存在");
+                        run.setResult(Result.FAILURE);
                         return;
                     }
                     result = MeterSphereUtils.runTestPlan(run, client, realProjectId, mode, first.get().getId(), resourcePoolId, openMode);
@@ -119,6 +120,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                             .findFirst();
                     if (!firstCase.isPresent()) {
                         log("测试不存在");
+                        run.setResult(Result.FAILURE);
                         return;
                     }
                     result = MeterSphereUtils.getTestStepsBySingle(client, realProjectId, firstCase.get(), testPlanId, resourcePoolId, openMode);
@@ -133,11 +135,13 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
                     if (!firstCase.isPresent()) {
                         log("测试不存在");
+                        run.setResult(Result.FAILURE);
                         return;
                     }
                     result = MeterSphereUtils.getTestStepsBySingle(client, realProjectId, firstCase.get(), testPlanId, resourcePoolId, openMode);
                     break;
                 default:
+                    run.setResult(Result.FAILURE);
                     log("测试用例不存在");
             }
             // 使用case的结果
