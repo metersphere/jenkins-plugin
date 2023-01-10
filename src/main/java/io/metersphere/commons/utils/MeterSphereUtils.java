@@ -205,14 +205,18 @@ public class MeterSphereUtils {
         log("生成测试报告id:" + id);
         String url = meterSphereClient.getBaseInfo();
         boolean flag = true;
-        while (flag) {
+        boolean state = true;
+        while (state) {
             String status = meterSphereClient.getStatus(id);
             if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.SUCCESS)) {
                 log("该测试计划已完成");
+                state = false;
             } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.FAILED)) {
                 flag = false;
+                state = false;
                 log("该测试计划失败");
             } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.COMPLETED)) {
+                state = false;
                 log("该测试计划已完成");
             }
             Thread.sleep(5000);
