@@ -208,13 +208,11 @@ public class MeterSphereUtils {
         while (flag) {
             String status = meterSphereClient.getStatus(id);
             if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.SUCCESS)) {
-                flag = false;
                 log("该测试计划已完成");
             } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.FAILED)) {
                 flag = false;
                 log("该测试计划失败");
             } else if (status.replace('"', ' ').trim().equalsIgnoreCase(Results.COMPLETED)) {
-                flag = false;
                 log("该测试计划已完成");
             }
             Thread.sleep(5000);
