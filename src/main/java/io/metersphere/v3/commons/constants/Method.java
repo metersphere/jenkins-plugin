@@ -1,0 +1,8 @@
+package io.metersphere.v3.commons.constants;
+
+public class Method {
+    public static final String TEST_PLAN = "testPlan";
+    public static final String TEST_PLAN_NAME = "testPlanName";
+    public static final String SINGLE = "single";
+    public static final String SINGLE_NAME = "singleName";
+}

@@ -1,0 +1,92 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:entry title="MeterSphere 站点" field="msEndpoint">
+        <f:textbox/>
+    </f:entry>
+    <f:entry title="MeterSphere AccessKey" field="msAccessKey">
+        <f:textbox/>
+    </f:entry>
+    <f:entry title="MeterSphere SecretKey" field="msSecretKey">
+        <f:textbox onblur="handleSelectOrganizationChange()"/>
+    </f:entry>
+    <f:validateButton
+            title="验证账户" progress="验证中..."
+            method="checkAccount" with="msAccessKey,msSecretKey,msEndpoint"/>
+
+    <f:entry title="组织名称" field="organizationId">
+        <f:select id="selectOrganizationOption" onchange="handleSelectOrganizationChange()" />
+    </f:entry>
+    <f:entry title="输入项目名称" field="projectName">
+         <f:textbox id="selectProjectOption" onblur="handleSelectProjectChange()"/>
+    </f:entry>
+    <f:entry title="输入测试计划(组)名称" field="testPlanName">
+        <f:textbox id="selectTestPlanOption"/>
+    </f:entry>
+    <script>
+        function handleSelectOrganizationChange() {
+            const crumbValue = document.querySelector('head').getAttribute('data-crumb-value')
+
+            const selectElement = document.querySelector("[id='selectOrganizationOption']");
+            const selectedValue = selectElement.value;
+            const url = '${rootURL}/descriptorByName/io.metersphere.v3.MeterSphereBuilder/checkSelectOrganizationOption';
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Jenkins-Crumb': crumbValue
+                },
+                body: 'value=' + encodeURIComponent(selectedValue)
+            }).then((res)=> {
+                console.log(res);
+            })
+
+            const selectProjectElement = document.querySelector("[id='selectProjectOption']");
+            selectProjectElement.addEventListener('focus', function () {
+                if (!this.value || this.value.trim() === '') {
+                    this.value = ' ';
+                    // Trigger the autocomplete without user input
+                    var evt = document.createEvent('HTMLEvents');
+                    evt.initEvent('keyup', false, true);
+                    this.dispatchEvent(evt);
+                    this.value = '';
+                }
+            });
+        }
+
+
+        function handleSelectProjectChange() {
+            const crumbValue = document.querySelector('head').getAttribute('data-crumb-value')
+            const selectElement = document.querySelector("[id='selectProjectOption']");
+            const selectedValue = selectElement.value;
+            console.log(selectedValue);
+            const url = '${rootURL}/descriptorByName/io.metersphere.v3.MeterSphereBuilder/checkSelectProjectOption';
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Jenkins-Crumb': crumbValue
+                },
+                body: 'value=' + encodeURIComponent(selectedValue)
+            }).then((res)=> {
+                console.log(res);
+            })
+
+            const selectTestPlanElement = document.querySelector("[id='selectTestPlanOption']");
+            selectTestPlanElement.addEventListener('focus', function () {
+                if (!this.value || this.value.trim() === '') {
+                    this.value = ' ';
+                    // Trigger the autocomplete without user input
+                    var evt = document.createEvent('HTMLEvents');
+                    evt.initEvent('keyup', false, true);
+                    this.dispatchEvent(evt);
+                    this.value = '';
+                }
+            });
+        }
+
+        setTimeout(() => {
+            handleSelectOrganizationChange();
+            handleSelectProjectChange();
+        }, 2000);
+    </script>
+</j:jelly>

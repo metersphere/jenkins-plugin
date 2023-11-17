@@ -6,14 +6,14 @@ pipeline {
     }
     options { quietPeriod(2400) }
     environment {
-        JAVA_HOME = '/opt/jdk-8'
+        JAVA_HOME = '/opt/jdk-11'
     }
     stages {
         stage('Build/Test') {
             steps {
                 configFileProvider([configFile(fileId: 'metersphere-maven', targetLocation: 'settings.xml')]) {
                     sh """#!/bin/bash -e
-                    export JAVA_HOME=/opt/jdk-8
+                    export JAVA_HOME=/opt/jdk-11
                     export CLASSPATH=$JAVA_HOME/lib:$CLASSPATH
                     export PATH=$JAVA_HOME/bin:$PATH
                     java -version
