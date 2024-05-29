@@ -23,33 +23,38 @@
         <f:textbox/>
     </f:entry>
     <script>
-        function handleSelectOrganizationChange() {
-            var selectElement = document.querySelector("[id='selectOrganizationOption']");
-            var selectedValue = selectElement.value;
-            var url = '${rootURL}/descriptorByName/io.metersphere.v3.MeterSphereBuilder/checkSelectOrganizationOption';
-            new Ajax.Request(url, {
-                parameters: {
-                    value: selectedValue
+        async function handleSelectOrganizationChange() {
+            const crumbValue = document.querySelector('head').getAttribute('data-crumb-value')
+
+            const selectElement = document.querySelector("[id='selectOrganizationOption']");
+            const selectedValue = selectElement.value;
+            const url = '${rootURL}/descriptorByName/io.metersphere.v3.MeterSphereBuilder/checkSelectOrganizationOption';
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Jenkins-Crumb': crumbValue
                 },
-                onSuccess: function(response) {
-                    console.log('Change event handled successfully');
-                }
+                body: 'value=' + encodeURIComponent(selectedValue)
             });
+            console.log(res);
         }
 
-        function handleSelectProjectChange() {
-            var selectElement = document.querySelector("[id='selectProjectOption']");
-            var selectedValue = selectElement.value;
+        async function handleSelectProjectChange() {
+            const crumbValue = document.querySelector('head').getAttribute('data-crumb-value')
+            const selectElement = document.querySelector("[id='selectProjectOption']");
+            const selectedValue = selectElement.value;
             console.log(selectedValue);
-            var url = '${rootURL}/descriptorByName/io.metersphere.v3.MeterSphereBuilder/checkSelectProjectOption';
-            new Ajax.Request(url, {
-                parameters: {
-                    value: selectedValue
+            const url = '${rootURL}/descriptorByName/io.metersphere.v3.MeterSphereBuilder/checkSelectProjectOption';
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Jenkins-Crumb': crumbValue
                 },
-                onSuccess: function(response) {
-                    console.log('Change event handled successfully');
-                }
+                body: 'value=' + encodeURIComponent(selectedValue)
             });
+            console.log(res);
         }
     </script>
 </j:jelly>
