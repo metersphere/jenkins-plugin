@@ -13,6 +13,8 @@ public class TestPlanDTO {
 
     private String name;
 
+    private String num;
+
     private String description;
 
     private String status;
@@ -153,7 +155,11 @@ public class TestPlanDTO {
         this.tags = tags;
     }
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
+    public String getNum() {
+        return num;
+    }
+
+    public void setNum(String num) {
+        this.num = num;
     }
 }

@@ -72,7 +72,7 @@ public class MeterSphereClient {
     public List<ProjectDTO> getProjectIds(String organizationId) {
         ResultHolder result = call(ApiUrlConstants.PROJECT_LIST_ALL + "/" + organizationId);
         String listJson = JSON.toJSONString(result.getData());
-        LogUtil.info("用户所属项目" + listJson);
+        LogUtil.info("用户所属项目: " + listJson);
         return JSON.parseArray(listJson, ProjectDTO.class);
 
     }
@@ -86,7 +86,7 @@ public class MeterSphereClient {
         params.put("type", "ALL");
         ResultHolder result = call(ApiUrlConstants.PLAN_LIST_ALL, RequestMethod.POST, params);
         String listJson = JSON.toJSONString(result.getData());
-        LogUtil.debug("该项目下的所有的测试计划" + listJson);
+        LogUtil.info("该项目下的所有的测试计划: " + listJson);
         return JSON.parseArray(JSON.parseObject(listJson).getJSONArray("list").toJSONString(), TestPlanDTO.class);
     }
 

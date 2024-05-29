@@ -185,13 +185,17 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             AutoCompletionCandidates c = new AutoCompletionCandidates();
 
             if (StringUtils.isBlank(value)) {
-                testPlanList.stream().map(TestPlanDTO::getName).forEach(c::add);
+                testPlanList.stream().map(model -> "[" + model.getNum() + "] " + model.getName()).forEach(c::add);
             } else {
-                testPlanList.stream().map(TestPlanDTO::getName).forEach(v -> {
+                testPlanList.stream().map(model -> "[" + model.getNum() + "] " + model.getName()).forEach(v -> {
                     if (v.toLowerCase().contains(value.toLowerCase())) {
                         c.add(v);
                     }
                 });
+            }
+
+            for (int i = 0; i < 200; i++) {
+                c.add("item" + i);
             }
 
             return c;
