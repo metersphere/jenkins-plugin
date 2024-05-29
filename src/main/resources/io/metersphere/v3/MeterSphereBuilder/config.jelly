@@ -10,7 +10,7 @@
         <f:textbox/>
     </f:entry>
     <f:validateButton
-            title="刷新内容" progress="刷新中..."
+            title="验证账户" progress="验证中..."
             method="checkAccount" with="msAccessKey,msSecretKey,msEndpoint"/>
 
     <f:entry title="组织名称" field="organizationId">
