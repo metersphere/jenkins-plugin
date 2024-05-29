@@ -194,10 +194,6 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 });
             }
 
-            for (int i = 0; i < 200; i++) {
-                c.add("item" + i);
-            }
-
             return c;
         }
 
