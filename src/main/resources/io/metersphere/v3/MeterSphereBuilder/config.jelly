@@ -20,7 +20,7 @@
          <f:textbox id="selectProjectOption" onblur="handleSelectProjectChange()"/>
     </f:entry>
     <f:entry title="输入测试计划(组)名称" field="testPlanName">
-        <f:textbox/>
+        <f:textbox id="selectTestPlanOption"/>
     </f:entry>
     <script>
         async function handleSelectOrganizationChange() {
@@ -38,6 +38,18 @@
                 body: 'value=' + encodeURIComponent(selectedValue)
             });
             console.log(res);
+
+            const selectProjectElement = document.querySelector("[id='selectProjectOption']");
+            selectProjectElement.addEventListener('focus', function () {
+                if (!this.value || this.value.trim() === '') {
+                    this.value = ' ';
+                    // Trigger the autocomplete without user input
+                    var evt = document.createEvent('HTMLEvents');
+                    evt.initEvent('keyup', false, true);
+                    this.dispatchEvent(evt);
+                    this.value = '';
+                }
+            });
         }
 
         async function handleSelectProjectChange() {
@@ -55,6 +67,18 @@
                 body: 'value=' + encodeURIComponent(selectedValue)
             });
             console.log(res);
+
+            const selectTestPlanElement = document.querySelector("[id='selectTestPlanOption']");
+            selectTestPlanElement.addEventListener('focus', function () {
+                if (!this.value || this.value.trim() === '') {
+                    this.value = ' ';
+                    // Trigger the autocomplete without user input
+                    var evt = document.createEvent('HTMLEvents');
+                    evt.initEvent('keyup', false, true);
+                    this.dispatchEvent(evt);
+                    this.value = '';
+                }
+            });
         }
     </script>
 </j:jelly>
