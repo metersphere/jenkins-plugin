@@ -23,21 +23,22 @@
         <f:textbox id="selectTestPlanOption"/>
     </f:entry>
     <script>
-        async function handleSelectOrganizationChange() {
+        function handleSelectOrganizationChange() {
             const crumbValue = document.querySelector('head').getAttribute('data-crumb-value')
 
             const selectElement = document.querySelector("[id='selectOrganizationOption']");
             const selectedValue = selectElement.value;
             const url = '${rootURL}/descriptorByName/io.metersphere.v3.MeterSphereBuilder/checkSelectOrganizationOption';
-            const res = await fetch(url, {
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Jenkins-Crumb': crumbValue
                 },
                 body: 'value=' + encodeURIComponent(selectedValue)
-            });
-            console.log(res);
+            }).then((res)=> {
+                console.log(res);
+            })
 
             const selectProjectElement = document.querySelector("[id='selectProjectOption']");
             selectProjectElement.addEventListener('focus', function () {
@@ -52,21 +53,24 @@
             });
         }
 
-        async function handleSelectProjectChange() {
+        handleSelectOrganizationChange();
+
+        function handleSelectProjectChange() {
             const crumbValue = document.querySelector('head').getAttribute('data-crumb-value')
             const selectElement = document.querySelector("[id='selectProjectOption']");
             const selectedValue = selectElement.value;
             console.log(selectedValue);
             const url = '${rootURL}/descriptorByName/io.metersphere.v3.MeterSphereBuilder/checkSelectProjectOption';
-            const res = await fetch(url, {
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Jenkins-Crumb': crumbValue
                 },
                 body: 'value=' + encodeURIComponent(selectedValue)
-            });
-            console.log(res);
+            }).then((res)=> {
+                console.log(res);
+            })
 
             const selectTestPlanElement = document.querySelector("[id='selectTestPlanOption']");
             selectTestPlanElement.addEventListener('focus', function () {
