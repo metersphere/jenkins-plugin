@@ -94,7 +94,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
             run.setResult(result ? Result.SUCCESS : Result.FAILURE);
         } catch (Exception e) {
             run.setResult(Result.FAILURE);
-            log("该测试请求未能通过，登陆MeterSphere网站查看该报告结果");
+            log("该测试请求未能通过，登录MeterSphere网站查看该报告结果");
         }
 
     }
