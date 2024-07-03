@@ -18,11 +18,13 @@ MeterSphere Jenkins 插件
 
 插件安装后，在指定的 Jenkins 构建任务中，添加「MeterSphere」类型的构建步骤
 
-![](https://metersphere.oss-cn-hangzhou.aliyuncs.com/img/jenkins-plugin.png)
+<img width="1365" alt="image" src="https://github.com/metersphere/jenkins-plugin/assets/23045261/d8522e36-4cce-4226-9bdd-f4017f22ac3a">
+
 
 根据图示配置，填写认证信息并选择需要触发执行的用例
 
-![](https://metersphere.oss-cn-hangzhou.aliyuncs.com/img/Jenkins-config.png)
+<img width="1333" alt="image" src="https://github.com/metersphere/jenkins-plugin/assets/23045261/43ffa7d7-6d71-442d-8c9e-ec10a2333662">
+
 
 ## 问题反馈
 
