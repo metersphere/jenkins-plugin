@@ -26,17 +26,17 @@ public class MeterSphereUtils {
         boolean state = true;
         while (state) {
             String status = meterSphereClient.getStatus(id);
-            if (status.equalsIgnoreCase(Results.STOPPED)) {
+            if (Results.STOPPED.equalsIgnoreCase(status)) {
                 flag = false;
                 state = false;
                 log("该测试计划已停止");
-            } else if (status.equalsIgnoreCase(Results.COMPLETED)) {
+            } else if (Results.COMPLETED.equalsIgnoreCase(status)) {
                 state = false;
                 log("该测试计划已完成");
-            } else if (status.equalsIgnoreCase(Results.SUCCESS)) {
+            } else if (Results.SUCCESS.equalsIgnoreCase(status)) {
                 state = false;
                 log("该测试计划已完成");
-            } else if (status.equalsIgnoreCase(Results.ERROR)) {
+            } else if (Results.ERROR.equalsIgnoreCase(status)) {
                 flag = false;
                 state = false;
                 log("该测试计划已完成");

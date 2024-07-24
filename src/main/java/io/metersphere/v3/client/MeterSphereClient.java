@@ -118,7 +118,9 @@ public class MeterSphereClient {
     public String getStatus(String reportId) {
         ResultHolder result = call(ApiUrlConstants.TEST_PLAN_STATUS + "/" + reportId);
         JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(result.getData()));
-
+        if (jsonObject == null) {
+            return null;
+        }
         return jsonObject.getString("resultStatus");
     }
 
