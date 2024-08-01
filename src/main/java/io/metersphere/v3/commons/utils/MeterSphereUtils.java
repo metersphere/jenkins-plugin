@@ -21,7 +21,7 @@ public class MeterSphereUtils {
     public static boolean runTestPlan(Run<?, ?> run, MeterSphereClient meterSphereClient, String testPlanId, String projectId, String endpoint) throws InterruptedException {
         log("测试计划开始执行");
         String id = meterSphereClient.exeTestPlan(testPlanId);
-        log("生成测试报告id:" + id);
+        log("生成测试报告id: " + id);
         boolean flag = true;
         boolean state = true;
         while (state) {
@@ -57,7 +57,7 @@ public class MeterSphereUtils {
             String shareUrl = meterSphereClient.getShareInfo(params);
             reportView = "/#/share/shareReportTestPlan" + shareUrl;
         }
-        log("点击链接进入测试计划报告页面:" + endpoint + reportView);
+        log("点击链接进入测试计划报告页面:" + StringUtils.stripEnd(endpoint, "/") + reportView);
         return flag;
     }
 
