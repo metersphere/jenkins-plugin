@@ -89,7 +89,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 run.setResult(Result.FAILURE);
                 return;
             }
-            result = MeterSphereUtils.runTestPlan(run, client, first.get().getId(), realProjectId, msEndpoint);
+            result = MeterSphereUtils.runTestPlan(run, client, first.get(), organizationId, realProjectId, msEndpoint);
             // 使用case的结果
             run.setResult(result ? Result.SUCCESS : Result.FAILURE);
         } catch (Exception e) {

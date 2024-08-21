@@ -33,6 +33,8 @@ public class TestPlanDTO {
 
     private String tags;
 
+    private String type;
+
     private static final long serialVersionUID = 1L;
 
     public String getProjectName() {
@@ -161,5 +163,13 @@ public class TestPlanDTO {
 
     public void setNum(String num) {
         this.num = num;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
