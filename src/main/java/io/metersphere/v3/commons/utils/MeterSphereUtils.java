@@ -11,15 +11,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MeterSphereUtils {
-    public static PrintStream logger;
+    public PrintStream logger;
     private static final String LOG_PREFIX = "[MeterSphere，代码测试]";
 
-    private static void log(String msg) {
+    public MeterSphereUtils(PrintStream logger) {
+        this.logger = logger;
+    }
+
+    public void log(String msg) {
         logger.println(LOG_PREFIX + msg);
     }
 
 
-    public static boolean runTestPlan(Run<?, ?> run, MeterSphereClient meterSphereClient, TestPlanDTO testPlan, String organizationId, String projectId, String endpoint) throws InterruptedException {
+    public boolean runTestPlan(Run<?, ?> run, MeterSphereClient meterSphereClient, TestPlanDTO testPlan, String organizationId, String projectId, String endpoint) throws InterruptedException {
         log("测试计划开始执行");
         String id = meterSphereClient.exeTestPlan(testPlan.getId());
         log("生成测试报告id: " + id + "，测试计划: " + testPlan.getName() + "，类型: " + testPlan.getType());
@@ -64,7 +68,7 @@ public class MeterSphereUtils {
     }
 
 
-    public static String handleTestPlanName(String name, String num) {
+    public String handleTestPlanName(String name, String num) {
         return "[" + num + "] " + name;
     }
 

@@ -32,6 +32,7 @@ import java.util.Optional;
 public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Serializable {
 
     private static final String LOG_PREFIX = "[MeterSphere] ";
+    private MeterSphereUtils meterSphereUtils;
 
     private final String msEndpoint;
     private final String msAccessKey;
@@ -52,7 +53,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
     @Override
     public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher,
                         @Nonnull TaskListener listener) throws InterruptedException, IOException {
-        MeterSphereUtils.logger = listener.getLogger();
+        this.meterSphereUtils = new MeterSphereUtils(listener.getLogger());
         listener.getLogger().println("workspace=" + workspace);
         listener.getLogger().println("number=" + run.getNumber());
         listener.getLogger().println("url=" + run.getUrl());
@@ -80,8 +81,8 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
             List<TestPlanDTO> testPlans = client.getTestPlanIds(realProjectId);
             Optional<TestPlanDTO> first = testPlans.stream()
-                    .filter(plan -> StringUtils.equals(testPlanName, MeterSphereUtils.handleTestPlanName(plan.getId(), plan.getNum()))
-                            || StringUtils.equals(testPlanName, MeterSphereUtils.handleTestPlanName(plan.getName(), plan.getNum())))
+                    .filter(plan -> StringUtils.equals(testPlanName, meterSphereUtils.handleTestPlanName(plan.getId(), plan.getNum()))
+                            || StringUtils.equals(testPlanName, meterSphereUtils.handleTestPlanName(plan.getName(), plan.getNum())))
                     .findFirst();
 
             if (!first.isPresent()) {
@@ -89,7 +90,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
                 run.setResult(Result.FAILURE);
                 return;
             }
-            result = MeterSphereUtils.runTestPlan(run, client, first.get(), organizationId, realProjectId, msEndpoint);
+            result = meterSphereUtils.runTestPlan(run, client, first.get(), organizationId, realProjectId, msEndpoint);
             // 使用case的结果
             run.setResult(result ? Result.SUCCESS : Result.FAILURE);
         } catch (Exception e) {
@@ -243,7 +244,7 @@ public class MeterSphereBuilder extends Builder implements SimpleBuildStep, Seri
 
 
     private void log(String msg) {
-        MeterSphereUtils.logger.println(LOG_PREFIX + msg);
+        meterSphereUtils.log(LOG_PREFIX + msg);
     }
 
     @DataBoundSetter
